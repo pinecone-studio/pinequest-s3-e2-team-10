@@ -98,6 +98,43 @@ Expected local ports:
 - frontend: `http://localhost:3000`
 - backend: `http://localhost:3001/api`
 
+## Deployment stack
+
+Recommended for this hackathon:
+
+- Frontend: Next.js on Vercel
+- Backend: NestJS on Railway or Render
+- Database: Supabase Postgres or Neon Postgres
+- File storage: Supabase Storage or Cloudinary
+
+Why this stack:
+
+- fast setup
+- easy team onboarding
+- low DevOps overhead
+- good enough for demo-scale traffic
+
+If Vercel is blocked for now, keep the frontend deploy decision open and continue with CI only. The app structure still fits Vercel best once your account issue is fixed.
+
+## CI strategy
+
+Keep CI strict enough to catch broken merges, but not so strict that it slows the team down.
+
+Current recommendation:
+
+1. Frontend lint
+2. Frontend build
+3. Backend build
+4. Backend test
+
+This is a good hackathon baseline because it answers the main question:
+
+`can this branch still build and run the core product?`
+
+GitHub Actions workflow:
+
+- `.github/workflows/ci.yml`
+
 ## API starter routes
 
 - `GET /api`
