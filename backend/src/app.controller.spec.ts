@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return project overview', () => {
+      expect(appController.getOverview()).toEqual(
+        expect.objectContaining({
+          name: 'PineQuest LMS API',
+        }),
+      );
     });
   });
 });
