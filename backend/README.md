@@ -26,8 +26,8 @@ This backend now has a real Wrangler config at [`wrangler.toml`](/c:/Users/tsats
 
 - Account: `Avengers.pinequest@gmail.com's Account`
 - D1 binding: `lms`
-- D1 database name: `lms`
-- D1 database id: `b86c9fa3-3d16-48b3-9c39-7611cd7e941e`
+- D1 database name: `lms-apac`
+- D1 database id: `78c854ea-0d1c-4104-965d-aa59d095be32`
 
 This project is still a standard NestJS server right now. The Wrangler config is the source of truth for Cloudflare resources, but the Nest app has not yet been adapted to run as a Cloudflare Worker.
 

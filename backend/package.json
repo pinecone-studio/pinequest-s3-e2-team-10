@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "npx wrangler d1 migrations apply lms --local",
-    "db:migrate:remote": "npx wrangler d1 migrations apply lms --remote",
+    "db:migrate:local": "npx wrangler d1 migrations apply lms-apac --local",
+    "db:migrate:remote": "npx wrangler d1 migrations apply lms-apac --remote",
     "db:studio": "drizzle-kit studio",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
