@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
+export type ReportsSummary = {
+  completionRate: number;
+  coverage: number;
+  averageScore: number;
+  passRate: number;
+};
+
 @Injectable()
 export class ReportsService {
-  getSummary() {
+  getSummary(): ReportsSummary {
     return {
       completionRate: 100,
       coverage: 1,
