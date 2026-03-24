@@ -10,6 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "npx wrangler d1 migrations apply lms-apac --local",
     "db:migrate:remote": "npx wrangler d1 migrations apply lms-apac --remote",
+    "r2:create": "npx wrangler r2 bucket create pinequest-assets",
+    "r2:list": "npx wrangler r2 bucket list",
     "db:studio": "drizzle-kit studio",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -24,6 +26,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1015.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",

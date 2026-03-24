@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { executeOrRethrow, rethrowAsInternal } from '../../common/error-handling';
 
 export type Submission = {
   id: string;
@@ -22,34 +23,53 @@ export class SubmissionsService {
   ];
 
   findAll(): Submission[] {
-    return this.submissions;
+    return executeOrRethrow(
+      () => this.submissions,
+      'Failed to list submissions from the in-memory store',
+    );
   }
 
   findOne(id: string): Submission {
-    const submission = this.submissions.find((item) => item.id === id);
-    if (!submission) {
-      throw new NotFoundException(`Submission ${id} not found`);
+    try {
+      const submission = this.submissions.find((item) => item.id === id);
+      if (!submission) {
+        throw new NotFoundException(`Submission ${id} not found`);
+      }
+      return submission;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to load submission ${id}`);
     }
-    return submission;
   }
 
   create(payload: CreateSubmissionDto): Submission {
-    this.submissions.push(payload);
-    return payload;
+    try {
+      this.submissions.push(payload);
+      return payload;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to create submission ${payload.id}`);
+    }
   }
 
   update(id: string, payload: UpdateSubmissionDto): Submission {
-    const submission = this.findOne(id);
-    Object.assign(submission, payload);
-    return submission;
+    try {
+      const submission = this.findOne(id);
+      Object.assign(submission, payload);
+      return submission;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to update submission ${id}`);
+    }
   }
 
   remove(id: string): Submission {
-    const index = this.submissions.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Submission ${id} not found`);
+    try {
+      const index = this.submissions.findIndex((item) => item.id === id);
+      if (index === -1) {
+        throw new NotFoundException(`Submission ${id} not found`);
+      }
+      const [removed] = this.submissions.splice(index, 1);
+      return removed;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to delete submission ${id}`);
     }
-    const [removed] = this.submissions.splice(index, 1);
-    return removed;
   }
 }

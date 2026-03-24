@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { executeOrRethrow, rethrowAsInternal } from '../../common/error-handling';
 
 export type Assessment = {
   id: string;
@@ -24,34 +25,53 @@ export class AssessmentsService {
   ];
 
   findAll(): Assessment[] {
-    return this.assessments;
+    return executeOrRethrow(
+      () => this.assessments,
+      'Failed to list assessments from the in-memory store',
+    );
   }
 
   findOne(id: string): Assessment {
-    const assessment = this.assessments.find((item) => item.id === id);
-    if (!assessment) {
-      throw new NotFoundException(`Assessment ${id} not found`);
+    try {
+      const assessment = this.assessments.find((item) => item.id === id);
+      if (!assessment) {
+        throw new NotFoundException(`Assessment ${id} not found`);
+      }
+      return assessment;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to load assessment ${id}`);
     }
-    return assessment;
   }
 
   create(payload: CreateAssessmentDto): Assessment {
-    this.assessments.push(payload);
-    return payload;
+    try {
+      this.assessments.push(payload);
+      return payload;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to create assessment ${payload.id}`);
+    }
   }
 
   update(id: string, payload: UpdateAssessmentDto): Assessment {
-    const assessment = this.findOne(id);
-    Object.assign(assessment, payload);
-    return assessment;
+    try {
+      const assessment = this.findOne(id);
+      Object.assign(assessment, payload);
+      return assessment;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to update assessment ${id}`);
+    }
   }
 
   remove(id: string): Assessment {
-    const index = this.assessments.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Assessment ${id} not found`);
+    try {
+      const index = this.assessments.findIndex((item) => item.id === id);
+      if (index === -1) {
+        throw new NotFoundException(`Assessment ${id} not found`);
+      }
+      const [removed] = this.assessments.splice(index, 1);
+      return removed;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to delete assessment ${id}`);
     }
-    const [removed] = this.assessments.splice(index, 1);
-    return removed;
   }
 }
