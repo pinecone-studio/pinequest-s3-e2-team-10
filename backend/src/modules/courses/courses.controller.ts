@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { executeOrRethrow } from '../../common/error-handling';
 import {
   type Course,
   CoursesService,
@@ -20,26 +21,41 @@ export class CoursesController {
 
   @Get()
   findAll(): Course[] {
-    return this.coursesService.findAll();
+    return executeOrRethrow(
+      () => this.coursesService.findAll(),
+      'Failed to handle GET /courses',
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Course {
-    return this.coursesService.findOne(id);
+    return executeOrRethrow(
+      () => this.coursesService.findOne(id),
+      `Failed to handle GET /courses/${id}`,
+    );
   }
 
   @Post()
   create(@Body() payload: CreateCourseDto): Course {
-    return this.coursesService.create(payload);
+    return executeOrRethrow(
+      () => this.coursesService.create(payload),
+      `Failed to handle POST /courses for payload id ${payload.id}`,
+    );
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() payload: UpdateCourseDto): Course {
-    return this.coursesService.update(id, payload);
+    return executeOrRethrow(
+      () => this.coursesService.update(id, payload),
+      `Failed to handle PATCH /courses/${id}`,
+    );
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): Course {
-    return this.coursesService.remove(id);
+    return executeOrRethrow(
+      () => this.coursesService.remove(id),
+      `Failed to handle DELETE /courses/${id}`,
+    );
   }
 }

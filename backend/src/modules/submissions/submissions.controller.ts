@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { executeOrRethrow } from '../../common/error-handling';
 import {
   type CreateSubmissionDto,
   type Submission,
@@ -20,17 +21,26 @@ export class SubmissionsController {
 
   @Get()
   findAll(): Submission[] {
-    return this.submissionsService.findAll();
+    return executeOrRethrow(
+      () => this.submissionsService.findAll(),
+      'Failed to handle GET /submissions',
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Submission {
-    return this.submissionsService.findOne(id);
+    return executeOrRethrow(
+      () => this.submissionsService.findOne(id),
+      `Failed to handle GET /submissions/${id}`,
+    );
   }
 
   @Post()
   create(@Body() payload: CreateSubmissionDto): Submission {
-    return this.submissionsService.create(payload);
+    return executeOrRethrow(
+      () => this.submissionsService.create(payload),
+      `Failed to handle POST /submissions for payload id ${payload.id}`,
+    );
   }
 
   @Patch(':id')
@@ -38,11 +48,17 @@ export class SubmissionsController {
     @Param('id') id: string,
     @Body() payload: UpdateSubmissionDto,
   ): Submission {
-    return this.submissionsService.update(id, payload);
+    return executeOrRethrow(
+      () => this.submissionsService.update(id, payload),
+      `Failed to handle PATCH /submissions/${id}`,
+    );
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): Submission {
-    return this.submissionsService.remove(id);
+    return executeOrRethrow(
+      () => this.submissionsService.remove(id),
+      `Failed to handle DELETE /submissions/${id}`,
+    );
   }
 }

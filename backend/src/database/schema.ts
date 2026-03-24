@@ -40,3 +40,14 @@ export const results = sqliteTable('results', {
   score: integer('score').notNull(),
   passed: integer('passed', { mode: 'boolean' }).notNull(),
 });
+
+export const uploadedFiles = sqliteTable('uploaded_files', {
+  id: text('id').primaryKey(),
+  bucket: text('bucket').notNull(),
+  key: text('key').notNull(),
+  folder: text('folder').notNull(),
+  originalName: text('original_name').notNull(),
+  contentType: text('content_type').notNull(),
+  size: integer('size').notNull(),
+  uploadedAt: text('uploaded_at').notNull(),
+});

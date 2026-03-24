@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { executeOrRethrow } from '../../common/error-handling';
 import { type AuthRolesResponse, AuthService } from './auth.service';
 
 @Controller('auth')
@@ -7,6 +8,9 @@ export class AuthController {
 
   @Get('roles')
   getRoles(): AuthRolesResponse {
-    return this.authService.getRoles();
+    return executeOrRethrow(
+      () => this.authService.getRoles(),
+      'Failed to handle GET /auth/roles',
+    );
   }
 }

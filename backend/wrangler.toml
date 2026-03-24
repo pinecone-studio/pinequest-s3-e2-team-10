@@ -6,3 +6,8 @@ binding = "lms"
 database_name = "lms-apac"
 database_id = "78c854ea-0d1c-4104-965d-aa59d095be32"
 migrations_dir = "drizzle"
+
+[[r2_buckets]]
+binding = "pinequest_assets"
+bucket_name = "pinequest-assets"
+preview_bucket_name = "pinequest-assets"

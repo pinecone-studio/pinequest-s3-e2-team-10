@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { ResultsModule } from './modules/results/results.module';
 import { SubmissionsModule } from './modules/submissions/submissions.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { UsersModule } from './modules/users/users.module';
     SubmissionsModule,
     ResultsModule,
     ReportsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

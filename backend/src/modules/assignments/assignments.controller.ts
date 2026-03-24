@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { executeOrRethrow } from '../../common/error-handling';
 import {
   type Assignment,
   AssignmentsService,
@@ -20,17 +21,26 @@ export class AssignmentsController {
 
   @Get()
   findAll(): Assignment[] {
-    return this.assignmentsService.findAll();
+    return executeOrRethrow(
+      () => this.assignmentsService.findAll(),
+      'Failed to handle GET /assignments',
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Assignment {
-    return this.assignmentsService.findOne(id);
+    return executeOrRethrow(
+      () => this.assignmentsService.findOne(id),
+      `Failed to handle GET /assignments/${id}`,
+    );
   }
 
   @Post()
   create(@Body() payload: CreateAssignmentDto): Assignment {
-    return this.assignmentsService.create(payload);
+    return executeOrRethrow(
+      () => this.assignmentsService.create(payload),
+      `Failed to handle POST /assignments for payload id ${payload.id}`,
+    );
   }
 
   @Patch(':id')
@@ -38,11 +48,17 @@ export class AssignmentsController {
     @Param('id') id: string,
     @Body() payload: UpdateAssignmentDto,
   ): Assignment {
-    return this.assignmentsService.update(id, payload);
+    return executeOrRethrow(
+      () => this.assignmentsService.update(id, payload),
+      `Failed to handle PATCH /assignments/${id}`,
+    );
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): Assignment {
-    return this.assignmentsService.remove(id);
+    return executeOrRethrow(
+      () => this.assignmentsService.remove(id),
+      `Failed to handle DELETE /assignments/${id}`,
+    );
   }
 }

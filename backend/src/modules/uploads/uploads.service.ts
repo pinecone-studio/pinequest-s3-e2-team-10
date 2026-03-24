@@ -1,0 +1,383 @@
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { eq } from 'drizzle-orm';
+import {
+  executeOrRethrowAsync,
+  rethrowAsInternal,
+} from '../../common/error-handling';
+import { DatabaseService } from '../../database/database.service';
+import { uploadedFiles } from '../../database/schema';
+
+export type UploadedFilePayload = {
+  originalname: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+};
+
+export type UploadRecord = {
+  id: string;
+  key: string;
+  bucket: string;
+  folder: string;
+  originalName: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+  publicUrl: string | null;
+};
+
+export type PaginatedUploadRecords = {
+  items: UploadRecord[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+@Injectable()
+export class UploadsService {
+  private s3Client: S3Client | null = null;
+  private readonly uploadRecords = new Map<string, UploadRecord>();
+  private readonly localMetadataPath = resolve(
+    process.cwd(),
+    '.data',
+    'upload-records.json',
+  );
+  private localMetadataLoaded = false;
+
+  constructor(private readonly databaseService: DatabaseService) {}
+
+  private async ensureLocalRecordsLoaded(): Promise<void> {
+    if (this.localMetadataLoaded || this.databaseService.isConfigured()) {
+      return;
+    }
+
+    try {
+      const rawContent = await readFile(this.localMetadataPath, 'utf8');
+      const records = JSON.parse(rawContent) as UploadRecord[];
+
+      this.uploadRecords.clear();
+      for (const record of records) {
+        this.uploadRecords.set(record.id, record);
+      }
+
+      this.localMetadataLoaded = true;
+    } catch (error) {
+      const nodeError = error as NodeJS.ErrnoException;
+
+      if (nodeError.code === 'ENOENT') {
+        this.localMetadataLoaded = true;
+        return;
+      }
+
+      rethrowAsInternal(
+        error,
+        `Failed to load local upload metadata from ${this.localMetadataPath}`,
+      );
+    }
+  }
+
+  private async persistLocalRecords(): Promise<void> {
+    if (this.databaseService.isConfigured()) {
+      return;
+    }
+
+    try {
+      await mkdir(dirname(this.localMetadataPath), { recursive: true });
+      await writeFile(
+        this.localMetadataPath,
+        JSON.stringify([...this.uploadRecords.values()], null, 2),
+        'utf8',
+      );
+    } catch (error) {
+      rethrowAsInternal(
+        error,
+        `Failed to persist local upload metadata to ${this.localMetadataPath}`,
+      );
+    }
+  }
+
+  private getBucketName(): string {
+    const bucket = process.env.CLOUDFLARE_R2_BUCKET_NAME;
+    if (!bucket) {
+      throw new InternalServerErrorException(
+        'CLOUDFLARE_R2_BUCKET_NAME is not configured',
+      );
+    }
+    return bucket;
+  }
+
+  private getClient(): S3Client {
+    if (this.s3Client) {
+      return this.s3Client;
+    }
+
+    const endpoint = process.env.CLOUDFLARE_R2_ENDPOINT;
+    const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
+
+    if (!endpoint || !accessKeyId || !secretAccessKey) {
+      throw new InternalServerErrorException(
+        'Cloudflare R2 credentials are not fully configured',
+      );
+    }
+
+    this.s3Client = new S3Client({
+      region: 'auto',
+      endpoint,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+    });
+
+    return this.s3Client;
+  }
+
+  private sanitizeFileName(fileName: string): string {
+    return fileName.replace(/[^a-zA-Z0-9._-]/g, '-');
+  }
+
+  private buildObjectKey(originalName: string, folder?: string): string {
+    const safeName = this.sanitizeFileName(originalName);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const randomSuffix = Math.random().toString(36).slice(2, 10);
+    const baseFolder = folder?.trim().replace(/^\/+|\/+$/g, '') || 'uploads';
+
+    return `${baseFolder}/${timestamp}-${randomSuffix}-${safeName}`;
+  }
+
+  private buildPublicUrl(key: string): string | null {
+    const publicBase = process.env.CLOUDFLARE_R2_PUBLIC_URL?.trim();
+
+    if (!publicBase) {
+      return null;
+    }
+
+    return `${publicBase.replace(/\/+$/g, '')}/${key}`;
+  }
+
+  private async saveUploadRecord(record: UploadRecord): Promise<void> {
+    try {
+      await this.ensureLocalRecordsLoaded();
+      this.uploadRecords.set(record.id, record);
+
+      const db = this.databaseService.getDb();
+      if (!db) {
+        await this.persistLocalRecords();
+        return;
+      }
+
+      await db.insert(uploadedFiles).values({
+        id: record.id,
+        bucket: record.bucket,
+        key: record.key,
+        folder: record.folder,
+        originalName: record.originalName,
+        contentType: record.contentType,
+        size: record.size,
+        uploadedAt: record.uploadedAt,
+      });
+    } catch (error) {
+      rethrowAsInternal(
+        error,
+        `Failed to save upload metadata for file ${record.originalName}`,
+      );
+    }
+  }
+
+  private async findPersistedUploadRecord(
+    id: string,
+  ): Promise<UploadRecord | null> {
+    try {
+      await this.ensureLocalRecordsLoaded();
+      const cachedRecord = this.uploadRecords.get(id);
+      if (cachedRecord) {
+        return cachedRecord;
+      }
+
+      const db = this.databaseService.getDb();
+      if (!db) {
+        return null;
+      }
+
+      const [record] = await db
+        .select()
+        .from(uploadedFiles)
+        .where(eq(uploadedFiles.id, id))
+        .limit(1);
+
+      if (!record) {
+        return null;
+      }
+
+      const hydratedRecord: UploadRecord = {
+        id: record.id,
+        bucket: record.bucket,
+        key: record.key,
+        folder: record.folder,
+        originalName: record.originalName,
+        contentType: record.contentType,
+        size: record.size,
+        uploadedAt: record.uploadedAt,
+        publicUrl: this.buildPublicUrl(record.key),
+      };
+
+      this.uploadRecords.set(hydratedRecord.id, hydratedRecord);
+      return hydratedRecord;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to load upload metadata for id ${id}`);
+    }
+  }
+
+  private normalizeFolder(folder?: string): string {
+    return folder?.trim().replace(/^\/+|\/+$/g, '') || 'uploads';
+  }
+
+  async uploadFile(
+    file: UploadedFilePayload | undefined,
+    folder?: string,
+  ): Promise<UploadRecord> {
+    return executeOrRethrowAsync(async () => {
+      if (!file) {
+        throw new BadRequestException('A file is required');
+      }
+
+      if (!file.buffer?.length) {
+        throw new BadRequestException('Uploaded file is empty');
+      }
+
+      const bucket = this.getBucketName();
+      const normalizedFolder = this.normalizeFolder(folder);
+      const key = this.buildObjectKey(file.originalname, normalizedFolder);
+
+      await this.getClient().send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype || 'application/octet-stream',
+        }),
+      );
+
+      const uploadRecord: UploadRecord = {
+        id: crypto.randomUUID(),
+        key,
+        bucket,
+        folder: normalizedFolder,
+        originalName: file.originalname,
+        contentType: file.mimetype || 'application/octet-stream',
+        size: file.size,
+        uploadedAt: new Date().toISOString(),
+        publicUrl: this.buildPublicUrl(key),
+      };
+
+      await this.saveUploadRecord(uploadRecord);
+
+      return uploadRecord;
+    }, `Failed to upload file ${file?.originalname ?? 'unknown-file'} to R2`);
+  }
+
+  async findAllUploads(
+    page: number,
+    limit: number,
+  ): Promise<PaginatedUploadRecords> {
+    try {
+      await this.ensureLocalRecordsLoaded();
+      const db = this.databaseService.getDb();
+      if (!db) {
+        const items = [...this.uploadRecords.values()].sort((left, right) =>
+          right.uploadedAt.localeCompare(left.uploadedAt),
+        );
+        const start = (page - 1) * limit;
+        const pagedItems = items.slice(start, start + limit);
+
+        return {
+          items: pagedItems,
+          page,
+          limit,
+          total: items.length,
+          totalPages: Math.ceil(items.length / limit),
+        };
+      }
+
+      const records = await db.select().from(uploadedFiles);
+
+      const items = records
+        .map((record) => ({
+          id: record.id,
+          bucket: record.bucket,
+          key: record.key,
+          folder: record.folder,
+          originalName: record.originalName,
+          contentType: record.contentType,
+          size: record.size,
+          uploadedAt: record.uploadedAt,
+          publicUrl: this.buildPublicUrl(record.key),
+        }))
+        .sort((left, right) => right.uploadedAt.localeCompare(left.uploadedAt));
+
+      const start = (page - 1) * limit;
+      const pagedItems = items.slice(start, start + limit);
+
+      return {
+        items: pagedItems,
+        page,
+        limit,
+        total: items.length,
+        totalPages: Math.ceil(items.length / limit),
+      };
+    } catch (error) {
+      rethrowAsInternal(error, 'Failed to list upload metadata records');
+    }
+  }
+
+  async findUploadById(id: string): Promise<UploadRecord> {
+    try {
+      const record = await this.findPersistedUploadRecord(id);
+      if (!record) {
+        throw new NotFoundException(`Upload ${id} not found`);
+      }
+
+      return record;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to load upload ${id}`);
+    }
+  }
+
+  async downloadUpload(id: string): Promise<{
+    file: UploadRecord;
+    body: Buffer;
+  }> {
+    try {
+      const record = await this.findUploadById(id);
+      const response = await this.getClient().send(
+        new GetObjectCommand({
+          Bucket: record.bucket,
+          Key: record.key,
+        }),
+      );
+
+      if (!response.Body) {
+        throw new NotFoundException(`Upload ${id} has no content in R2`);
+      }
+
+      const bytes = await response.Body.transformToByteArray();
+
+      return {
+        file: record,
+        body: Buffer.from(bytes),
+      };
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to download upload ${id} from R2`);
+    }
+  }
+}

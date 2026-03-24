@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { executeOrRethrow } from '../../common/error-handling';
 import {
   type CreateResultDto,
   type Result,
@@ -20,26 +21,41 @@ export class ResultsController {
 
   @Get()
   findAll(): Result[] {
-    return this.resultsService.findAll();
+    return executeOrRethrow(
+      () => this.resultsService.findAll(),
+      'Failed to handle GET /results',
+    );
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Result {
-    return this.resultsService.findOne(id);
+    return executeOrRethrow(
+      () => this.resultsService.findOne(id),
+      `Failed to handle GET /results/${id}`,
+    );
   }
 
   @Post()
   create(@Body() payload: CreateResultDto): Result {
-    return this.resultsService.create(payload);
+    return executeOrRethrow(
+      () => this.resultsService.create(payload),
+      `Failed to handle POST /results for payload id ${payload.id}`,
+    );
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() payload: UpdateResultDto): Result {
-    return this.resultsService.update(id, payload);
+    return executeOrRethrow(
+      () => this.resultsService.update(id, payload),
+      `Failed to handle PATCH /results/${id}`,
+    );
   }
 
   @Delete(':id')
   remove(@Param('id') id: string): Result {
-    return this.resultsService.remove(id);
+    return executeOrRethrow(
+      () => this.resultsService.remove(id),
+      `Failed to handle DELETE /results/${id}`,
+    );
   }
 }

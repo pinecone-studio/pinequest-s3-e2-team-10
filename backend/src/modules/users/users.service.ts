@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { executeOrRethrow, rethrowAsInternal } from '../../common/error-handling';
 
 export type User = {
   id: string;
@@ -17,34 +18,53 @@ export class UsersService {
   ];
 
   findAll(): User[] {
-    return this.users;
+    return executeOrRethrow(
+      () => this.users,
+      'Failed to list users from the in-memory store',
+    );
   }
 
   findOne(id: string): User {
-    const user = this.users.find((item) => item.id === id);
-    if (!user) {
-      throw new NotFoundException(`User ${id} not found`);
+    try {
+      const user = this.users.find((item) => item.id === id);
+      if (!user) {
+        throw new NotFoundException(`User ${id} not found`);
+      }
+      return user;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to load user ${id}`);
     }
-    return user;
   }
 
   create(payload: CreateUserDto): User {
-    this.users.push(payload);
-    return payload;
+    try {
+      this.users.push(payload);
+      return payload;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to create user ${payload.id}`);
+    }
   }
 
   update(id: string, payload: UpdateUserDto): User {
-    const user = this.findOne(id);
-    Object.assign(user, payload);
-    return user;
+    try {
+      const user = this.findOne(id);
+      Object.assign(user, payload);
+      return user;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to update user ${id}`);
+    }
   }
 
   remove(id: string): User {
-    const index = this.users.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`User ${id} not found`);
+    try {
+      const index = this.users.findIndex((item) => item.id === id);
+      if (index === -1) {
+        throw new NotFoundException(`User ${id} not found`);
+      }
+      const [removed] = this.users.splice(index, 1);
+      return removed;
+    } catch (error) {
+      rethrowAsInternal(error, `Failed to delete user ${id}`);
     }
-    const [removed] = this.users.splice(index, 1);
-    return removed;
   }
 }
