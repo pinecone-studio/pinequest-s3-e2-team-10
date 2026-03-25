@@ -6,6 +6,7 @@ import { AssignmentsModule } from './modules/assignments/assignments.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { DatabaseModule } from './database/database.module';
+import { ExamsModule } from './modules/exams/exams.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { ResultsModule } from './modules/results/results.module';
 import { SubmissionsModule } from './modules/submissions/submissions.module';
@@ -18,6 +19,7 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     UsersModule,
     CoursesModule,
+    ExamsModule,
     AssessmentsModule,
     AssignmentsModule,
     SubmissionsModule,
