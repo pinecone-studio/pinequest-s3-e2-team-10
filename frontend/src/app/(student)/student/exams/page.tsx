@@ -13,7 +13,7 @@ function formatCountdown(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
-  
+
   if (hours > 0) {
     return `${hours}h ${minutes}m ${secs}s`;
   }
@@ -41,7 +41,9 @@ function areCountdownsEqual(
     return false;
   }
 
-  return nextKeys.every((key) => currentCountdowns[key] === nextCountdowns[key]);
+  return nextKeys.every(
+    (key) => currentCountdowns[key] === nextCountdowns[key],
+  );
 }
 
 export default function StudentExamsPage() {
@@ -91,7 +93,10 @@ export default function StudentExamsPage() {
           (scheduledClass) => scheduledClass.classId === studentClass,
         );
         if (schedule) {
-          newCountdowns[exam.id] = getSecondsUntil(schedule.date, schedule.time);
+          newCountdowns[exam.id] = getSecondsUntil(
+            schedule.date,
+            schedule.time,
+          );
         }
       });
       setCountdowns((currentCountdowns) =>
@@ -106,7 +111,9 @@ export default function StudentExamsPage() {
     return () => clearInterval(interval);
   }, [todaysExams, studentClass]);
 
-  const myResults = examResults.filter((result) => result.studentId === studentId);
+  const myResults = examResults.filter(
+    (result) => result.studentId === studentId,
+  );
   const findExamTitle = (examId: string) =>
     exams.find((exam) => exam.id === examId)?.title ?? "Unknown exam";
 
@@ -114,7 +121,9 @@ export default function StudentExamsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Exams</h1>
-        <p className="text-muted-foreground">View your upcoming and completed exams</p>
+        <p className="text-muted-foreground">
+          View your upcoming and completed exams
+        </p>
       </div>
       <TodaysExamsSection
         countdowns={countdowns}
@@ -133,3 +142,5 @@ export default function StudentExamsPage() {
     </div>
   );
 }
+
+////Test
