@@ -2,20 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { QuestionBankUploadDialog } from "@/components/teacher/question-bank-upload-dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { mockTests, type MockTest } from "@/lib/mock-data"
 
 export default function QuestionBankPage() {
@@ -76,84 +66,20 @@ export default function QuestionBankPage() {
           <h1 className="text-2xl font-bold">Question Bank</h1>
           <p className="text-muted-foreground">Upload and manage mock tests for your students</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Upload New Test</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Upload Mock Test</DialogTitle>
-              <DialogDescription>
-                Add a new mock test file for your students to practice
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="testName">Test Name</Label>
-                <Input
-                  id="testName"
-                  placeholder="e.g., HTML Basics Test, Semester 1 Mock"
-                  value={newTestName}
-                  onChange={(e) => setNewTestName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Test File (PDF or Word)</Label>
-                <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                    isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  {selectedFile ? (
-                    <div>
-                      <p className="font-medium">{selectedFile.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {(selectedFile.size / 1024).toFixed(1)} KB
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => setSelectedFile(null)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-muted-foreground mb-2">
-                        Drag and drop your file here, or
-                      </p>
-                      <label htmlFor="fileInput">
-                        <Button variant="outline" asChild>
-                          <span>Choose File</span>
-                        </Button>
-                      </label>
-                      <input
-                        id="fileInput"
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        className="hidden"
-                        onChange={handleFileSelect}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit} disabled={!newTestName || !selectedFile}>
-                Upload
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <QuestionBankUploadDialog
+          isDialogOpen={isDialogOpen}
+          isDragging={isDragging}
+          newTestName={newTestName}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onFileSelect={handleFileSelect}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={handleSubmit}
+          selectedFile={selectedFile}
+          setNewTestName={setNewTestName}
+          setSelectedFile={setSelectedFile}
+        />
       </div>
 
       {tests.length === 0 ? (

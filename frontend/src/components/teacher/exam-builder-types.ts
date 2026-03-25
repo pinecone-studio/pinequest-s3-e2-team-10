@@ -1,0 +1,17 @@
+import type { ExamQuestion } from '@/lib/mock-data'
+
+export type QuestionType =
+  | 'multiple-choice'
+  | 'true-false'
+  | 'short-answer'
+  | 'essay'
+
+export interface NewQuestion extends Omit<ExamQuestion, 'id'> {
+  id: string
+}
+
+export type ScheduleEntry = {
+  classId: string
+  date: string
+  time: string
+}

@@ -1,56 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { exams, examResults, getStudentById } from "@/lib/mock-data"
-
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-const timeSlots = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"]
-
-function getWeekDates() {
-  const today = new Date()
-  const currentDay = today.getDay()
-  const monday = new Date(today)
-  monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1))
-  
-  return daysOfWeek.map((day, index) => {
-    const date = new Date(monday)
-    date.setDate(monday.getDate() + index)
-    return {
-      day,
-      date: date.toISOString().split('T')[0],
-      displayDate: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    }
-  })
-}
+import { StudentRecentResultsCard } from "@/components/student/student-recent-results-card"
+import { StudentScheduleCalendar } from "@/components/student/student-schedule-calendar"
+import { exams, examResults } from "@/lib/mock-data"
+import { useStudentSession } from "@/hooks/use-student-session"
 
 export default function StudentDashboard() {
-  const [studentId, setStudentId] = useState("")
-  const [studentClass, setStudentClass] = useState("")
-  const [studentName, setStudentName] = useState("")
-
-  useEffect(() => {
-    setStudentId(localStorage.getItem('studentId') || '')
-    setStudentClass(localStorage.getItem('studentClass') || '')
-    setStudentName(localStorage.getItem('studentName') || '')
-  }, [])
-
-  const weekDates = getWeekDates()
-  
-  // Get exams for student's class
+  const { studentClass, studentId, studentName } = useStudentSession()
   const myExams = exams.filter(e => 
     e.scheduledClasses.some(sc => sc.classId === studentClass)
   )
   const upcomingExams = myExams.filter(e => e.status === 'scheduled')
-  const completedExams = myExams.filter(e => e.status === 'completed')
-  
-  // Get student's results
   const myResults = examResults.filter(r => r.studentId === studentId)
-
-  // Calculate stats
   const avgScore = myResults.length > 0
     ? Math.round(myResults.reduce((sum, r) => sum + (r.score / r.totalPoints) * 100, 0) / myResults.length)
     : 0
@@ -122,98 +87,8 @@ export default function StudentDashboard() {
         </Card>
       </div>
 
-      {/* Exam Schedule Calendar */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Exam Schedule</CardTitle>
-          <CardDescription>Your upcoming exams this week</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <div className="min-w-[800px]">
-              {/* Calendar Header */}
-              <div className="grid grid-cols-6 border-b">
-                <div className="p-2 font-medium text-muted-foreground">Time</div>
-                {weekDates.map(({ day, displayDate }) => (
-                  <div key={day} className="p-2 text-center border-l">
-                    <div className="font-medium">{day}</div>
-                    <div className="text-sm text-muted-foreground">{displayDate}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Time Slots */}
-              {timeSlots.map((time) => (
-                <div key={time} className="grid grid-cols-6 border-b min-h-[60px]">
-                  <div className="p-2 text-sm text-muted-foreground">{time}</div>
-                  {weekDates.map(({ day, date }) => {
-                    const examItem = myExams.flatMap(e => 
-                      e.scheduledClasses
-                        .filter(sc => sc.classId === studentClass && sc.date === date && sc.time === time)
-                        .map(sc => ({ exam: e, schedule: sc }))
-                    )[0]
-
-                    return (
-                      <div key={`${day}-${time}`} className="p-1 border-l min-h-[60px]">
-                        {examItem && (
-                          <div className={`p-1 rounded text-xs ${
-                            examItem.exam.status === 'completed' 
-                              ? 'bg-muted' 
-                              : 'bg-destructive/10 border border-destructive/20'
-                          }`}>
-                            <div className={`font-medium ${
-                              examItem.exam.status === 'scheduled' ? 'text-destructive' : ''
-                            }`}>
-                              {examItem.exam.title}
-                            </div>
-                            <div className="text-muted-foreground">{examItem.exam.duration} min</div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Results */}
-      {myResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Results</CardTitle>
-            <CardDescription>Your exam scores</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {myResults.map(result => {
-                const exam = exams.find(e => e.id === result.examId)
-                const percentage = Math.round((result.score / result.totalPoints) * 100)
-                return (
-                  <div key={`${result.examId}-${result.studentId}`} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <div className="font-medium">{exam?.title}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Submitted: {new Date(result.submittedAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={percentage >= 70 ? "default" : percentage >= 50 ? "secondary" : "destructive"}>
-                        {percentage}%
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        {result.score}/{result.totalPoints}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <StudentScheduleCalendar myExams={myExams} studentClass={studentClass} />
+      <StudentRecentResultsCard results={myResults} />
     </div>
   )
 }

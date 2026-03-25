@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
+import { useStudentSession } from "@/hooks/use-student-session"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -18,21 +19,13 @@ export default function StudentLayout({
 }) {
   const router = useRouter()
   const pathname = usePathname()
-  const [studentName, setStudentName] = useState("")
-  const [studentClass, setStudentClass] = useState("")
+  const { studentClass, studentName } = useStudentSession()
 
   useEffect(() => {
-    const name = localStorage.getItem('studentName')
-    const classId = localStorage.getItem('studentClass')
-    
-    if (!name) {
+    if (!studentName) {
       router.push('/student/login')
-      return
     }
-    
-    setStudentName(name)
-    setStudentClass(classId || '')
-  }, [router])
+  }, [router, studentName])
 
   const handleLogout = () => {
     localStorage.removeItem('studentId')
@@ -71,7 +64,7 @@ export default function StudentLayout({
         {/* Sidebar */}
         <aside className="w-56 border-r bg-muted/30 p-4">
           <nav className="flex flex-col gap-1">
-            {navItems.map((item) => (
+                {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

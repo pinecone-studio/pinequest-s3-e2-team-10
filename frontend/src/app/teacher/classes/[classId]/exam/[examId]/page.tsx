@@ -2,11 +2,10 @@
 
 import { use } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { TeacherExamResultsTable } from "@/components/teacher/teacher-exam-results-table"
+import { TeacherQuestionAnalysisCard } from "@/components/teacher/teacher-question-analysis-card"
 import { exams, getClassById, getExamResults, getQuestionStats, getStudentById } from "@/lib/mock-data"
 
 export default function ExamStatsPage({ 
@@ -125,79 +124,8 @@ export default function ExamStatsPage({
         </Card>
       </div>
 
-      {/* Most Failed Questions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Question Analysis</CardTitle>
-          <CardDescription>Questions sorted by fail rate (highest to lowest)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {questionStats.map((stat, index) => (
-              <div key={stat.questionId} className="space-y-2">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Q{index + 1}.</span>
-                      <Badge variant="outline" className="text-xs">{stat.type}</Badge>
-                    </div>
-                    <p className="text-sm mt-1">{stat.question}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-destructive">
-                      {Math.round(stat.failRate)}% fail rate
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {stat.correctCount}/{stat.totalCount} correct
-                    </div>
-                  </div>
-                </div>
-                <Progress value={100 - stat.failRate} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Student Results */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Student Results</CardTitle>
-          <CardDescription>Individual scores for this exam</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Percentage</TableHead>
-                <TableHead>Submitted At</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {results.map(result => {
-                const student = getStudentById(result.studentId)
-                const percentage = Math.round((result.score / result.totalPoints) * 100)
-                return (
-                  <TableRow key={result.studentId}>
-                    <TableCell className="font-medium">{student?.name}</TableCell>
-                    <TableCell>{result.score}/{result.totalPoints}</TableCell>
-                    <TableCell>
-                      <Badge variant={percentage >= 70 ? "default" : percentage >= 50 ? "secondary" : "destructive"}>
-                        {percentage}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(result.submittedAt).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <TeacherQuestionAnalysisCard questionStats={questionStats} />
+      <TeacherExamResultsTable results={results} />
     </div>
   )
 }

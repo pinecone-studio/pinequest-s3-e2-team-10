@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getClassById, getExamsForClass, getExamResults, students } from "@/lib/mock-data"
+import { getClassById, getExamsForClass, getExamResults } from "@/lib/mock-data"
 
 export default function ClassDetailPage({ params }: { params: Promise<{ classId: string }> }) {
   const { classId } = use(params)

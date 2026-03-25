@@ -2,10 +2,12 @@
 
 import { use, useEffect, useState } from "react"
 import Link from "next/link"
+import { ExamCountdownDisplay } from "@/components/student/exam-countdown-display"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { exams } from "@/lib/mock-data"
+import { useStudentSession } from "@/hooks/use-student-session"
 
 function formatCountdown(seconds: number) {
   const hours = Math.floor(seconds / 3600)
@@ -28,18 +30,13 @@ function getSecondsUntil(date: string, time: string) {
 
 export default function ExamDetailPage({ params }: { params: Promise<{ examId: string }> }) {
   const { examId } = use(params)
-  const [studentClass, setStudentClass] = useState("")
+  const { studentClass } = useStudentSession()
   const [countdown, setCountdown] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
-
-  useEffect(() => {
-    setStudentClass(localStorage.getItem('studentClass') || '')
-  }, [])
 
   const exam = exams.find(e => e.id === examId)
   const schedule = exam?.scheduledClasses.find(sc => sc.classId === studentClass)
 
-  // Update countdown
   useEffect(() => {
     if (!schedule) return
 
@@ -71,7 +68,6 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
     alert('Starting exam... (This would redirect to the actual exam interface)')
   }
 
-  // Fullscreen Countdown View
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center">
@@ -82,51 +78,16 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
           Exit Fullscreen
         </button>
         
-        <h1 className="text-3xl font-bold mb-2">{exam.title}</h1>
-        <p className="text-muted-foreground mb-8">
-          {schedule?.date} at {schedule?.time}
-        </p>
-
-        {isReady ? (
-          <div className="text-center">
-            <div className="text-6xl font-bold text-primary mb-8">Exam is Ready!</div>
-            <Button size="lg" onClick={handleTakeExam} className="text-xl px-8 py-6">
-              Take Exam Now
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="text-muted-foreground mb-4">Exam starts in</div>
-            <div className="flex items-center gap-4 mb-8">
-              <div className="text-center">
-                <div className="text-7xl font-mono font-bold bg-muted rounded-lg px-6 py-4">
-                  {hours}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">Hours</div>
-              </div>
-              <div className="text-5xl font-bold text-muted-foreground">:</div>
-              <div className="text-center">
-                <div className="text-7xl font-mono font-bold bg-muted rounded-lg px-6 py-4">
-                  {minutes}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">Minutes</div>
-              </div>
-              <div className="text-5xl font-bold text-muted-foreground">:</div>
-              <div className="text-center">
-                <div className="text-7xl font-mono font-bold bg-muted rounded-lg px-6 py-4">
-                  {seconds}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">Seconds</div>
-              </div>
-            </div>
-            <Button size="lg" disabled className="opacity-50">
-              Waiting for exam to start...
-            </Button>
-          </>
-        )}
-
-        <div className="mt-12 text-center text-muted-foreground">
-          <p>Duration: {exam.duration} minutes</p>
+        <ExamCountdownDisplay
+          countdown={{ hours, minutes, seconds }}
+          duration={exam.duration}
+          isFullscreen
+          isReady={isReady}
+          onPrimaryAction={handleTakeExam}
+          scheduleLabel={`${schedule?.date} at ${schedule?.time}`}
+          title={exam.title}
+        />
+        <div className="text-center text-muted-foreground">
           <p>Questions: {exam.questions.length}</p>
         </div>
       </div>
@@ -142,7 +103,6 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
         <h1 className="text-2xl font-bold mt-2">{exam.title}</h1>
       </div>
 
-      {/* Exam Info */}
       <Card>
         <CardHeader>
           <CardTitle>Exam Details</CardTitle>
@@ -180,7 +140,6 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
         </CardContent>
       </Card>
 
-      {/* Countdown */}
       <Card className={isReady ? 'border-primary' : ''}>
         <CardHeader>
           <CardTitle>{isReady ? 'Exam is Ready!' : 'Time Until Exam'}</CardTitle>
@@ -191,51 +150,16 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isReady ? (
-            <div className="text-center py-4">
-              <div className="text-4xl font-bold text-primary mb-4">Start Now!</div>
-              <Button size="lg" onClick={handleTakeExam}>
-                Take Exam
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-center gap-4">
-                <div className="text-center">
-                  <div className="text-4xl font-mono font-bold bg-muted rounded-lg px-4 py-2">
-                    {hours}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Hours</div>
-                </div>
-                <div className="text-2xl font-bold text-muted-foreground">:</div>
-                <div className="text-center">
-                  <div className="text-4xl font-mono font-bold bg-muted rounded-lg px-4 py-2">
-                    {minutes}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Minutes</div>
-                </div>
-                <div className="text-2xl font-bold text-muted-foreground">:</div>
-                <div className="text-center">
-                  <div className="text-4xl font-mono font-bold bg-muted rounded-lg px-4 py-2">
-                    {seconds}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Seconds</div>
-                </div>
-              </div>
-              <div className="flex justify-center gap-4">
-                <Button variant="outline" onClick={() => setIsFullscreen(true)}>
-                  View Fullscreen
-                </Button>
-                <Button disabled>
-                  Take Exam (Locked)
-                </Button>
-              </div>
-            </div>
-          )}
+          <ExamCountdownDisplay
+            countdown={{ hours, minutes, seconds }}
+            duration={exam.duration}
+            isReady={isReady}
+            onFullscreen={() => setIsFullscreen(true)}
+            onPrimaryAction={handleTakeExam}
+          />
         </CardContent>
       </Card>
 
-      {/* Instructions */}
       <Card>
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
