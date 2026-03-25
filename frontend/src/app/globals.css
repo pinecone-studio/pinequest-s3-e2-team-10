@@ -1,28 +1,28 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #eaf6ff;
+  --foreground: #16324f;
+  --card: #ffffff;
+  --card-foreground: #16324f;
+  --popover: #ffffff;
+  --popover-foreground: #16324f;
+  --primary: #4f9cf9;
+  --primary-foreground: #ffffff;
+  --secondary: #ddf1ff;
+  --secondary-foreground: #16324f;
+  --muted: #f8fcff;
+  --muted-foreground: #35516e;
+  --accent: #67e8f9;
+  --accent-foreground: #16324f;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #d9ecff;
+  --input: rgba(255, 255, 255, 0.92);
+  --ring: rgba(79, 156, 249, 0.35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -75,8 +75,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -121,5 +121,74 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .skywash-background {
+    background:
+      radial-gradient(circle at top left, rgba(103, 232, 249, 0.2), transparent 22%),
+      radial-gradient(circle at top right, rgba(79, 156, 249, 0.16), transparent 28%),
+      linear-gradient(180deg, #eaf6ff 0%, #ddf1ff 55%, #f4fbff 100%);
+  }
+
+  .ocean-glow {
+    background: radial-gradient(circle at center, rgba(103, 232, 249, 0.28) 0%, rgba(103, 232, 249, 0.12) 28%, rgba(103, 232, 249, 0) 70%);
+  }
+
+  .bubble-accents {
+    background:
+      radial-gradient(circle at 12% 26%, rgba(255, 255, 255, 0.56) 0, rgba(255, 255, 255, 0.56) 1.4rem, rgba(255, 255, 255, 0) 1.65rem),
+      radial-gradient(circle at 23% 76%, rgba(103, 232, 249, 0.22) 0, rgba(103, 232, 249, 0.22) 1.1rem, rgba(103, 232, 249, 0) 1.35rem),
+      radial-gradient(circle at 76% 18%, rgba(79, 156, 249, 0.18) 0, rgba(79, 156, 249, 0.18) 1.8rem, rgba(79, 156, 249, 0) 2.1rem),
+      radial-gradient(circle at 86% 72%, rgba(255, 255, 255, 0.46) 0, rgba(255, 255, 255, 0.46) 1.25rem, rgba(255, 255, 255, 0) 1.55rem);
+  }
+
+  .wave-accent {
+    background:
+      radial-gradient(110% 100% at 50% 100%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.56) 51%, rgba(255, 255, 255, 0.56) 57%, rgba(255, 255, 255, 0) 58%),
+      radial-gradient(120% 100% at 24% 100%, rgba(255, 255, 255, 0) 54%, rgba(207, 234, 255, 0.92) 55%, rgba(207, 234, 255, 0.92) 61%, rgba(255, 255, 255, 0) 62%);
+  }
+
+  .floating-hero-card {
+    background: #fdfeff;
+    border: 1px solid #d9ecff;
+    border-radius: 2rem;
+    box-shadow: 0 16px 40px rgba(59, 130, 246, 0.1);
+  }
+
+  .role-card {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid #d7ebff;
+    box-shadow: 0 10px 24px rgba(59, 130, 246, 0.08);
+    backdrop-filter: blur(8px);
+  }
+
+  .role-card:hover {
+    transform: translateY(-4px);
+    border-color: #93d9ff;
+    box-shadow: 0 16px 34px rgba(59, 130, 246, 0.12);
+  }
+
+  .primary-ocean-button {
+    background: linear-gradient(135deg, #4f9cf9, #22d3ee);
+    color: #ffffff;
+    box-shadow: 0 12px 28px rgba(79, 156, 249, 0.24);
+  }
+
+  .primary-ocean-button:hover {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.28);
+  }
+
+  .secondary-ocean-button {
+    background: #ffffff;
+    border: 1px solid #93d9ff;
+    color: #2563eb;
+  }
+
+  .secondary-ocean-button:hover {
+    background: #f8fcff;
+    border-color: #67e8f9;
   }
 }
