@@ -20,6 +20,35 @@ export const assessments = sqliteTable('assessments', {
   attemptsAllowed: integer('attempts_allowed').notNull(),
 });
 
+export const exams = sqliteTable('exams', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  durationMinutes: integer('duration_minutes').notNull(),
+  reportReleaseMode: text('report_release_mode').notNull(),
+  status: text('status').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+export const examQuestions = sqliteTable('exam_questions', {
+  id: text('id').primaryKey(),
+  examId: text('exam_id').notNull(),
+  type: text('type').notNull(),
+  prompt: text('prompt').notNull(),
+  optionsJson: text('options_json'),
+  correctAnswer: text('correct_answer'),
+  points: integer('points').notNull(),
+  displayOrder: integer('display_order').notNull(),
+});
+
+export const examSchedules = sqliteTable('exam_schedules', {
+  id: text('id').primaryKey(),
+  examId: text('exam_id').notNull(),
+  classId: text('class_id').notNull(),
+  scheduledDate: text('scheduled_date').notNull(),
+  scheduledTime: text('scheduled_time').notNull(),
+});
+
 export const assignments = sqliteTable('assignments', {
   id: text('id').primaryKey(),
   assessmentId: text('assessment_id').notNull(),
