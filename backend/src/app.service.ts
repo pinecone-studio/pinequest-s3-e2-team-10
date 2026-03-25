@@ -15,6 +15,7 @@ export class AppService {
         'auth',
         'users',
         'courses',
+        'exams',
         'assessments',
         'assignments',
         'submissions',
