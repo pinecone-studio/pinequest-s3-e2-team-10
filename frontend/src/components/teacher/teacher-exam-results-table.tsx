@@ -1,18 +1,15 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatMockDateTime } from "@/lib/date-utils";
-import { getDisplayStudentName } from "@/lib/demo-personas";
-import { getStudentById, type ExamResult } from "@/lib/mock-data";
+'use client'
 
-export function TeacherExamResultsTable({ results }: { results: ExamResult[] }) {
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { getStudentById, type ExamResult } from '@/lib/mock-data'
+
+export function TeacherExamResultsTable({
+  results,
+}: {
+  results: ExamResult[]
+}) {
   return (
     <Card>
       <CardHeader>
@@ -31,39 +28,25 @@ export function TeacherExamResultsTable({ results }: { results: ExamResult[] }) 
           </TableHeader>
           <TableBody>
             {results.map((result) => {
-              const student = getStudentById(result.studentId);
-              const percentage = Math.round((result.score / result.totalPoints) * 100);
+              const student = getStudentById(result.studentId)
+              const percentage = Math.round((result.score / result.totalPoints) * 100)
+              const variant =
+                percentage >= 70 ? 'default' : percentage >= 50 ? 'secondary' : 'destructive'
 
               return (
                 <TableRow key={result.studentId}>
-                  <TableCell className="font-medium">
-                    {getDisplayStudentName(result.studentId, student?.name)}
-                  </TableCell>
-                  <TableCell>
-                    {result.score}/{result.totalPoints}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        percentage >= 70
-                          ? "default"
-                          : percentage >= 50
-                            ? "secondary"
-                            : "destructive"
-                      }
-                    >
-                      {percentage}%
-                    </Badge>
-                  </TableCell>
+                  <TableCell className="font-medium">{student?.name}</TableCell>
+                  <TableCell>{result.score}/{result.totalPoints}</TableCell>
+                  <TableCell><Badge variant={variant}>{percentage}%</Badge></TableCell>
                   <TableCell className="text-muted-foreground">
-                    {formatMockDateTime(result.submittedAt)}
+                    {new Date(result.submittedAt).toLocaleString()}
                   </TableCell>
                 </TableRow>
-              );
+              )
             })}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -1,20 +1,22 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+'use client'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 
 type QuestionStat = {
-  correctCount: number;
-  failRate: number;
-  question: string;
-  questionId: string;
-  totalCount: number;
-  type: string;
-};
+  correctCount: number
+  failRate: number
+  question: string
+  questionId: string
+  totalCount: number
+  type: string
+}
 
 export function TeacherQuestionAnalysisCard({
   questionStats,
 }: {
-  questionStats: QuestionStat[];
+  questionStats: QuestionStat[]
 }) {
   return (
     <Card>
@@ -30,11 +32,9 @@ export function TeacherQuestionAnalysisCard({
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Q{index + 1}.</span>
-                    <Badge className="text-xs" variant="outline">
-                      {stat.type}
-                    </Badge>
+                    <Badge variant="outline" className="text-xs">{stat.type}</Badge>
                   </div>
-                  <p className="mt-1 text-sm">{stat.question}</p>
+                  <p className="text-sm mt-1">{stat.question}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-medium text-destructive">
@@ -45,11 +45,11 @@ export function TeacherQuestionAnalysisCard({
                   </div>
                 </div>
               </div>
-              <Progress className="h-2" value={100 - stat.failRate} />
+              <Progress value={100 - stat.failRate} className="h-2" />
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

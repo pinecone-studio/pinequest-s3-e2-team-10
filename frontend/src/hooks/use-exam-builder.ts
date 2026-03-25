@@ -1,106 +1,123 @@
-import { useState } from "react";
-import { type NewQuestion, type QuestionType, type ScheduleEntry } from "@/components/teacher/exam-builder-types";
-import { useQuestionBankTests } from "@/hooks/use-question-bank-tests";
+'use client'
 
-function createQuestion(id: string, type: QuestionType): NewQuestion {
+import { useState } from 'react'
+import type { NewQuestion, QuestionType, ScheduleEntry } from '@/components/teacher/exam-builder-types'
+
+function createQuestion(type: QuestionType, id: string): NewQuestion {
   return {
     id,
     type,
-    question: "",
-    points: type === "essay" ? 15 : type === "short-answer" ? 10 : type === "true-false" ? 5 : 10,
-    options: type === "multiple-choice" ? ["", "", "", ""] : undefined,
-    correctAnswer: type === "true-false" ? "True" : "",
-  };
+    question: '',
+    points:
+      type === 'essay' ? 15 : type === 'short-answer' ? 10 : type === 'true-false' ? 5 : 10,
+    options: type === 'multiple-choice' ? ['', '', '', ''] : undefined,
+    correctAnswer: type === 'true-false' ? 'True' : '',
+  }
 }
 
-function buildGeneratedQuestions(mcCount: number, tfCount: number, shortCount: number) {
-  const now = Date.now();
+function createAiQuestions(
+  mcCount: number,
+  tfCount: number,
+  shortCount: number,
+): NewQuestion[] {
+  const seed = Date.now()
   return [
-    ...Array.from({ length: mcCount }, (_, index) => ({
-      ...createQuestion(`ai-mc-${now}-${index}`, "multiple-choice"),
-      question: `AI-generated multiple choice question ${index + 1}: choose the best answer.`,
-      options: ["Option A - First choice", "Option B - Second choice", "Option C - Third choice", "Option D - Fourth choice"],
-      correctAnswer: "Option A - First choice",
+    ...Array.from({ length: mcCount }, (_, index) =>
+      createQuestion('multiple-choice', `ai-mc-${seed}-${index}`),
+    ).map((question, index) => ({
+      ...question,
+      question: `AI Generated Multiple Choice Question ${index + 1}: What is the correct answer for this topic?`,
+      options: [
+        'Option A - First choice',
+        'Option B - Second choice',
+        'Option C - Third choice',
+        'Option D - Fourth choice',
+      ],
+      correctAnswer: 'Option A - First choice',
     })),
-    ...Array.from({ length: tfCount }, (_, index) => ({
-      ...createQuestion(`ai-tf-${now}-${index}`, "true-false"),
-      question: `AI-generated true/false question ${index + 1}: evaluate the statement.`,
+    ...Array.from({ length: tfCount }, (_, index) =>
+      createQuestion('true-false', `ai-tf-${seed}-${index}`),
+    ).map((question, index) => ({
+      ...question,
+      question: `AI Generated True/False Question ${index + 1}: This statement about the topic is correct.`,
     })),
-    ...Array.from({ length: shortCount }, (_, index) => ({
-      ...createQuestion(`ai-sa-${now}-${index}`, "short-answer"),
-      question: `AI-generated short answer question ${index + 1}: explain the idea briefly.`,
-      correctAnswer: "Expected answer",
+    ...Array.from({ length: shortCount }, (_, index) =>
+      createQuestion('short-answer', `ai-sa-${seed}-${index}`),
+    ).map((question, index) => ({
+      ...question,
+      question: `AI Generated Short Answer Question ${index + 1}: Briefly explain this concept.`,
+      correctAnswer: 'Expected answer',
     })),
-  ];
+  ]
 }
 
 export function useExamBuilder() {
-  const practiceMaterials = useQuestionBankTests();
-  const [examTitle, setExamTitle] = useState("");
-  const [questions, setQuestions] = useState<NewQuestion[]>([]);
-  const [duration, setDuration] = useState(60);
-  const [showAIDialog, setShowAIDialog] = useState(false);
-  const [aiMCCount, setAiMCCount] = useState(5);
-  const [aiTFCount, setAiTFCount] = useState(3);
-  const [aiShortCount, setAiShortCount] = useState(2);
-  const [selectedMaterialIds, setSelectedMaterialIds] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
+  const [examTitle, setExamTitle] = useState('')
+  const [questions, setQuestions] = useState<NewQuestion[]>([])
+  const [duration, setDuration] = useState(60)
+  const [showAIDialog, setShowAIDialog] = useState(false)
+  const [aiMCCount, setAiMCCount] = useState(5)
+  const [aiTFCount, setAiTFCount] = useState(3)
+  const [aiShortCount, setAiShortCount] = useState(2)
+  const [selectedMockTests, setSelectedMockTests] = useState<string[]>([])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([])
 
   const addQuestion = (type: QuestionType) => {
-    setQuestions((currentQuestions) => [...currentQuestions, createQuestion(`new-${Date.now()}`, type)]);
-  };
+    setQuestions((current) => [...current, createQuestion(type, `new-${Date.now()}`)])
+  }
 
   const updateQuestion = (id: string, updates: Partial<NewQuestion>) => {
-    setQuestions((currentQuestions) =>
-      currentQuestions.map((question) => question.id === id ? { ...question, ...updates } : question),
-    );
-  };
+    setQuestions((current) =>
+      current.map((question) => (question.id === id ? { ...question, ...updates } : question)),
+    )
+  }
 
   const updateOption = (questionId: string, optionIndex: number, value: string) => {
-    setQuestions((currentQuestions) =>
-      currentQuestions.map((question) => {
-        if (question.id !== questionId || !question.options) return question;
-        const nextOptions = [...question.options];
-        nextOptions[optionIndex] = value;
-        return { ...question, options: nextOptions };
+    setQuestions((current) =>
+      current.map((question) => {
+        if (question.id !== questionId || !question.options) return question
+        const options = [...question.options]
+        options[optionIndex] = value
+        return { ...question, options }
       }),
-    );
-  };
+    )
+  }
 
   const removeQuestion = (id: string) => {
-    setQuestions((currentQuestions) => currentQuestions.filter((question) => question.id !== id));
-  };
+    setQuestions((current) => current.filter((question) => question.id !== id))
+  }
 
   const generateAIQuestions = async () => {
-    setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setQuestions((currentQuestions) => [...currentQuestions, ...buildGeneratedQuestions(aiMCCount, aiTFCount, aiShortCount)]);
-    setIsGenerating(false);
-    setShowAIDialog(false);
-  };
+    setIsGenerating(true)
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setQuestions((current) => [
+      ...current,
+      ...createAiQuestions(aiMCCount, aiTFCount, aiShortCount),
+    ])
+    setIsGenerating(false)
+    setShowAIDialog(false)
+  }
 
   const addScheduleEntry = () => {
-    setScheduleEntries((currentEntries) => [...currentEntries, { classId: "", date: "", time: "" }]);
-  };
+    setScheduleEntries((current) => [...current, { classId: '', date: '', time: '' }])
+  }
 
-  const updateScheduleEntry = (index: number, field: keyof ScheduleEntry, value: string) => {
-    setScheduleEntries((currentEntries) =>
-      currentEntries.map((entry, entryIndex) => entryIndex === index ? { ...entry, [field]: value } : entry),
-    );
-  };
+  const updateScheduleEntry = (
+    index: number,
+    field: keyof ScheduleEntry,
+    value: string,
+  ) => {
+    setScheduleEntries((current) => {
+      const updated = [...current]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
 
   const removeScheduleEntry = (index: number) => {
-    setScheduleEntries((currentEntries) => currentEntries.filter((_, entryIndex) => entryIndex !== index));
-  };
-
-  const totalPoints = questions.reduce((sum, question) => sum + question.points, 0);
-  const questionCounts = {
-    "multiple-choice": questions.filter((question) => question.type === "multiple-choice").length,
-    "true-false": questions.filter((question) => question.type === "true-false").length,
-    "short-answer": questions.filter((question) => question.type === "short-answer").length,
-    essay: questions.filter((question) => question.type === "essay").length,
-  };
+    setScheduleEntries((current) => current.filter((_, entryIndex) => entryIndex !== index))
+  }
 
   return {
     addQuestion,
@@ -112,24 +129,21 @@ export function useExamBuilder() {
     examTitle,
     generateAIQuestions,
     isGenerating,
-    practiceMaterials,
-    questionCounts,
     questions,
     removeQuestion,
     removeScheduleEntry,
     scheduleEntries,
-    selectedMaterialIds,
+    selectedMockTests,
     setAiMCCount,
     setAiShortCount,
     setAiTFCount,
     setDuration,
     setExamTitle,
-    setSelectedMaterialIds,
+    setSelectedMockTests,
     setShowAIDialog,
     showAIDialog,
-    totalPoints,
     updateOption,
     updateQuestion,
     updateScheduleEntry,
-  };
+  }
 }

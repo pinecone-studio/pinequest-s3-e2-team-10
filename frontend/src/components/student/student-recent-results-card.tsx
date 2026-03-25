@@ -1,19 +1,16 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatMockDate } from "@/lib/date-utils";
-import type { ExamResult } from "@/lib/mock-data";
+'use client'
 
-type StudentRecentResultsCardProps = {
-  findExamTitle: (examId: string) => string;
-  results: ExamResult[];
-};
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { exams, type ExamResult } from '@/lib/mock-data'
 
 export function StudentRecentResultsCard({
-  findExamTitle,
   results,
-}: StudentRecentResultsCardProps) {
+}: {
+  results: ExamResult[]
+}) {
   if (results.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -25,40 +22,30 @@ export function StudentRecentResultsCard({
       <CardContent>
         <div className="space-y-3">
           {results.map((result) => {
-            const percentage = Math.round((result.score / result.totalPoints) * 100);
+            const exam = exams.find((entry) => entry.id === result.examId)
+            const percentage = Math.round((result.score / result.totalPoints) * 100)
+            const badgeVariant =
+              percentage >= 70 ? 'default' : percentage >= 50 ? 'secondary' : 'destructive'
 
             return (
-              <div
-                key={`${result.examId}-${result.studentId}`}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
+              <div key={`${result.examId}-${result.studentId}`} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
-                  <div className="font-medium">{findExamTitle(result.examId)}</div>
+                  <div className="font-medium">{exam?.title}</div>
                   <div className="text-sm text-muted-foreground">
-                    Submitted: {formatMockDate(result.submittedAt.split("T")[0])}
+                    Submitted: {new Date(result.submittedAt).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="text-right">
-                  <Badge
-                    variant={
-                      percentage >= 70
-                        ? "default"
-                        : percentage >= 50
-                          ? "secondary"
-                          : "destructive"
-                    }
-                  >
-                    {percentage}%
-                  </Badge>
+                  <Badge variant={badgeVariant}>{percentage}%</Badge>
                   <div className="text-sm text-muted-foreground">
                     {result.score}/{result.totalPoints}
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
