@@ -1,52 +1,78 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">ExamFlow LMS</h1>
-          <p className="text-muted-foreground">Learning Management System - Exam Module</p>
+    <main className="skywash-background relative min-h-screen overflow-hidden p-4">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="ocean-glow absolute left-1/2 top-[18%] h-36 w-72 -translate-x-1/2 blur-2xl" />
+        <div className="ocean-glow absolute left-1/2 bottom-[10%] h-32 w-[22rem] -translate-x-1/2 opacity-60 blur-3xl" />
+      </div>
+
+      <div className="relative flex min-h-[calc(100vh-2rem)] items-center justify-center">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-[#16324F] md:text-4xl">
+              ExamFlow LMS
+            </h1>
+            <p className="mt-2 text-[#35516E]">
+              Learning Management System - Exam Module
+            </p>
+          </div>
+
+          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="wave-accent pointer-events-none absolute inset-x-6 -top-8 h-24 opacity-70" />
+            <Link href="/teacher/dashboard">
+              <Card className="role-card h-full cursor-pointer rounded-[1.75rem] transition-all duration-200">
+                <CardHeader>
+                  <CardTitle className="text-[#16324F]">I am a Teacher</CardTitle>
+                  <CardDescription className="text-[#35516E]">
+                    Create and manage exams, view student results, and organize
+                    your question bank
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="primary-ocean-button w-full rounded-full border-0 font-semibold">
+                    Enter as Teacher
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/student/login">
+              <Card className="role-card h-full cursor-pointer rounded-[1.75rem] transition-all duration-200">
+                <CardHeader>
+                  <CardTitle className="text-[#16324F]">I am a Student</CardTitle>
+                  <CardDescription className="text-[#35516E]">
+                    Take exams, view mock tests, and check your exam schedule
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    className="secondary-ocean-button w-full rounded-full font-semibold"
+                    variant="outline"
+                  >
+                    Enter as Student
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+
+          <p className="mt-8 text-center text-sm text-[#35516E]">
+            Hackathon Demo - No real authentication required
+          </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link href="/teacher/dashboard">
-            <Card className="h-full cursor-pointer hover:border-foreground transition-colors">
-              <CardHeader>
-                <CardTitle>I am a Teacher</CardTitle>
-                <CardDescription>
-                  Create and manage exams, view student results, and organize your question bank
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full">Enter as Teacher</Button>
-              </CardContent>
-            </Card>
-          </Link>
-          
-          <Link href="/student/login">
-            <Card className="h-full cursor-pointer hover:border-foreground transition-colors">
-              <CardHeader>
-                <CardTitle>I am a Student</CardTitle>
-                <CardDescription>
-                  Take exams, view mock tests, and check your exam schedule
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" variant="outline">Enter as Student</Button>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-        
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          Hackathon Demo - No real authentication required
-        </p>
       </div>
     </main>
-  )
+  );
 }
