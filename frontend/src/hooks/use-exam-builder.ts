@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { Exam } from '@/lib/mock-data'
 import type { NewQuestion, QuestionType, ScheduleEntry } from '@/components/teacher/exam-builder-types'
+import { useAiSourceFiles } from '@/hooks/use-ai-source-files'
 
 function createQuestion(type: QuestionType, id: string): NewQuestion {
   return {
@@ -55,6 +57,9 @@ export function useExamBuilder() {
   const [examTitle, setExamTitle] = useState('')
   const [questions, setQuestions] = useState<NewQuestion[]>([])
   const [duration, setDuration] = useState(60)
+  const aiSourceFiles = useAiSourceFiles()
+  const [reportReleaseMode, setReportReleaseMode] =
+    useState<Exam['reportReleaseMode']>('after-all-classes-complete')
   const [showAIDialog, setShowAIDialog] = useState(false)
   const [aiMCCount, setAiMCCount] = useState(5)
   const [aiTFCount, setAiTFCount] = useState(3)
@@ -120,6 +125,7 @@ export function useExamBuilder() {
   }
 
   return {
+    ...aiSourceFiles,
     addQuestion,
     addScheduleEntry,
     aiMCCount,
@@ -130,6 +136,7 @@ export function useExamBuilder() {
     generateAIQuestions,
     isGenerating,
     questions,
+    reportReleaseMode,
     removeQuestion,
     removeScheduleEntry,
     scheduleEntries,
@@ -139,6 +146,7 @@ export function useExamBuilder() {
     setAiTFCount,
     setDuration,
     setExamTitle,
+    setReportReleaseMode,
     setSelectedMockTests,
     setShowAIDialog,
     showAIDialog,
