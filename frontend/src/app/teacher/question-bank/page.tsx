@@ -103,9 +103,9 @@ export default function QuestionBankPage() {
       {tests.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">No mock tests uploaded yet</p>
+            <p className="text-muted-foreground">Одоогоор demo шалгалт оруулаагүй байна</p>
             <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
-              Upload Your First Test
+              Анхны Шалгалтаа Оруулах
             </Button>
           </CardContent>
         </Card>

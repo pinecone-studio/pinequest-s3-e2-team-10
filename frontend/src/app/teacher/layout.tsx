@@ -7,13 +7,13 @@ import { BookOpen, ChevronLeft, ChevronRight, ClipboardList, LayoutDashboard, Us
 import { BrandLogo } from "@/components/brand-logo"
 import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { cn } from "@/lib/utils"
-import { teacher } from "@/lib/mock-data"
+import { teacher } from "@/lib/mock-data-helpers"
 
 const navItems = [
-  { href: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/teacher/classes", label: "Classes", icon: Users },
-  { href: "/teacher/question-bank", label: "Question Bank", icon: BookOpen },
-  { href: "/teacher/exams", label: "Exams", icon: ClipboardList },
+  { href: "/teacher/dashboard", label: "Хянах Самбар", icon: LayoutDashboard },
+  { href: "/teacher/classes", label: "Ангиуд", icon: Users },
+  { href: "/teacher/question-bank", label: "Асуултын Сан", icon: BookOpen },
+  { href: "/teacher/exams", label: "Шалгалтууд", icon: ClipboardList },
 ]
 
 export default function TeacherLayout({
