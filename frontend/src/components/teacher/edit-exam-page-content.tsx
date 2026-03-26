@@ -1,35 +1,49 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { CircleAlert, Trash2 } from 'lucide-react'
-import { EditExamAiDialog } from '@/components/teacher/edit-exam-ai-dialog'
-import { ExamBuilderQuestionList } from '@/components/teacher/exam-builder-question-list'
-import { ExamBuilderSummaryCard } from '@/components/teacher/exam-builder-summary-card'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Spinner } from '@/components/ui/spinner'
-import type { useExamBuilder } from '@/hooks/use-exam-builder'
-import type { useExamCreation } from '@/hooks/use-exam-creation'
+import Link from "next/link";
+import { CircleAlert, Trash2 } from "lucide-react";
+import { EditExamAiDialog } from "@/components/teacher/edit-exam-ai-dialog";
+import { ExamBuilderQuestionList } from "@/components/teacher/exam-builder-question-list";
+import { ExamBuilderSummaryCard } from "@/components/teacher/exam-builder-summary-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import type { useExamBuilder } from "@/hooks/use-exam-builder";
+import type { useExamCreation } from "@/hooks/use-exam-creation";
 
-type ExamBuilderState = ReturnType<typeof useExamBuilder>
-type ExamCreationState = ReturnType<typeof useExamCreation>
+type ExamBuilderState = ReturnType<typeof useExamBuilder>;
+type ExamCreationState = ReturnType<typeof useExamCreation>;
 
 export function EditExamPageContent({
   builder,
   creation,
+  isDeleteDialogOpen,
   isDeleting,
   isLoading,
   loadError,
+  onDeleteDialogOpenChange,
   onDelete,
 }: {
-  builder: ExamBuilderState
-  creation: ExamCreationState
-  isDeleting: boolean
-  isLoading: boolean
-  loadError: string | null
-  onDelete: () => void
+  builder: ExamBuilderState;
+  creation: ExamCreationState;
+  isDeleteDialogOpen: boolean;
+  isDeleting: boolean;
+  isLoading: boolean;
+  loadError: string | null;
+  onDeleteDialogOpenChange: (open: boolean) => void;
+  onDelete: () => void;
 }) {
   const {
     addQuestion,
@@ -64,22 +78,32 @@ export function EditExamPageContent({
     updateOption,
     updateQuestion,
     updateScheduleEntry,
-  } = builder
-  const { canSaveDraft, canScheduleExam, submissionError, submitExam, submitMode } = creation
+  } = builder;
+  const {
+    canSaveDraft,
+    canScheduleExam,
+    submissionError,
+    submitExam,
+    submitMode,
+  } = creation;
 
-  const totalPoints = questions.reduce((sum, q) => sum + q.points, 0)
+  const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
   const questionCounts = {
-    'multiple-choice': questions.filter((q) => q.type === 'multiple-choice').length,
-    'true-false': questions.filter((q) => q.type === 'true-false').length,
-    'short-answer': questions.filter((q) => q.type === 'short-answer').length,
-    essay: questions.filter((q) => q.type === 'essay').length,
-  }
+    "multiple-choice": questions.filter((q) => q.type === "multiple-choice")
+      .length,
+    "true-false": questions.filter((q) => q.type === "true-false").length,
+    "short-answer": questions.filter((q) => q.type === "short-answer").length,
+    essay: questions.filter((q) => q.type === "essay").length,
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/teacher/exams" className="text-sm text-muted-foreground hover:underline">
+          <Link
+            href="/teacher/exams"
+            className="text-sm text-muted-foreground hover:underline"
+          >
             &larr; Back to Exams
           </Link>
           <h1 className="text-2xl font-bold mt-2">Edit Scheduled Exam</h1>
@@ -88,12 +112,44 @@ export function EditExamPageContent({
           <Button variant="outline" onClick={() => setShowAIDialog(true)}>
             Prepare Questions with AI
           </Button>
-          <Button variant="destructive" onClick={onDelete} disabled={isDeleting || isLoading}>
-            {isDeleting ? <Spinner className="mr-2" /> : <Trash2 className="mr-2 h-4 w-4" />}
+          <Button
+            variant="destructive"
+            onClick={() => onDeleteDialogOpenChange(true)}
+            disabled={isDeleting || isLoading}
+          >
+            {isDeleting ? (
+              <Spinner className="mr-2" />
+            ) : (
+              <Trash2 className="mr-2 h-4 w-4" />
+            )}
             Delete Exam
           </Button>
         </div>
       </div>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={onDeleteDialogOpenChange}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>🗑️ Шалгалтыг устгах уу?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ⚠️ Та энэ шалгалтыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг
+              буцаах боломжгүй.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Үгүй</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={onDelete}
+              disabled={isDeleting}
+            >
+              Тийм
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {loadError ? (
         <Alert variant="destructive">
           <CircleAlert />
@@ -140,12 +196,19 @@ export function EditExamPageContent({
         totalPoints={totalPoints}
       />
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => void submitExam('draft')} disabled={!canSaveDraft || isLoading}>
-          {submitMode === 'draft' ? <Spinner className="mr-2" /> : null}
+        <Button
+          variant="outline"
+          onClick={() => void submitExam("draft")}
+          disabled={!canSaveDraft || isLoading}
+        >
+          {submitMode === "draft" ? <Spinner className="mr-2" /> : null}
           Save as Draft
         </Button>
-        <Button onClick={() => void submitExam('scheduled')} disabled={!canScheduleExam || isLoading}>
-          {submitMode === 'scheduled' ? <Spinner className="mr-2" /> : null}
+        <Button
+          onClick={() => void submitExam("scheduled")}
+          disabled={!canScheduleExam || isLoading}
+        >
+          {submitMode === "scheduled" ? <Spinner className="mr-2" /> : null}
           Update Scheduled Exam
         </Button>
       </div>
@@ -169,5 +232,5 @@ export function EditExamPageContent({
         setShowAIDialog={setShowAIDialog}
       />
     </div>
-  )
+  );
 }
