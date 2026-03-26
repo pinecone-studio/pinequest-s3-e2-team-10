@@ -63,23 +63,25 @@ export interface ExamResult {
 // Mock Students
 export const students: Student[] = [
   // Class 10A
-  { id: 's1', name: 'Alice Johnson', email: 'alice@school.com', password: 'alice123', classId: '10A' },
-  { id: 's2', name: 'Bob Smith', email: 'bob@school.com', password: 'bob123', classId: '10A' },
-  { id: 's3', name: 'Charlie Brown', email: 'charlie@school.com', password: 'charlie123', classId: '10A' },
-  { id: 's4', name: 'Diana Ross', email: 'diana@school.com', password: 'diana123', classId: '10A' },
-  { id: 's5', name: 'Edward Lee', email: 'edward@school.com', password: 'edward123', classId: '10A' },
-  // Class 10B
-  { id: 's6', name: 'Fiona Green', email: 'fiona@school.com', password: 'fiona123', classId: '10B' },
-  { id: 's7', name: 'George White', email: 'george@school.com', password: 'george123', classId: '10B' },
-  { id: 's8', name: 'Hannah Black', email: 'hannah@school.com', password: 'hannah123', classId: '10B' },
-  { id: 's9', name: 'Ivan Grey', email: 'ivan@school.com', password: 'ivan123', classId: '10B' },
-  { id: 's10', name: 'Julia Red', email: 'julia@school.com', password: 'julia123', classId: '10B' },
-  // Class 10C
-  { id: 's11', name: 'Kevin Blue', email: 'kevin@school.com', password: 'kevin123', classId: '10C' },
-  { id: 's12', name: 'Laura Pink', email: 'laura@school.com', password: 'laura123', classId: '10C' },
-  { id: 's13', name: 'Mike Yellow', email: 'mike@school.com', password: 'mike123', classId: '10C' },
-  { id: 's14', name: 'Nina Orange', email: 'nina@school.com', password: 'nina123', classId: '10C' },
-  { id: 's15', name: 'Oscar Purple', email: 'oscar@school.com', password: 'oscar123', classId: '10C' },
+{ id: 's1', name: 'Бат-Эрдэнэ', email: 'baterdene@school.com', password: 'baterdene123', classId: '10A' },
+{ id: 's2', name: 'Сарангэрэл', email: 'sarangerel@school.com', password: 'sarangerel123', classId: '10A' },
+{ id: 's3', name: 'Тэмүүлэн', email: 'temuulen@school.com', password: 'temuulen123', classId: '10A' },
+{ id: 's4', name: 'Номин', email: 'nomin@school.com', password: 'nomin123', classId: '10A' },
+{ id: 's5', name: 'Энхжин', email: 'enkhjin@school.com', password: 'enkhjin123', classId: '10A' },
+
+// Class 10B
+{ id: 's6', name: 'Мөнх-Оргил', email: 'munkhorgil@school.com', password: 'munkhorgil123', classId: '10B' },
+{ id: 's7', name: 'Анударь', email: 'anudari@school.com', password: 'anudari123', classId: '10B' },
+{ id: 's8', name: 'Билгүүн', email: 'bilguun@school.com', password: 'bilguun123', classId: '10B' },
+{ id: 's9', name: 'Гэрэлмаа', email: 'gerelmaa@school.com', password: 'gerelmaa123', classId: '10B' },
+{ id: 's10', name: 'Дөлгөөн', email: 'dulguun@school.com', password: 'dulguun123', classId: '10B' },
+
+// Class 10C
+{ id: 's11', name: 'Төгөлдөр', email: 'tuguldur@school.com', password: 'tuguldur123', classId: '10C' },
+{ id: 's12', name: 'Хулан', email: 'khulan@school.com', password: 'khulan123', classId: '10C' },
+{ id: 's13', name: 'Отгонбаяр', email: 'otgonbayar@school.com', password: 'otgonbayar123', classId: '10C' },
+{ id: 's14', name: 'Баярмаа', email: 'bayarmaa@school.com', password: 'bayarmaa123', classId: '10C' },
+{ id: 's15', name: 'Сүхбат', email: 'sukhbat@school.com', password: 'sukhbat123', classId: '10C' },
 ]
 
 // Mock Classes
