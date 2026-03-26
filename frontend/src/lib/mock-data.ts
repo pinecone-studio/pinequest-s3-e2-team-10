@@ -93,23 +93,23 @@ export const classes: Class[] = [
 
 // Mock Tests (Question Bank)
 export const mockTests: MockTest[] = [
-  { id: 'mt1', name: 'HTML Basics Test', fileName: 'html-basics.pdf', fileType: 'pdf', uploadedAt: '2026-03-10', teacherId: 'teacher1' },
-  { id: 'mt2', name: 'CSS Fundamentals', fileName: 'css-fundamentals.pdf', fileType: 'pdf', uploadedAt: '2026-03-12', teacherId: 'teacher1' },
-  { id: 'mt3', name: 'JavaScript Quiz', fileName: 'js-quiz.pdf', fileType: 'pdf', uploadedAt: '2026-03-15', teacherId: 'teacher1' },
-  { id: 'mt4', name: 'Semester 1 Mock Exam', fileName: 'semester1-mock.pdf', fileType: 'pdf', uploadedAt: '2026-03-18', teacherId: 'teacher1' },
+  { id: 'mt1', name: 'Математикийн дасгал', fileName: 'mathematics-test.pdf', fileType: 'pdf', uploadedAt: '2026-03-10', teacherId: 'teacher1' },
+  { id: 'mt2', name: 'Нийгмийн ухааны шалгалт', fileName: 'social-studies-test.pdf', fileType: 'pdf', uploadedAt: '2026-03-12', teacherId: 'teacher1' },
+  { id: 'mt3', name: 'Физикийн сорил', fileName: 'physics-quiz.pdf', fileType: 'pdf', uploadedAt: '2026-03-15', teacherId: 'teacher1' },
+  { id: 'mt4', name: 'Нэгдсэн жишиг шалгалт', fileName: 'combined-mock-exam.pdf', fileType: 'pdf', uploadedAt: '2026-03-18', teacherId: 'teacher1' },
 ]
 
 // Mock Exams
 export const exams: Exam[] = [
   {
     id: 'e1',
-    title: 'HTML Midterm Exam',
+    title: 'Математикийн дунд шалгалт',
     questions: [
-      { id: 'q1', type: 'multiple-choice', question: 'What does HTML stand for?', options: ['Hyper Text Markup Language', 'High Tech Modern Language', 'Home Tool Markup Language', 'Hyperlinks Text Mark Language'], correctAnswer: 'Hyper Text Markup Language', points: 10 },
-      { id: 'q2', type: 'true-false', question: 'HTML is a programming language.', correctAnswer: 'False', points: 5 },
-      { id: 'q3', type: 'short-answer', question: 'What tag is used to create a hyperlink?', correctAnswer: '<a>', points: 10 },
-      { id: 'q4', type: 'multiple-choice', question: 'Which tag is used for the largest heading?', options: ['<h6>', '<h1>', '<heading>', '<head>'], correctAnswer: '<h1>', points: 10 },
-      { id: 'q5', type: 'essay', question: 'Explain the difference between block and inline elements.', points: 15 },
+      { id: 'q1', type: 'multiple-choice', question: '2 + 3 × 4 = ?', options: ['20', '14', '24', '10'], correctAnswer: '14', points: 10 },
+      { id: 'q2', type: 'true-false', question: '√16 = 5.', correctAnswer: 'Худал', points: 5 },
+      { id: 'q3', type: 'short-answer', question: 'x + 5 = 12 бол x = ?', correctAnswer: '7', points: 10 },
+      { id: 'q4', type: 'multiple-choice', question: 'Тэгш өнцөгт гурвалжинд гипотенуз аль нь вэ?', options: ['Хамгийн урт тал', 'Хамгийн богино тал', 'Өндөр', 'Суурь'], correctAnswer: 'Хамгийн урт тал', points: 10 },
+      { id: 'q5', type: 'essay', question: 'Квадрат тэгшитгэлийг бодох аргуудыг тайлбарлана уу.', points: 15 },
     ],
     duration: 45,
     reportReleaseMode: 'after-all-classes-complete',
@@ -122,11 +122,11 @@ export const exams: Exam[] = [
   },
   {
     id: 'e2',
-    title: 'CSS Styling Quiz',
+    title: 'Нийгмийн ухааны сорил',
     questions: [
-      { id: 'q6', type: 'multiple-choice', question: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Creative Style System', 'Computer Style Sheets', 'Colorful Style Sheets'], correctAnswer: 'Cascading Style Sheets', points: 10 },
-      { id: 'q7', type: 'true-false', question: 'CSS can change the content of HTML elements.', correctAnswer: 'False', points: 5 },
-      { id: 'q8', type: 'short-answer', question: 'What property is used to change text color?', correctAnswer: 'color', points: 10 },
+      { id: 'q6', type: 'multiple-choice', question: 'Ардчилал гэж юу вэ?', options: ['Нэг хүний засаглал', 'Ард түмний оролцоотой засаглал', 'Цэргийн засаглал', 'Хаант засаглал'], correctAnswer: 'Ард түмний оролцоотой засаглал', points: 10 },
+      { id: 'q7', type: 'true-false', question: 'Монгол улс хаант засаглалтай.', correctAnswer: 'Худал', points: 5 },
+      { id: 'q8', type: 'short-answer', question: 'Монгол Улсын нийслэл аль хот вэ?', correctAnswer: 'Улаанбаатар', points: 10 },
     ],
     duration: 30,
     reportReleaseMode: 'after-all-classes-complete',
@@ -138,10 +138,10 @@ export const exams: Exam[] = [
   },
   {
     id: 'e3',
-    title: 'JavaScript Fundamentals',
+    title: 'Физикийн шалгалт',
     questions: [
-      { id: 'q9', type: 'multiple-choice', question: 'Which keyword declares a constant?', options: ['var', 'let', 'const', 'constant'], correctAnswer: 'const', points: 10 },
-      { id: 'q10', type: 'true-false', question: 'JavaScript is case-sensitive.', correctAnswer: 'True', points: 5 },
+      { id: 'q9', type: 'multiple-choice', question: 'Хурд = ?', options: ['Зам / хугацаа', 'Хугацаа / зам', 'Масс × хурдатгал', 'Хүч / талбай'], correctAnswer: 'Зам / хугацаа', points: 10 },
+      { id: 'q10', type: 'true-false', question: 'Хүчний нэгж нь Ньютон.', correctAnswer: 'Үнэн', points: 5 },
     ],
     duration: 60,
     reportReleaseMode: 'after-all-classes-complete',
@@ -154,7 +154,6 @@ export const exams: Exam[] = [
     status: 'scheduled',
   },
 ]
-
 // Mock Exam Results (for completed exams)
 export const examResults: ExamResult[] = [
   // 10A results for HTML Midterm
@@ -167,101 +166,3 @@ export const examResults: ExamResult[] = [
   { examId: 'e1', studentId: 's6', score: 38, totalPoints: 50, answers: [{ questionId: 'q1', answer: 'Hyper Text Markup Language', isCorrect: true }, { questionId: 'q2', answer: 'True', isCorrect: false }, { questionId: 'q3', answer: '<a>', isCorrect: true }, { questionId: 'q4', answer: '<h1>', isCorrect: true }, { questionId: 'q5', answer: 'Block elements...', isCorrect: true }], submittedAt: '2026-03-20T14:40:00' },
   { examId: 'e1', studentId: 's7', score: 42, totalPoints: 50, answers: [{ questionId: 'q1', answer: 'Hyper Text Markup Language', isCorrect: true }, { questionId: 'q2', answer: 'False', isCorrect: true }, { questionId: 'q3', answer: '<a>', isCorrect: true }, { questionId: 'q4', answer: '<heading>', isCorrect: false }, { questionId: 'q5', answer: 'Explanation...', isCorrect: true }], submittedAt: '2026-03-20T14:38:00' },
 ]
-
-// Class schedule (for teacher dashboard calendar)
-export const classSchedule = [
-  { classId: '10A', day: 'Monday', time: '09:00-10:30', subject: 'Web Development' },
-  { classId: '10A', day: 'Wednesday', time: '09:00-10:30', subject: 'Web Development' },
-  { classId: '10B', day: 'Monday', time: '14:00-15:30', subject: 'Web Development' },
-  { classId: '10B', day: 'Thursday', time: '14:00-15:30', subject: 'Web Development' },
-  { classId: '10C', day: 'Tuesday', time: '11:00-12:30', subject: 'Web Development' },
-  { classId: '10C', day: 'Friday', time: '11:00-12:30', subject: 'Web Development' },
-]
-
-// Teacher info
-export const teacher = {
-  id: 'teacher1',
-  name: 'Mr. Anderson',
-  email: 'anderson@school.com',
-  subject: 'Web Development',
-}
-
-// Helper functions
-export function getClassById(id: string) {
-  return classes.find(c => c.id === id)
-}
-
-export function getStudentById(id: string) {
-  return students.find(s => s.id === id)
-}
-
-export function getExamsForClass(classId: string) {
-  return exams.filter(e => e.scheduledClasses.some(sc => sc.classId === classId))
-}
-
-export function getExamResults(examId: string, classId?: string) {
-  const results = examResults.filter(r => r.examId === examId)
-  if (classId) {
-    const classStudentIds = students.filter(s => s.classId === classId).map(s => s.id)
-    return results.filter(r => classStudentIds.includes(r.studentId))
-  }
-  return results
-}
-
-export function getQuestionStats(examId: string) {
-  const exam = exams.find(e => e.id === examId)
-  if (!exam) return []
-  
-  const results = examResults.filter(r => r.examId === examId)
-  
-  return exam.questions.map(q => {
-    const answers = results.flatMap(r => r.answers.filter(a => a.questionId === q.id))
-    const correctCount = answers.filter(a => a.isCorrect).length
-    const totalCount = answers.length
-    return {
-      questionId: q.id,
-      question: q.question,
-      type: q.type,
-      correctCount,
-      totalCount,
-      failRate: totalCount > 0 ? ((totalCount - correctCount) / totalCount) * 100 : 0,
-    }
-  }).sort((a, b) => b.failRate - a.failRate)
-}
-
-function getScheduleEndTime(date: string, time: string, duration: number) {
-  const start = new Date(`${date}T${time}:00`)
-  return new Date(start.getTime() + duration * 60 * 1000)
-}
-
-export function getExamReportReleaseDate(exam: Exam) {
-  if (exam.reportReleaseMode === 'immediately') {
-    return null
-  }
-
-  return exam.scheduledClasses.reduce<Date | null>((latest, schedule) => {
-    const endTime = getScheduleEndTime(schedule.date, schedule.time, exam.duration)
-    if (!latest || endTime > latest) {
-      return endTime
-    }
-    return latest
-  }, null)
-}
-
-export function isExamReportAvailable(examId: string) {
-  const exam = exams.find((entry) => entry.id === examId)
-  if (!exam) {
-    return false
-  }
-
-  if (exam.reportReleaseMode === 'immediately') {
-    return true
-  }
-
-  const releaseDate = getExamReportReleaseDate(exam)
-  if (!releaseDate) {
-    return false
-  }
-
-  return new Date() >= releaseDate
-}
