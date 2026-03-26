@@ -46,9 +46,6 @@ jobs:
       contents: read
       issues: write
       pull-requests: write
-    defaults:
-      run:
-        working-directory: frontend
     env:
       # This workflow is designed to deploy via the Vercel CLI and secrets.
       # It does not require Git integration in the Vercel project.
@@ -82,6 +79,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.vercel.outputs.configured == 'true'
+        working-directory: frontend
         run: npm ci
 
       - name: Pull Vercel environment
