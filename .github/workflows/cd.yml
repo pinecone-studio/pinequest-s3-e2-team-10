@@ -103,6 +103,19 @@ jobs:
         if: steps.vercel.outputs.configured == 'true' && env.VERCEL_ENV == 'preview'
         run: npx vercel build --token="$VERCEL_TOKEN"
 
+      - name: Inspect prebuilt output
+        if: steps.vercel.outputs.configured == 'true'
+        run: |
+          if [ ! -f .vercel/output/config.json ]; then
+            echo "Missing .vercel/output/config.json"
+            exit 1
+          fi
+          echo "Prebuilt output config:"
+          cat .vercel/output/config.json
+          echo
+          echo "Top-level output entries:"
+          find .vercel/output -maxdepth 2 -type f | sort | head -n 200
+
       - name: Deploy preview
         id: deploy_preview
         if: steps.vercel.outputs.configured == 'true' && env.VERCEL_ENV == 'preview'
@@ -173,6 +186,7 @@ jobs:
         if: steps.vercel.outputs.configured == 'true' && steps.finalize.outputs.deployment_url != ''
         env:
           DEPLOYMENT_URL: ${{ steps.finalize.outputs.deployment_url }}
+          IS_PREVIEW: ${{ env.VERCEL_ENV == 'preview' && 'true' || 'false' }}
         run: |
           echo "Checking $DEPLOYMENT_URL"
           for attempt in 1 2 3 4 5; do
@@ -180,6 +194,11 @@ jobs:
             echo "Attempt $attempt returned HTTP $status"
             if [ "$status" = "200" ]; then
               echo "Deployment is reachable."
+              exit 0
+            fi
+            if [ "$status" = "401" ] && [ "$IS_PREVIEW" = "true" ]; then
+              echo "Preview is protected by Vercel authentication."
+              echo "The deployment exists, but anonymous requests are blocked."
               exit 0
             fi
             sleep 5
