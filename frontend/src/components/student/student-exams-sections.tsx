@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { exams, isExamReportAvailable, type Exam, type ExamResult } from '@/lib/mock-data'
+import type { Exam, ExamResult } from '@/lib/mock-data'
+import { isStudentExamReportAvailable } from '@/lib/student-exams'
 
 function formatCountdown(seconds: number) {
   const hours = Math.floor(seconds / 3600)
@@ -119,8 +120,10 @@ export function StudentUpcomingExamsSection({
   )
 }
 export function StudentCompletedExamsSection({
+  exams,
   results,
 }: {
+  exams: Exam[]
   results: ExamResult[]
 }) {
   return (
@@ -137,7 +140,7 @@ export function StudentCompletedExamsSection({
           const percentage = Math.round((result.score / result.totalPoints) * 100)
           const variant =
             percentage >= 70 ? 'default' : percentage >= 50 ? 'secondary' : 'destructive'
-          const isReportAvailable = isExamReportAvailable(result.examId)
+          const isReportAvailable = exam ? isStudentExamReportAvailable(exam) : false
 
           return (
             <Card key={`${result.examId}-${result.studentId}`}>
