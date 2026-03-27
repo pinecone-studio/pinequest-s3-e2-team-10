@@ -74,6 +74,8 @@ jobs:
             cd "$APP_DIR"
 
             git fetch "$REPO_URL" main
+            git reset --hard FETCH_HEAD
+            git clean -fd
             git checkout -B main FETCH_HEAD
 
             cd backend
