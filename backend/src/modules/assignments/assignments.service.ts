@@ -71,7 +71,12 @@ export class AssignmentsService {
         await this.databaseService.execute(
           `INSERT INTO assignments (id, assessment_id, candidate_id, status)
            VALUES (?, ?, ?, ?)`,
-          [payload.id, payload.assessmentId, payload.candidateId, payload.status],
+          [
+            payload.id,
+            payload.assessmentId,
+            payload.candidateId,
+            payload.status,
+          ],
         );
         return payload;
       }
@@ -109,7 +114,10 @@ export class AssignmentsService {
       const assignment = await this.findOne(id);
 
       if (this.databaseService.isConfigured()) {
-        await this.databaseService.execute('DELETE FROM assignments WHERE id = ?', [id]);
+        await this.databaseService.execute(
+          'DELETE FROM assignments WHERE id = ?',
+          [id],
+        );
         return assignment;
       }
 

@@ -104,7 +104,9 @@ export class StudentExamResultsService {
     }, `Failed to load student exam result ${id}`);
   }
 
-  async upsert(payload: CreateStudentExamResultDto): Promise<StudentExamResult> {
+  async upsert(
+    payload: CreateStudentExamResultDto,
+  ): Promise<StudentExamResult> {
     return executeOrRethrowAsync(async () => {
       const timestamp = new Date().toISOString();
       const id = `${payload.examId.trim()}::${payload.studentId.trim()}`;
@@ -123,10 +125,12 @@ export class StudentExamResultsService {
         updatedAt: timestamp,
       };
 
-      const existing = (await this.readRecords({
-        examId: nextRecord.examId,
-        studentId: nextRecord.studentId,
-      }))[0];
+      const existing = (
+        await this.readRecords({
+          examId: nextRecord.examId,
+          studentId: nextRecord.studentId,
+        })
+      )[0];
 
       if (existing) {
         nextRecord.createdAt = existing.createdAt;
@@ -161,7 +165,8 @@ export class StudentExamResultsService {
         params.push(filters.classId);
       }
 
-      const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+      const whereSql =
+        whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
       return this.databaseService.query<StudentExamResultRecord>(
         `SELECT
@@ -198,8 +203,10 @@ export class StudentExamResultsService {
     return this.localStore.results
       .filter((record) => {
         if (filters?.examId && record.examId !== filters.examId) return false;
-        if (filters?.studentId && record.studentId !== filters.studentId) return false;
-        if (filters?.classId && record.classId !== filters.classId) return false;
+        if (filters?.studentId && record.studentId !== filters.studentId)
+          return false;
+        if (filters?.classId && record.classId !== filters.classId)
+          return false;
         return true;
       })
       .slice()
@@ -208,7 +215,10 @@ export class StudentExamResultsService {
 
   private async writeRecord(record: StudentExamResultRecord): Promise<void> {
     const upsertToDatabase = async () => {
-      const existing = await this.databaseService.queryFirst<{ id: string; createdAt: string }>(
+      const existing = await this.databaseService.queryFirst<{
+        id: string;
+        createdAt: string;
+      }>(
         `SELECT id, created_at as createdAt
          FROM student_exam_results
          WHERE exam_id = ? AND student_id = ?
@@ -274,7 +284,8 @@ export class StudentExamResultsService {
 
     await this.ensureLocalStoreLoaded();
     const existingIndex = this.localStore.results.findIndex(
-      (entry) => entry.examId === record.examId && entry.studentId === record.studentId,
+      (entry) =>
+        entry.examId === record.examId && entry.studentId === record.studentId,
     );
 
     if (existingIndex >= 0) {
@@ -297,7 +308,9 @@ export class StudentExamResultsService {
 
     try {
       const rawContent = await readFile(this.localStorePath, 'utf8');
-      const parsed = JSON.parse(rawContent) as Partial<LocalStudentExamResultStore>;
+      const parsed = JSON.parse(
+        rawContent,
+      ) as Partial<LocalStudentExamResultStore>;
       this.localStore = {
         results: parsed.results ?? [],
       };

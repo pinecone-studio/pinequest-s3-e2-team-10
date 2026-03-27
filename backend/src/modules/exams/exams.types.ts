@@ -57,8 +57,9 @@ export type CreateExamDto = {
   schedules: CreateExamScheduleDto[];
 };
 
-export type UpdateExamDto = Partial<Omit<CreateExamDto, 'questions' | 'schedules'>> & {
+export type UpdateExamDto = Partial<
+  Omit<CreateExamDto, 'questions' | 'schedules'>
+> & {
   questions?: CreateExamQuestionDto[];
   schedules?: CreateExamScheduleDto[];
 };
-

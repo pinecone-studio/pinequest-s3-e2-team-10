@@ -44,7 +44,10 @@ export class ResultsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() payload: UpdateResultDto): Promise<Result> {
+  async update(
+    @Param('id') id: string,
+    @Body() payload: UpdateResultDto,
+  ): Promise<Result> {
     return executeOrRethrowAsync(
       () => this.resultsService.update(id, payload),
       `Failed to handle PATCH /results/${id}`,

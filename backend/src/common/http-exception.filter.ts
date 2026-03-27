@@ -34,10 +34,9 @@ export class HttpExceptionLoggingFilter implements ExceptionFilter {
 
     const responseBody = this.buildResponseBody(exception, request, status);
 
-    const message =
-      Array.isArray(responseBody.message)
-        ? responseBody.message.join(' ')
-        : responseBody.message;
+    const message = Array.isArray(responseBody.message)
+      ? responseBody.message.join(' ')
+      : responseBody.message;
 
     const errorLog = {
       level: status >= 500 ? 'error' : 'warn',
@@ -136,7 +135,9 @@ export class HttpExceptionLoggingFilter implements ExceptionFilter {
         : 'Хүсэлтийн мэдээлэл буруу байна.';
     }
 
-    if (message.includes('Cloudflare D1 credentials are not fully configured')) {
+    if (
+      message.includes('Cloudflare D1 credentials are not fully configured')
+    ) {
       return 'Cloudflare D1-ийн орчны хувьсагч дутуу байна. `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, `CLOUDFLARE_D1_TOKEN` утгуудыг `.env` эсвэл deployment secret дээр бүрэн тохируулна уу.';
     }
 
@@ -156,7 +157,9 @@ export class HttpExceptionLoggingFilter implements ExceptionFilter {
       return 'Cloudflare D1 дээр SQL ажиллагаа амжилтгүй боллоо. Миграци, хүсэлтийн бүтэц, хүснэгтийн схемийг шалгана уу.';
     }
 
-    if (message.includes('Cloudflare R2 credentials are not fully configured')) {
+    if (
+      message.includes('Cloudflare R2 credentials are not fully configured')
+    ) {
       return 'Cloudflare R2-ийн орчны хувьсагч дутуу байна. `CLOUDFLARE_R2_BUCKET_NAME`, `CLOUDFLARE_R2_ENDPOINT`, `CLOUDFLARE_R2_ACCESS_KEY_ID`, `CLOUDFLARE_R2_SECRET_ACCESS_KEY` утгуудыг бүрэн тохируулна уу.';
     }
 

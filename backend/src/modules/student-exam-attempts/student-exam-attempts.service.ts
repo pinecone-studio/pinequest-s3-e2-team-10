@@ -115,8 +115,8 @@ export class StudentExamAttemptsService {
         startedAt: existing?.startedAt ?? payload.startedAt,
         submittedAt:
           payload.status === 'submitted'
-            ? payload.submittedAt ?? existing?.submittedAt ?? timestamp
-            : existing?.submittedAt ?? null,
+            ? (payload.submittedAt ?? existing?.submittedAt ?? timestamp)
+            : (existing?.submittedAt ?? null),
         createdAt: existing?.createdAt ?? timestamp,
         updatedAt: timestamp,
       };
@@ -194,7 +194,8 @@ export class StudentExamAttemptsService {
         if (filters?.examId && record.examId !== filters.examId) return false;
         if (filters?.studentId && record.studentId !== filters.studentId)
           return false;
-        if (filters?.classId && record.classId !== filters.classId) return false;
+        if (filters?.classId && record.classId !== filters.classId)
+          return false;
         if (filters?.status && record.status !== filters.status) return false;
         return true;
       })
@@ -269,7 +270,8 @@ export class StudentExamAttemptsService {
 
     await this.ensureLocalStoreLoaded();
     const existingIndex = this.localStore.attempts.findIndex(
-      (entry) => entry.examId === record.examId && entry.studentId === record.studentId,
+      (entry) =>
+        entry.examId === record.examId && entry.studentId === record.studentId,
     );
 
     if (existingIndex >= 0) {
@@ -292,7 +294,9 @@ export class StudentExamAttemptsService {
 
     try {
       const rawContent = await readFile(this.localStorePath, 'utf8');
-      const parsed = JSON.parse(rawContent) as Partial<LocalStudentExamAttemptStore>;
+      const parsed = JSON.parse(
+        rawContent,
+      ) as Partial<LocalStudentExamAttemptStore>;
       this.localStore = {
         attempts: parsed.attempts ?? [],
       };

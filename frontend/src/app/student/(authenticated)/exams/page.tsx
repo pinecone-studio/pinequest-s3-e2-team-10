@@ -5,15 +5,13 @@ import { StudentCompletedExamsSection } from "@/components/student/student-compl
 import { StudentTodayExamsSection, StudentUpcomingExamsSection } from "@/components/student/student-exams-sections"
 import { useStudentSession } from "@/hooks/use-student-session"
 import { examResults, exams as legacyExams, type Exam } from "@/lib/mock-data"
-import { loadStudentExamResults } from "@/lib/student-exam-results"
-import { getLocalDateString, getSecondsUntil, isScheduleVisible } from "@/lib/student-exam-time"
+import { getLocalDateString, getSecondsUntil } from "@/lib/student-exam-time"
 import { getStudentExams } from "@/lib/student-exams"
 
 export default function StudentExamsPage() {
   const { studentClass, studentId } = useStudentSession()
   const [countdowns, setCountdowns] = useState<Record<string, number>>({})
   const [allExams, setAllExams] = useState<Exam[]>(legacyExams)
-  const [allResults, setAllResults] = useState(examResults)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

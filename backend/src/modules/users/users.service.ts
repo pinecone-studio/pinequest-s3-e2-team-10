@@ -209,9 +209,17 @@ export class UsersService {
       const user = await this.findOne(id);
 
       if (this.databaseService.isConfigured()) {
-        await this.databaseService.execute('DELETE FROM student_profiles WHERE user_id = ?', [id]);
-        await this.databaseService.execute('DELETE FROM teacher_profiles WHERE user_id = ?', [id]);
-        await this.databaseService.execute('DELETE FROM users WHERE id = ?', [id]);
+        await this.databaseService.execute(
+          'DELETE FROM student_profiles WHERE user_id = ?',
+          [id],
+        );
+        await this.databaseService.execute(
+          'DELETE FROM teacher_profiles WHERE user_id = ?',
+          [id],
+        );
+        await this.databaseService.execute('DELETE FROM users WHERE id = ?', [
+          id,
+        ]);
         return user;
       }
 
@@ -226,9 +234,18 @@ export class UsersService {
     }
   }
 
-  private async syncProfiles(id: string, user: Pick<User, 'role' | 'classId' | 'subject'>) {
-    await this.databaseService.execute('DELETE FROM student_profiles WHERE user_id = ?', [id]);
-    await this.databaseService.execute('DELETE FROM teacher_profiles WHERE user_id = ?', [id]);
+  private async syncProfiles(
+    id: string,
+    user: Pick<User, 'role' | 'classId' | 'subject'>,
+  ) {
+    await this.databaseService.execute(
+      'DELETE FROM student_profiles WHERE user_id = ?',
+      [id],
+    );
+    await this.databaseService.execute(
+      'DELETE FROM teacher_profiles WHERE user_id = ?',
+      [id],
+    );
 
     if (user.role === 'student' && user.classId?.trim()) {
       await this.databaseService.execute(

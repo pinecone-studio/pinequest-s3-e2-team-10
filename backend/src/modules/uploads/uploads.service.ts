@@ -187,7 +187,10 @@ export class UploadsService {
       return true;
     }
 
-    if (candidate.$metadata?.httpStatusCode && candidate.$metadata.httpStatusCode >= 500) {
+    if (
+      candidate.$metadata?.httpStatusCode &&
+      candidate.$metadata.httpStatusCode >= 500
+    ) {
       return true;
     }
 
@@ -207,7 +210,11 @@ export class UploadsService {
   ): Promise<T> {
     let lastError: unknown;
 
-    for (let attempt = 0; attempt <= UploadsService.STORAGE_MAX_RETRIES; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt <= UploadsService.STORAGE_MAX_RETRIES;
+      attempt += 1
+    ) {
       const controller = new AbortController();
       const timeout = setTimeout(
         () => controller.abort(),
@@ -221,7 +228,10 @@ export class UploadsService {
       } catch (error) {
         lastError = error;
 
-        if (!this.isRetryableStorageError(error) || attempt === UploadsService.STORAGE_MAX_RETRIES) {
+        if (
+          !this.isRetryableStorageError(error) ||
+          attempt === UploadsService.STORAGE_MAX_RETRIES
+        ) {
           break;
         }
       } finally {
@@ -230,7 +240,9 @@ export class UploadsService {
     }
 
     const message =
-      lastError instanceof Error ? lastError.message : `Unknown ${operationName} failure`;
+      lastError instanceof Error
+        ? lastError.message
+        : `Unknown ${operationName} failure`;
 
     if (
       lastError &&
@@ -241,7 +253,9 @@ export class UploadsService {
       throw new GatewayTimeoutException(`${operationName} timed out`);
     }
 
-    throw new ServiceUnavailableException(`${operationName} failed: ${message}`);
+    throw new ServiceUnavailableException(
+      `${operationName} failed: ${message}`,
+    );
   }
 
   private async saveUploadRecord(record: UploadRecord): Promise<void> {
@@ -345,8 +359,8 @@ export class UploadsService {
     const bucketConfigured = Boolean(process.env.CLOUDFLARE_R2_BUCKET_NAME);
     const credentialConfigured = Boolean(
       process.env.CLOUDFLARE_R2_ENDPOINT &&
-        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
-        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+      process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
+      process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
     );
 
     if (!bucketConfigured || !credentialConfigured) {
@@ -378,7 +392,10 @@ export class UploadsService {
         configured: true,
         ok: false,
         latencyMs: Date.now() - startedAt,
-        error: error instanceof Error ? error.message : 'Unknown R2 health check failure',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Unknown R2 health check failure',
       };
     }
   }
@@ -387,45 +404,48 @@ export class UploadsService {
     file: UploadedFilePayload | undefined,
     folder?: string,
   ): Promise<UploadRecord> {
-    return executeOrRethrowAsync(async () => {
-      if (!file) {
-        throw new BadRequestException('A file is required');
-      }
+    return executeOrRethrowAsync(
+      async () => {
+        if (!file) {
+          throw new BadRequestException('A file is required');
+        }
 
-      if (!file.buffer?.length) {
-        throw new BadRequestException('Uploaded file is empty');
-      }
+        if (!file.buffer?.length) {
+          throw new BadRequestException('Uploaded file is empty');
+        }
 
-      const bucket = this.getBucketName();
-      const normalizedFolder = this.normalizeFolder(folder);
-      const key = this.buildObjectKey(file.originalname, normalizedFolder);
+        const bucket = this.getBucketName();
+        const normalizedFolder = this.normalizeFolder(folder);
+        const key = this.buildObjectKey(file.originalname, normalizedFolder);
 
-      await this.sendStorageCommand(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: key,
-          Body: file.buffer,
-          ContentType: file.mimetype || 'application/octet-stream',
-        }),
-        'R2 upload',
-      );
+        await this.sendStorageCommand(
+          new PutObjectCommand({
+            Bucket: bucket,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype || 'application/octet-stream',
+          }),
+          'R2 upload',
+        );
 
-      const uploadRecord: UploadRecord = {
-        id: crypto.randomUUID(),
-        key,
-        bucket,
-        folder: normalizedFolder,
-        originalName: file.originalname,
-        contentType: file.mimetype || 'application/octet-stream',
-        size: file.size,
-        uploadedAt: new Date().toISOString(),
-        publicUrl: this.buildPublicUrl(key),
-      };
+        const uploadRecord: UploadRecord = {
+          id: crypto.randomUUID(),
+          key,
+          bucket,
+          folder: normalizedFolder,
+          originalName: file.originalname,
+          contentType: file.mimetype || 'application/octet-stream',
+          size: file.size,
+          uploadedAt: new Date().toISOString(),
+          publicUrl: this.buildPublicUrl(key),
+        };
 
-      await this.saveUploadRecord(uploadRecord);
+        await this.saveUploadRecord(uploadRecord);
 
-      return uploadRecord;
-    }, `Failed to upload file ${file?.originalname ?? 'unknown-file'} to R2`);
+        return uploadRecord;
+      },
+      `Failed to upload file ${file?.originalname ?? 'unknown-file'} to R2`,
+    );
   }
 
   async findAllUploads(

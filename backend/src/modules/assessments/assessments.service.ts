@@ -127,7 +127,10 @@ export class AssessmentsService {
       const assessment = await this.findOne(id);
 
       if (this.databaseService.isConfigured()) {
-        await this.databaseService.execute('DELETE FROM assessments WHERE id = ?', [id]);
+        await this.databaseService.execute(
+          'DELETE FROM assessments WHERE id = ?',
+          [id],
+        );
         return assessment;
       }
 

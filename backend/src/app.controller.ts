@@ -1,5 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
-import { executeOrRethrow, executeOrRethrowAsync } from './common/error-handling';
+import {
+  executeOrRethrow,
+  executeOrRethrowAsync,
+} from './common/error-handling';
 import { AppService } from './app.service';
 
 @Controller()

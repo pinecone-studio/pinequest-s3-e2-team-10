@@ -93,7 +93,10 @@ export class DatabaseService {
         ok: false,
         latencyMs: Date.now() - startedAt,
         mode: 'd1',
-        error: error instanceof Error ? error.message : 'Unknown D1 health check failure',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Unknown D1 health check failure',
       };
     }
   }
@@ -136,15 +139,20 @@ export class DatabaseService {
           const transientMessage = `Cloudflare D1 request failed with status ${response.status}`;
           lastError = new ServiceUnavailableException(transientMessage);
 
-          if (!TRANSIENT_STATUSES.has(response.status) || attempt === RETRY_DELAYS_MS.length) {
+          if (
+            !TRANSIENT_STATUSES.has(response.status) ||
+            attempt === RETRY_DELAYS_MS.length
+          ) {
             throw lastError;
           }
         } else {
           const payload = (await response.json()) as D1ApiResponse<T>;
           if (!payload.success) {
             const message =
-              payload.errors?.map((entry) => entry.message).filter(Boolean).join(' ') ||
-              'Cloudflare D1 rejected the request';
+              payload.errors
+                ?.map((entry) => entry.message)
+                .filter(Boolean)
+                .join(' ') || 'Cloudflare D1 rejected the request';
             lastError = new ServiceUnavailableException(message);
 
             if (attempt === RETRY_DELAYS_MS.length) {
@@ -179,9 +187,9 @@ export class DatabaseService {
           const message =
             error instanceof Error && error.name === 'AbortError'
               ? 'Cloudflare D1 request timed out'
-                : error instanceof Error
-                  ? error.message
-                  : 'Cloudflare D1 request failed';
+              : error instanceof Error
+                ? error.message
+                : 'Cloudflare D1 request failed';
           lastError = new ServiceUnavailableException(message);
         }
 
@@ -195,6 +203,9 @@ export class DatabaseService {
       await wait(RETRY_DELAYS_MS[attempt]);
     }
 
-    throw lastError ?? new ServiceUnavailableException('Cloudflare D1 request failed');
+    throw (
+      lastError ??
+      new ServiceUnavailableException('Cloudflare D1 request failed')
+    );
   }
 }

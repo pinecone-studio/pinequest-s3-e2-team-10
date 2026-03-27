@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 import { parsePaginationParams } from '../../common/pagination';
 import { executeOrRethrowAsync } from '../../common/error-handling';
 import {
@@ -28,7 +27,6 @@ export class UploadsController {
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage(),
       limits: {
         fileSize: 10 * 1024 * 1024,
       },
@@ -38,15 +36,18 @@ export class UploadsController {
     @UploadedFile() file: UploadedFilePayload | undefined,
     @Query('folder') folder?: string,
   ): Promise<Awaited<ReturnType<UploadsService['uploadFile']>>> {
-    return executeOrRethrowAsync(async () => {
-      if (!file) {
-        throw new BadRequestException(
-          'Upload a multipart/form-data request with a file field named "file"',
-        );
-      }
+    return executeOrRethrowAsync(
+      async () => {
+        if (!file) {
+          throw new BadRequestException(
+            'Upload a multipart/form-data request with a file field named "file"',
+          );
+        }
 
-      return await this.uploadsService.uploadFile(file, folder);
-    }, `Failed to upload file ${file?.originalname ?? 'unknown-file'}`);
+        return await this.uploadsService.uploadFile(file, folder);
+      },
+      `Failed to upload file ${file?.originalname ?? 'unknown-file'}`,
+    );
   }
 
   @Get()
@@ -54,17 +55,14 @@ export class UploadsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ): Promise<PaginatedUploadRecords> {
-    return executeOrRethrowAsync(
-      () => {
-        const pagination = parsePaginationParams(page, limit);
+    return executeOrRethrowAsync(() => {
+      const pagination = parsePaginationParams(page, limit);
 
-        return this.uploadsService.findAllUploads(
-          pagination.page,
-          pagination.limit,
-        );
-      },
-      'Failed to list upload metadata records',
-    );
+      return this.uploadsService.findAllUploads(
+        pagination.page,
+        pagination.limit,
+      );
+    }, 'Failed to list upload metadata records');
   }
 
   @Get(':id')
