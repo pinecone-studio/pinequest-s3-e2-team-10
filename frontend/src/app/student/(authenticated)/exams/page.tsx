@@ -33,7 +33,7 @@ export default function StudentExamsPage() {
     return () => {
       isMounted = false
     }
-  }, [studentClass])
+  }, [studentClass, studentId])
 
   const myExams = useMemo(() => allExams.filter((exam) =>
     exam.scheduledClasses.some((schedule) => schedule.classId === studentClass),

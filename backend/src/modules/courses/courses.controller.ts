@@ -44,7 +44,10 @@ export class CoursesController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() payload: UpdateCourseDto): Promise<Course> {
+  async update(
+    @Param('id') id: string,
+    @Body() payload: UpdateCourseDto,
+  ): Promise<Course> {
     return executeOrRethrowAsync(
       () => this.coursesService.update(id, payload),
       `Failed to handle PATCH /courses/${id}`,

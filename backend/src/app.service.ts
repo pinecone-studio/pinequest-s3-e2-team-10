@@ -35,12 +35,14 @@ export class AppService {
       timestamp: new Date().toISOString(),
       service: 'pinequest-backend',
       databaseConfigured: this.databaseService.isConfigured(),
-      uploadMetadataPersistence: this.databaseService.isConfigured() ? 'd1' : 'local-file',
+      uploadMetadataPersistence: this.databaseService.isConfigured()
+        ? 'd1'
+        : 'local-file',
       storageConfigured: Boolean(
         process.env.CLOUDFLARE_R2_BUCKET_NAME &&
-          process.env.CLOUDFLARE_R2_ENDPOINT &&
-          process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
-          process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+        process.env.CLOUDFLARE_R2_ENDPOINT &&
+        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
+        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
       ),
     };
   }
@@ -57,6 +59,9 @@ export class AppService {
       status: ready ? 'ready' : 'not-ready',
       timestamp: new Date().toISOString(),
       service: 'pinequest-backend',
+      message: ready
+        ? 'Сервер бэлэн байна.'
+        : 'Сервер бүрэн бэлэн биш байна. Cloudflare D1 эсвэл R2 үйлчилгээ, эсвэл орчны хувьсагчийн тохиргоог шалгана уу.',
       checks: {
         database,
         storage,

@@ -44,7 +44,10 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<User> {
+  async update(
+    @Param('id') id: string,
+    @Body() payload: UpdateUserDto,
+  ): Promise<User> {
     return executeOrRethrowAsync(
       () => this.usersService.update(id, payload),
       `Failed to handle PATCH /users/${id}`,

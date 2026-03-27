@@ -91,7 +91,12 @@ export class ResultsService {
         await this.databaseService.execute(
           `INSERT INTO results (id, submission_id, score, passed)
            VALUES (?, ?, ?, ?)`,
-          [payload.id, payload.submissionId, payload.score, payload.passed ? 1 : 0],
+          [
+            payload.id,
+            payload.submissionId,
+            payload.score,
+            payload.passed ? 1 : 0,
+          ],
         );
         return payload;
       }
@@ -128,7 +133,9 @@ export class ResultsService {
       const result = await this.findOne(id);
 
       if (this.databaseService.isConfigured()) {
-        await this.databaseService.execute('DELETE FROM results WHERE id = ?', [id]);
+        await this.databaseService.execute('DELETE FROM results WHERE id = ?', [
+          id,
+        ]);
         return result;
       }
 

@@ -103,7 +103,9 @@ export class CoursesService {
       const course = await this.findOne(id);
 
       if (this.databaseService.isConfigured()) {
-        await this.databaseService.execute('DELETE FROM courses WHERE id = ?', [id]);
+        await this.databaseService.execute('DELETE FROM courses WHERE id = ?', [
+          id,
+        ]);
         return course;
       }
 

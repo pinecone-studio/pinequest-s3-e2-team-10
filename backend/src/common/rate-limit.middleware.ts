@@ -1,7 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
 type RequestWithRateLimit = Request & {
@@ -33,14 +30,30 @@ function getClientKey(request: Request) {
 
 function getBucketConfig(request: Request) {
   if (request.path.startsWith('/api/uploads') && request.method === 'POST') {
-    return { windowMs: UPLOAD_WINDOW_MS, maxRequests: UPLOAD_MAX_REQUESTS, scope: 'upload' };
+    return {
+      windowMs: UPLOAD_WINDOW_MS,
+      maxRequests: UPLOAD_MAX_REQUESTS,
+      scope: 'upload',
+    };
   }
 
-  if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') {
-    return { windowMs: WRITE_WINDOW_MS, maxRequests: WRITE_MAX_REQUESTS, scope: 'write' };
+  if (
+    request.method !== 'GET' &&
+    request.method !== 'HEAD' &&
+    request.method !== 'OPTIONS'
+  ) {
+    return {
+      windowMs: WRITE_WINDOW_MS,
+      maxRequests: WRITE_MAX_REQUESTS,
+      scope: 'write',
+    };
   }
 
-  return { windowMs: GENERAL_WINDOW_MS, maxRequests: GENERAL_MAX_REQUESTS, scope: 'general' };
+  return {
+    windowMs: GENERAL_WINDOW_MS,
+    maxRequests: GENERAL_MAX_REQUESTS,
+    scope: 'general',
+  };
 }
 
 export function rateLimitMiddleware(
@@ -48,10 +61,7 @@ export function rateLimitMiddleware(
   response: Response,
   next: NextFunction,
 ) {
-  if (
-    request.path === '/api/health' ||
-    request.path === '/api/ready'
-  ) {
+  if (request.path === '/api/health' || request.path === '/api/ready') {
     next();
     return;
   }
@@ -69,7 +79,10 @@ export function rateLimitMiddleware(
     });
 
     response.setHeader('X-RateLimit-Limit', bucket.maxRequests.toString());
-    response.setHeader('X-RateLimit-Remaining', Math.max(bucket.maxRequests - 1, 0).toString());
+    response.setHeader(
+      'X-RateLimit-Remaining',
+      Math.max(bucket.maxRequests - 1, 0).toString(),
+    );
     next();
     return;
   }
@@ -80,7 +93,10 @@ export function rateLimitMiddleware(
   const remaining = Math.max(bucket.maxRequests - current.count, 0);
   response.setHeader('X-RateLimit-Limit', bucket.maxRequests.toString());
   response.setHeader('X-RateLimit-Remaining', remaining.toString());
-  response.setHeader('Retry-After', Math.ceil((current.expiresAt - now) / 1000).toString());
+  response.setHeader(
+    'Retry-After',
+    Math.ceil((current.expiresAt - now) / 1000).toString(),
+  );
 
   if (current.count > bucket.maxRequests) {
     next(
