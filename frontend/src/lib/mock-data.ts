@@ -63,11 +63,11 @@ export interface ExamResult {
 // Mock Students
 export const students: Student[] = [
   // Class 10A
-{ id: 's1', name: 'Бат-Эрдэнэ', email: 'baterdene@school.com', password: 'baterdene123', classId: '10A' },
+{ id: 's1', name: 'Нандин', email: 'nandin@school.com', password: 'nandin123', classId: '10A' },
 { id: 's2', name: 'Сарангэрэл', email: 'sarangerel@school.com', password: 'sarangerel123', classId: '10A' },
 { id: 's3', name: 'Тэмүүлэн', email: 'temuulen@school.com', password: 'temuulen123', classId: '10A' },
 { id: 's4', name: 'Номин', email: 'nomin@school.com', password: 'nomin123', classId: '10A' },
-{ id: 's5', name: 'Энхжин', email: 'enkhjin@school.com', password: 'enkhjin123', classId: '10A' },
+{ id: 's5', name: 'Бат-Эрдэнэ', email: 'baterdene@school.com', password: 'baterdene123', classId: '10A' },
 
 // Class 10B
 { id: 's6', name: 'Мөнх-Оргил', email: 'munkhorgil@school.com', password: 'munkhorgil123', classId: '10B' },
