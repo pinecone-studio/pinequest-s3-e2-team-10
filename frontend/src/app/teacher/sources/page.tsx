@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,37 +11,55 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Upload, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import {
+  deleteUpload,
+  listUploads,
+  uploadFile,
+  type UploadRecord,
+} from "@/lib/uploads-api";
+import { FileText, Loader2, Upload, X } from "lucide-react";
 
-interface SourceFile {
-  id: string;
-  name: string;
-  size: number;
-  uploadedAt: string;
-  type: string;
-}
+const SOURCES_FOLDER = "sources";
 
 export default function SourcesPage() {
-  const [files, setFiles] = useState<SourceFile[]>([
-    {
-      id: "1",
-      name: "Математикийн дунд шатны ном.pdf",
-      size: 2048576, // 2MB
-      uploadedAt: "2026-03-25",
-      type: "application/pdf",
-    },
-    {
-      id: "2",
-      name: "Нийгмийн ухааны сурах бичиг.docx",
-      size: 1536000, // 1.5MB
-      uploadedAt: "2026-03-24",
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    },
-  ]);
+  const [files, setFiles] = useState<UploadRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [newFileName, setNewFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFiles = async () => {
+      try {
+        const uploadedFiles = await listUploads(SOURCES_FOLDER);
+        if (!isMounted) return;
+        setFiles(uploadedFiles);
+      } catch (error) {
+        if (!isMounted) return;
+        toast({
+          title: "Алдаа",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Медлэгийн сангийн файлуудыг ачаалж чадсангүй.",
+          variant: "destructive",
+        });
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadFiles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,7 +73,7 @@ export default function SourcesPage() {
     if (!selectedFile || !newFileName.trim()) {
       toast({
         title: "Алдаа",
-        description: "Файл сонгоод нэр оруулна уу",
+        description: "Файл сонгоод нэр оруулна уу.",
         variant: "destructive",
       });
       return;
@@ -64,35 +82,25 @@ export default function SourcesPage() {
     setIsUploading(true);
 
     try {
-      // TODO: Implement actual file upload to backend
-      // const formData = new FormData()
-      // formData.append('file', selectedFile)
-      // formData.append('name', newFileName.trim())
-      // await fetch('/api/uploads/sources', { method: 'POST', body: formData })
+      const createdFile = await uploadFile({
+        file: selectedFile,
+        fileName: newFileName.trim(),
+        folder: SOURCES_FOLDER,
+      });
 
-      // Mock upload for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newFile: SourceFile = {
-        id: Date.now().toString(),
-        name: newFileName.trim(),
-        size: selectedFile.size,
-        uploadedAt: new Date().toISOString().split("T")[0],
-        type: selectedFile.type,
-      };
-
-      setFiles((prev) => [...prev, newFile]);
+      setFiles((prev) => [createdFile, ...prev]);
       setSelectedFile(null);
       setNewFileName("");
 
       toast({
         title: "Амжилттай",
-        description: "Файл амжилттай хуулагдлаа",
+        description: "Файл медлэгийн санд хадгалагдлаа.",
       });
     } catch (error) {
       toast({
         title: "Алдаа",
-        description: "Файл хуулахад алдаа гарлаа",
+        description:
+          error instanceof Error ? error.message : "Файл хуулахад алдаа гарлаа.",
         variant: "destructive",
       });
     } finally {
@@ -102,19 +110,18 @@ export default function SourcesPage() {
 
   const handleDelete = async (fileId: string) => {
     try {
-      // TODO: Implement actual file deletion
-      // await fetch(`/api/uploads/sources/${fileId}`, { method: 'DELETE' })
-
-      setFiles((prev) => prev.filter((f) => f.id !== fileId));
+      await deleteUpload(fileId);
+      setFiles((prev) => prev.filter((file) => file.id !== fileId));
 
       toast({
         title: "Амжилттай",
-        description: "Файл устгагдлаа",
+        description: "Файл устгагдлаа.",
       });
     } catch (error) {
       toast({
         title: "Алдаа",
-        description: "Файл устгахад алдаа гарлаа",
+        description:
+          error instanceof Error ? error.message : "Файл устгаж чадсангүй.",
         variant: "destructive",
       });
     }
@@ -131,13 +138,12 @@ export default function SourcesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Медлегийн сан</h1>
+        <h1 className="text-2xl font-bold">Медлэгийн сан</h1>
         <p className="text-muted-foreground">
-          Шалгалтын асуулт үүсгэхэд ашиглах материал, ном, файлууд
+          Асуулт үүсгэхдээ ашиглах материал, ном, файлууд.
         </p>
       </div>
 
-      {/* Upload Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -145,16 +151,17 @@ export default function SourcesPage() {
             Шинэ файл нэмэх
           </CardTitle>
           <CardDescription>
-            PDF, Word зэрэг файлуудыг хуулж, асуулт үүсгэхэд ашиглана
+            PDF, Word зэрэг файлуудыг хадгалж, дараа нь асуулт үүсгэхдээ
+            ашиглана.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="file-name">Файлын нэр</Label>
               <Input
                 id="file-name"
-                placeholder="Жишээ: Математикийн дунд шатны ном"
+                placeholder="Жишээ: 7-р ангийн алгебрын томьёо"
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
               />
@@ -170,8 +177,8 @@ export default function SourcesPage() {
             </div>
           </div>
 
-          {selectedFile && (
-            <div className="p-3 bg-muted rounded-lg">
+          {selectedFile ? (
+            <div className="rounded-lg bg-muted p-3">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 <span className="text-sm font-medium">{selectedFile.name}</span>
@@ -180,7 +187,7 @@ export default function SourcesPage() {
                 </span>
               </div>
             </div>
-          )}
+          ) : null}
 
           <Button
             onClick={handleUpload}
@@ -192,41 +199,45 @@ export default function SourcesPage() {
         </CardContent>
       </Card>
 
-      {/* Files List */}
       <Card>
         <CardHeader>
-          <CardTitle>Хуулагдсан файлууд ({files.length})</CardTitle>
+          <CardTitle>Хуулсан файлууд ({files.length})</CardTitle>
           <CardDescription>
-            Асуулт үүсгэхэд ашиглах боломжтой файлууд
+            Эдгээр файлууд Асуултын сан дахь AI үүсгэлтэд шууд харагдана.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {files.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Одоогоор файл хуулаагүй байна</p>
+          {isLoading ? (
+            <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Файлуудыг ачаалж байна...
+            </div>
+          ) : files.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <FileText className="mx-auto mb-4 h-12 w-12 opacity-50" />
+              <p>Одоогоор файл алга байна.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div className="flex items-center gap-3">
                     <FileText className="h-8 w-8 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">{file.name}</p>
+                      <p className="font-medium">{file.originalName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {formatFileSize(file.size)} • Хуулагдсан:{" "}
-                        {file.uploadedAt}
+                        {formatFileSize(file.size)} • Хуулсан:{" "}
+                        {new Date(file.uploadedAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(file.id)}
+                    onClick={() => void handleDelete(file.id)}
                     className="text-destructive hover:text-destructive"
                   >
                     <X className="h-4 w-4" />

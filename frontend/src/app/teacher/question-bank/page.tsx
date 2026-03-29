@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AIQuestionGeneratorDialog } from "@/components/teacher/ai-question-generator-dialog";
+import { ExamBuilderQuestionList } from "@/components/teacher/exam-builder-question-list";
+import type {
+  NewQuestion,
+  QuestionType,
+} from "@/components/teacher/exam-builder-types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,104 +19,259 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AIQuestionGeneratorDialog } from "@/components/teacher/ai-question-generator-dialog";
 import { toast } from "@/hooks/use-toast";
-import { FileQuestion, Plus, Search } from "lucide-react";
+import { requestBackendJson } from "@/lib/backend-fetch";
+import {
+  createQuestionBankCategory,
+  createQuestionSet,
+  getQuestionBank,
+  type QuestionBankCategory,
+  type QuestionBankDifficulty,
+} from "@/lib/question-bank-api";
+import { listUploads, type UploadRecord } from "@/lib/uploads-api";
+import { FileQuestion, Loader2, Plus, Search, Sparkles } from "lucide-react";
 
-interface Question {
+const CREATE_CATEGORY_OPTION = "__create_new_category__";
+
+type GeneratedQuestion = {
   id: string;
+  type: QuestionType;
   question: string;
-  type: "multiple-choice" | "true-false" | "short-answer" | "essay";
-  category: string;
-  difficulty: "easy" | "standard" | "hard";
+  options?: string[];
+  correctAnswer?: string;
   points: number;
-  variants: number;
-  createdAt: string;
+  order: number;
+};
+
+function createQuestion(type: QuestionType, id: string): NewQuestion {
+  return {
+    id,
+    type,
+    question: "",
+    points:
+      type === "essay"
+        ? 15
+        : type === "short-answer"
+          ? 10
+          : type === "true-false"
+            ? 5
+            : 10,
+    options: type === "multiple-choice" ? ["", "", "", ""] : undefined,
+    correctAnswer: type === "true-false" ? "True" : "",
+  };
+}
+
+function toBuilderQuestion(question: GeneratedQuestion): NewQuestion {
+  return {
+    id: question.id,
+    type: question.type,
+    question: question.question,
+    options: question.options,
+    correctAnswer: question.correctAnswer,
+    points: question.points,
+  };
 }
 
 export default function QuestionBankPage() {
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      id: "1",
-      question: "2 + 3 × 4 = ?",
-      type: "multiple-choice",
-      category: "Математик",
-      difficulty: "easy",
-      points: 10,
-      variants: 3,
-      createdAt: "2026-03-25",
-    },
-    {
-      id: "2",
-      question: "√16 = 5.",
-      type: "true-false",
-      category: "Математик",
-      difficulty: "easy",
-      points: 5,
-      variants: 2,
-      createdAt: "2026-03-25",
-    },
-    {
-      id: "3",
-      question: "Ардчилал гэж юу вэ?",
-      type: "multiple-choice",
-      category: "Нийгмийн ухаан",
-      difficulty: "standard",
-      points: 10,
-      variants: 4,
-      createdAt: "2026-03-24",
-    },
-  ]);
+  const [questionBank, setQuestionBank] = useState<QuestionBankCategory[]>([]);
+  const [sourceFiles, setSourceFiles] = useState<UploadRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showBuilder, setShowBuilder] = useState(false);
   const [showAIDialog, setShowAIDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-
-  const [aiMCCount, setAiMCCount] = useState(0);
-  const [aiTFCount, setAiTFCount] = useState(0);
-  const [aiShortCount, setAiShortCount] = useState(0);
-  const [selectedSourceFiles, setSelectedSourceFiles] = useState<File[]>([]);
-  const [isAiSourceDragging, setIsAiSourceDragging] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [aiVariants, setAiVariants] = useState(1);
-  const [aiDifficulty, setAiDifficulty] = useState<
-    "easy" | "standard" | "hard"
-  >("standard");
-  const [aiCategory, setAiCategory] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+  const [builderCategoryId, setBuilderCategoryId] = useState("");
+  const [builderTopicName, setBuilderTopicName] = useState("");
+  const [builderDifficulty, setBuilderDifficulty] =
+    useState<QuestionBankDifficulty>("standard");
+  const [builderQuestions, setBuilderQuestions] = useState<NewQuestion[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [builderNewCategoryName, setBuilderNewCategoryName] = useState("");
 
-  const categories = Array.from(
-    new Set(questions.map((question) => question.category)),
-  );
-  const difficulties = ["easy", "standard", "hard"] as const;
+  useEffect(() => {
+    let isMounted = true;
 
-  const filteredQuestions = questions.filter((question) => {
-    const matchesSearch = question.question
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || question.category === selectedCategory;
-    const matchesDifficulty =
-      selectedDifficulty === "all" ||
-      question.difficulty === selectedDifficulty;
+    const loadData = async () => {
+      try {
+        const [questionBankData, sourceFileData] = await Promise.all([
+          getQuestionBank(),
+          listUploads("sources"),
+        ]);
 
-    return matchesSearch && matchesCategory && matchesDifficulty;
-  });
+        if (!isMounted) return;
+        setQuestionBank(questionBankData);
+        setSourceFiles(sourceFileData);
+      } catch (error) {
+        if (!isMounted) return;
+        toast({
+          title: "Алдаа",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Асуултын сангийн мэдээллийг ачаалж чадсангүй.",
+          variant: "destructive",
+        });
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
 
-  const handleGenerateAIQuestions = async () => {
-    if (selectedSourceFiles.length === 0) {
+    void loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!builderCategoryId && questionBank[0]) {
+      setBuilderCategoryId(questionBank[0].id);
+    }
+  }, [builderCategoryId, questionBank]);
+
+  const addQuestion = (type: QuestionType) => {
+    setBuilderQuestions((current) => [
+      ...current,
+      createQuestion(type, `new-${Date.now()}-${current.length}`),
+    ]);
+  };
+
+  const updateQuestion = (id: string, updates: Partial<NewQuestion>) => {
+    setBuilderQuestions((current) =>
+      current.map((question) =>
+        question.id === id ? { ...question, ...updates } : question,
+      ),
+    );
+  };
+
+  const updateOption = (
+    questionId: string,
+    optionIndex: number,
+    value: string,
+  ) => {
+    setBuilderQuestions((current) =>
+      current.map((question) => {
+        if (question.id !== questionId || !question.options) return question;
+        const options = [...question.options];
+        options[optionIndex] = value;
+        return { ...question, options };
+      }),
+    );
+  };
+
+  const removeQuestion = (id: string) => {
+    setBuilderQuestions((current) =>
+      current.filter((question) => question.id !== id),
+    );
+  };
+
+  const resetBuilder = () => {
+    setBuilderTopicName("");
+    setBuilderDifficulty("standard");
+    setBuilderQuestions([]);
+    setSelectedSourceIds([]);
+  };
+
+  const handleCreateCategory = async (
+    name: string,
+    onCreated?: (categoryId: string) => void,
+  ) => {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       toast({
         title: "Алдаа",
-        description: "Эх сурвалж файл сонгоно уу",
+        description: "Ангиллын нэр оруулна уу.",
         variant: "destructive",
       });
       return;
     }
 
+    setIsCreatingCategory(true);
+
+    try {
+      const createdCategory = await createQuestionBankCategory(trimmedName);
+      setQuestionBank((current) => {
+        const exists = current.some((category) => category.id === createdCategory.id);
+        return exists
+          ? current
+          : [...current, createdCategory].sort((left, right) =>
+              left.name.localeCompare(right.name),
+            );
+      });
+      setBuilderCategoryId(createdCategory.id);
+      onCreated?.(createdCategory.id);
+      setNewCategoryName("");
+      setBuilderNewCategoryName("");
+
+      toast({
+        title: "Амжилттай",
+        description: `"${createdCategory.name}" ангилал үүслээ.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Алдаа",
+        description:
+          error instanceof Error ? error.message : "Ангилал үүсгэж чадсангүй.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingCategory(false);
+    }
+  };
+
+  const handleCategorySelect = (value: string) => {
+    if (value === CREATE_CATEGORY_OPTION) {
+      setBuilderCategoryId("");
+      return;
+    }
+
+    setBuilderCategoryId(value);
+  };
+
+  const handleGenerateAIQuestions = async ({
+    sourceFilesWithPages,
+    aiMCCount,
+    aiTFCount,
+    aiShortCount,
+    variants,
+    difficulty,
+    category,
+    selectedMockTests,
+  }: {
+    sourceFilesWithPages: { file: File; startPage: number; endPage: number }[];
+    aiMCCount: number;
+    aiTFCount: number;
+    aiShortCount: number;
+    variants: number;
+    difficulty: "easy" | "standard" | "hard";
+    category: string;
+    selectedMockTests: string[];
+  }) => {
     const totalQuestions = aiMCCount + aiTFCount + aiShortCount;
     if (totalQuestions === 0) {
       toast({
         title: "Алдаа",
-        description: "Асуултын тоо оруулна уу",
+        description: "Асуултын тоо оруулна уу.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedUploads = selectedMockTests
+      .map((id) => sourceFiles.find((file) => file.id === id))
+      .filter((file): file is UploadRecord => Boolean(file));
+
+    if (selectedUploads.length === 0 && sourceFilesWithPages.length === 0) {
+      toast({
+        title: "Алдаа",
+        description: "Эх сурвалж файл сонгоно уу.",
         variant: "destructive",
       });
       return;
@@ -118,70 +280,55 @@ export default function QuestionBankPage() {
     setIsGenerating(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const generatedQuestions = await requestBackendJson<GeneratedQuestion[]>(
+        "exams/ai/generate",
+        {
+          method: "POST",
+          body: {
+          sourceFiles: [
+            ...selectedUploads.map((file) => ({
+              name: file.originalName,
+              startPage: 1,
+              endPage: 10,
+            })),
+            ...sourceFilesWithPages.map((item) => ({
+              name: item.file.name,
+              startPage: item.startPage,
+              endPage: item.endPage,
+            })),
+          ],
+          mcCount: aiMCCount,
+          tfCount: aiTFCount,
+          shortAnswerCount: aiShortCount,
+          variants,
+          difficulty,
+          category:
+            category ||
+            questionBank.find((item) => item.id === builderCategoryId)?.name ||
+            "Ерөнхий",
+        },
+          fallbackMessage: "AI асуулт үүсгэхэд алдаа гарлаа.",
+        },
+      );
 
-      const now = new Date().toISOString();
-      const generatedQuestions: Question[] = [];
-
-      for (let variant = 1; variant <= aiVariants; variant++) {
-        for (let index = 0; index < aiMCCount; index++) {
-          generatedQuestions.push({
-            id: `ai-mc-${Date.now()}-${variant}-${index}`,
-            question: `AI үүсгэсэн сонгох хариулттай асуулт (Хувилбар ${variant}) ${index + 1}`,
-            type: "multiple-choice",
-            category: aiCategory || "AI үүсгэсэн",
-            difficulty: aiDifficulty,
-            points: 10,
-            variants: aiVariants,
-            createdAt: now,
-          });
-        }
-
-        for (let index = 0; index < aiTFCount; index++) {
-          generatedQuestions.push({
-            id: `ai-tf-${Date.now()}-${variant}-${index}`,
-            question: `AI үүсгэсэн үнэн/худал асуулт (Хувилбар ${variant}) ${index + 1}`,
-            type: "true-false",
-            category: aiCategory || "AI үүсгэсэн",
-            difficulty: aiDifficulty,
-            points: 5,
-            variants: aiVariants,
-            createdAt: now,
-          });
-        }
-
-        for (let index = 0; index < aiShortCount; index++) {
-          generatedQuestions.push({
-            id: `ai-sa-${Date.now()}-${variant}-${index}`,
-            question: `AI үүсгэсэн богино хариулттай асуулт (Хувилбар ${variant}) ${index + 1}`,
-            type: "short-answer",
-            category: aiCategory || "AI үүсгэсэн",
-            difficulty: aiDifficulty,
-            points: 10,
-            variants: aiVariants,
-            createdAt: now,
-          });
-        }
-      }
-
-      setQuestions((prev) => [...prev, ...generatedQuestions]);
+      setBuilderQuestions((current) => [
+        ...current,
+        ...generatedQuestions.map(toBuilderQuestion),
+      ]);
+      setBuilderDifficulty(difficulty);
       setShowAIDialog(false);
-      setAiMCCount(0);
-      setAiTFCount(0);
-      setAiShortCount(0);
-      setSelectedSourceFiles([]);
-      setAiVariants(1);
-      setAiDifficulty("standard");
-      setAiCategory("");
 
       toast({
         title: "Амжилттай",
-        description: `${generatedQuestions.length} асуулт (${totalQuestions} × ${aiVariants} хувилбар) үүсгэгдлээ`,
+        description: `${generatedQuestions.length} асуулт ноорогт нэмэгдлээ.`,
       });
-    } catch {
+    } catch (error) {
       toast({
         title: "Алдаа",
-        description: "Асуулт үүсгэхэд алдаа гарлаа",
+        description:
+          error instanceof Error
+            ? error.message
+            : "AI асуулт үүсгэхэд алдаа гарлаа.",
         variant: "destructive",
       });
     } finally {
@@ -189,51 +336,266 @@ export default function QuestionBankPage() {
     }
   };
 
-  const getQuestionTypeLabel = (type: Question["type"]) => {
-    switch (type) {
-      case "multiple-choice":
-        return "Сонгох хариулттай";
-      case "true-false":
-        return "Үнэн/Худал";
-      case "short-answer":
-        return "Богино хариулт";
-      case "essay":
-        return "Эсээ";
-      default:
-        return type;
+  const handleSaveQuestionSet = async () => {
+    if (!builderCategoryId) {
+      toast({
+        title: "Алдаа",
+        description: "Ангилал сонгоно уу.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!builderTopicName.trim()) {
+      toast({
+        title: "Алдаа",
+        description: "Сэдвийн нэр оруулна уу.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const hasEmptyQuestion = builderQuestions.some(
+      (question) => !question.question.trim(),
+    );
+    if (builderQuestions.length === 0 || hasEmptyQuestion) {
+      toast({
+        title: "Алдаа",
+        description: "Хамгийн багадаа нэг бүрэн асуулт оруулна уу.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await createQuestionSet({
+        categoryId: builderCategoryId,
+        topicName: builderTopicName,
+        difficulty: builderDifficulty,
+        questions: builderQuestions,
+      });
+
+      const updatedQuestionBank = await getQuestionBank();
+      setQuestionBank(updatedQuestionBank);
+      resetBuilder();
+      setShowBuilder(false);
+
+      toast({
+        title: "Амжилттай",
+        description: "Шинэ асуултууд асуултын санд хадгалагдлаа.",
+      });
+    } catch (error) {
+      toast({
+        title: "Алдаа",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Асуултуудыг хадгалж чадсангүй.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const getDifficultyLabel = (difficulty: Question["difficulty"]) => {
-    switch (difficulty) {
-      case "easy":
-        return "Хөнгөн";
-      case "standard":
-        return "Дунд";
-      case "hard":
-        return "Хэцүү";
-      default:
-        return difficulty;
-    }
-  };
+  const filteredCategories = useMemo(() => {
+    return questionBank
+      .filter((category) =>
+        selectedCategoryFilter === "all"
+          ? true
+          : category.id === selectedCategoryFilter,
+      )
+      .map((category) => {
+        const topics = category.topics
+          .map((topic) => {
+            const questions = topic.questions.filter((question) => {
+              const matchesSearch = question.question
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase());
+              const matchesDifficulty =
+                selectedDifficulty === "all" ||
+                question.difficulty === selectedDifficulty;
+              return matchesSearch && matchesDifficulty;
+            });
+
+            return {
+              ...topic,
+              questions,
+            };
+          })
+          .filter((topic) => {
+            if (!searchQuery.trim()) {
+              return topic.questions.length > 0;
+            }
+
+            return (
+              topic.questions.length > 0 ||
+              topic.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          });
+
+        return {
+          ...category,
+          topics,
+        };
+      })
+      .filter((category) => {
+        if (!searchQuery.trim()) {
+          return category.topics.length > 0;
+        }
+
+        return (
+          category.topics.length > 0 ||
+          category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      });
+  }, [questionBank, searchQuery, selectedCategoryFilter, selectedDifficulty]);
+
+  const builderCategoryName =
+    questionBank.find((category) => category.id === builderCategoryId)?.name ?? "";
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Асуултын сан</h1>
           <p className="text-muted-foreground">
-            Шалгалт үүсгэхэд ашиглах асуултууд
+            Ангилал, сэдвээр зохион байгуулсан асуултууд.
           </p>
         </div>
-        <Button onClick={() => setShowAIDialog(true)}>
+        <Button onClick={() => setShowBuilder((current) => !current)}>
           <Plus className="mr-2 h-4 w-4" />
-          AI ашиглан асуулт үүсгэх
+          Шинэ асуултууд үүсгэх
         </Button>
       </div>
 
+      {showBuilder ? (
+        <Card>
+          <CardHeader className="space-y-1">
+            <CardTitle>Шинэ асуултууд үүсгэх</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Ангилал, сэдвээ сонгоод асуултаа гараар эсвэл AI-аар нэмнэ.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label>Ангилал</Label>
+                <Select
+                  value={builderCategoryId || CREATE_CATEGORY_OPTION}
+                  onValueChange={handleCategorySelect}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ангилал сонгох" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {questionBank.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={CREATE_CATEGORY_OPTION}>
+                      + Шинэ ангилал үүсгэх
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {!builderCategoryId ? (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Шинэ ангиллын нэр"
+                      value={builderNewCategoryName}
+                      onChange={(e) => setBuilderNewCategoryName(e.target.value)}
+                    />
+                    <Button
+                      variant="secondary"
+                      onClick={() =>
+                        void handleCreateCategory(builderNewCategoryName, (id) =>
+                          setBuilderCategoryId(id),
+                        )
+                      }
+                      disabled={isCreatingCategory}
+                    >
+                      Нэмэх
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Сэдэв</Label>
+                <Input
+                  placeholder="Жишээ: Алгебр 7 томьёо"
+                  value={builderTopicName}
+                  onChange={(e) => setBuilderTopicName(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Түвшин</Label>
+                <Select
+                  value={builderDifficulty}
+                  onValueChange={(value: QuestionBankDifficulty) =>
+                    setBuilderDifficulty(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="easy">Хөнгөн</SelectItem>
+                    <SelectItem value="standard">Дунд</SelectItem>
+                    <SelectItem value="hard">Хэцүү</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 p-4">
+              <div>
+                <p className="font-medium">
+                  {builderCategoryName || "Ангиллаа сонгоно уу"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Сэдэв доторх асуултуудыг энд бэлтгээд дараа нь нэг дор
+                  хадгална.
+                </p>
+              </div>
+              <Button variant="secondary" onClick={() => setShowAIDialog(true)}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Create question with AI
+              </Button>
+            </div>
+
+            <ExamBuilderQuestionList
+              onAddQuestion={addQuestion}
+              onRemoveQuestion={removeQuestion}
+              onUpdateOption={updateOption}
+              onUpdateQuestion={updateQuestion}
+              questions={builderQuestions}
+            />
+
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetBuilder();
+                  setShowBuilder(false);
+                }}
+              >
+                Болих
+              </Button>
+              <Button onClick={() => void handleSaveQuestionSet()} disabled={isSaving}>
+                {isSaving ? "Хадгалж байна..." : "Асуултуудыг хадгалах"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="space-y-4 pt-6">
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="flex-1">
               <div className="relative">
@@ -248,121 +610,140 @@ export default function QuestionBankPage() {
             </div>
 
             <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
+              value={selectedCategoryFilter}
+              onValueChange={setSelectedCategoryFilter}
             >
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className="w-full md:w-56">
                 <SelectValue placeholder="Ангилал сонгох" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Бүх ангилал</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                {questionBank.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select
-              value={selectedDifficulty}
-              onValueChange={setSelectedDifficulty}
-            >
+            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Түвшин сонгох" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Бүх түвшин</SelectItem>
-                {difficulties.map((difficulty) => (
-                  <SelectItem key={difficulty} value={difficulty}>
-                    {getDifficultyLabel(difficulty)}
-                  </SelectItem>
-                ))}
+                <SelectItem value="easy">Хөнгөн</SelectItem>
+                <SelectItem value="standard">Дунд</SelectItem>
+                <SelectItem value="hard">Хэцүү</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t pt-4 md:flex-row md:items-end">
+            <div className="flex-1 space-y-2">
+              <Label>Шинэ ангилал</Label>
+              <Input
+                placeholder="Жишээ: Математик"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => void handleCreateCategory(newCategoryName)}
+              disabled={isCreatingCategory}
+            >
+              Create new category
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4">
-        {filteredQuestions.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
-              <FileQuestion className="mx-auto mb-4 h-12 w-12 opacity-50" />
-              <p>Асуулт олдсонгүй</p>
-              <p className="text-sm">
-                Шүүлтүүрийг өөрчилж эсвэл шинэ асуулт үүсгэнэ үү
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredQuestions.map((question) => (
-            <Card key={question.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="mb-2 font-medium">{question.question}</p>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                      <Badge variant="outline">
-                        {getQuestionTypeLabel(question.type)}
+      {isLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Асуултын санг ачаалж байна...
+        </div>
+      ) : filteredCategories.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <FileQuestion className="mx-auto mb-4 h-12 w-12 opacity-50" />
+            <p>Асуулт олдсонгүй</p>
+            <p className="text-sm">
+              Шүүлтүүрээ өөрчилж үзэх эсвэл шинэ асуултууд үүсгэнэ үү.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {filteredCategories.map((category) => (
+            <Card key={category.id}>
+              <CardHeader className="space-y-3">
+                <div>
+                  <CardTitle>{category.name}</CardTitle>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {category.topics.map((topic) => (
+                      <Badge key={topic.id} variant="secondary">
+                        {topic.name}
                       </Badge>
-                      <Badge variant="secondary">{question.category}</Badge>
-                      <Badge variant="outline">
-                        {getDifficultyLabel(question.difficulty)}
-                      </Badge>
-                      <span>{question.points} оноо</span>
-                      <span>{question.variants} хувилбар</span>
-                      <span>Үүсгэсэн: {question.createdAt}</span>
-                    </div>
+                    ))}
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {category.topics.map((topic) => (
+                  <div key={topic.id} className="rounded-lg border p-4">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold">{topic.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {topic.questions.length} асуулт
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {topic.questions.map((question) => (
+                        <div
+                          key={question.id}
+                          className="rounded-md border bg-background p-3"
+                        >
+                          <p className="font-medium">{question.question}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                            <Badge variant="outline">{question.type}</Badge>
+                            <Badge variant="secondary">
+                              {question.difficulty === "easy"
+                                ? "Хөнгөн"
+                                : question.difficulty === "standard"
+                                  ? "Дунд"
+                                  : "Хэцүү"}
+                            </Badge>
+                            <span>{question.points} оноо</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       <AIQuestionGeneratorDialog
-        aiMCCount={aiMCCount}
-        aiShortCount={aiShortCount}
-        aiTFCount={aiTFCount}
-        isDragging={isAiSourceDragging}
+        availableSourceFiles={sourceFiles}
         isGenerating={isGenerating}
-        onDragLeave={(event) => {
-          event.preventDefault();
-          setIsAiSourceDragging(false);
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setIsAiSourceDragging(true);
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          setIsAiSourceDragging(false);
-          const files = Array.from(event.dataTransfer.files);
-          setSelectedSourceFiles((prev) => [...prev, ...files]);
-        }}
-        onFileSelect={(event) => {
-          if (event.target.files) {
-            const files = Array.from(event.target.files);
-            setSelectedSourceFiles((prev) => [...prev, ...files]);
-          }
-          event.target.value = "";
-        }}
         onGenerate={handleGenerateAIQuestions}
         onOpenChange={setShowAIDialog}
-        onRemoveSourceFile={(fileName) => {
-          setSelectedSourceFiles((prev) =>
-            prev.filter((file) => file.name !== fileName),
-          );
-        }}
-        onToggleTest={() => {}}
+        onToggleTest={(sourceId, checked) =>
+          setSelectedSourceIds((current) =>
+            checked
+              ? [...new Set([...current, sourceId])]
+              : current.filter((id) => id !== sourceId),
+          )
+        }
         open={showAIDialog}
-        selectedMockTests={[]}
-        selectedSourceFiles={selectedSourceFiles}
-        setAiMCCount={setAiMCCount}
-        setAiShortCount={setAiShortCount}
-        setAiTFCount={setAiTFCount}
+        selectedMockTests={selectedSourceIds}
       />
     </div>
   );

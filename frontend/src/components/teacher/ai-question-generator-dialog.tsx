@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent, type DragEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { UploadRecord } from "@/lib/uploads-api";
 import { FileText, X } from "lucide-react";
 
 interface SourceFileWithPages {
@@ -28,68 +29,110 @@ interface SourceFileWithPages {
   endPage: number;
 }
 
-export function AIQuestionGeneratorDialog({
-  aiMCCount,
-  aiShortCount,
-  aiTFCount,
-  isGenerating,
-  isDragging,
-  onGenerate,
-  onDragLeave,
-  onDragOver,
-  onDrop,
-  onFileSelect,
-  onOpenChange,
-  onRemoveSourceFile,
-  onToggleTest,
-  open,
-  selectedMockTests,
-  selectedSourceFiles,
-  setAiMCCount,
-  setAiShortCount,
-  setAiTFCount,
-}: {
+type QuestionGeneratorPayload = {
+  sourceFilesWithPages: SourceFileWithPages[];
   aiMCCount: number;
-  aiShortCount: number;
   aiTFCount: number;
+  aiShortCount: number;
+  variants: number;
+  difficulty: "easy" | "standard" | "hard";
+  category: string;
+  selectedMockTests: string[];
+};
+
+type SharedProps = {
+  availableSourceFiles?: UploadRecord[];
   isGenerating: boolean;
-  isDragging: boolean;
-  onGenerate: () => void;
-  onDragLeave: (e: React.DragEvent) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onOpenChange: (open: boolean) => void;
-  onRemoveSourceFile: (fileName: string) => void;
   onToggleTest: (testId: string, checked: boolean) => void;
   open: boolean;
   selectedMockTests: string[];
+};
+
+type BuilderDialogProps = SharedProps & {
+  aiMCCount: number;
+  aiTFCount: number;
+  aiShortCount: number;
+  isDragging: boolean;
+  onDragLeave: (event: DragEvent<HTMLDivElement>) => void;
+  onDragOver: (event: DragEvent<HTMLDivElement>) => void;
+  onDrop: (event: DragEvent<HTMLDivElement>) => void;
+  onFileSelect: (event: ChangeEvent<HTMLInputElement>) => void;
+  onGenerate: () => void | Promise<void>;
+  onRemoveSourceFile: (fileName: string) => void;
   selectedSourceFiles: File[];
   setAiMCCount: (value: number) => void;
-  setAiShortCount: (value: number) => void;
   setAiTFCount: (value: number) => void;
-}) {
+  setAiShortCount: (value: number) => void;
+};
+
+type QuestionBankDialogProps = SharedProps & {
+  onGenerate: (payload: QuestionGeneratorPayload) => void | Promise<void>;
+};
+
+type AIQuestionGeneratorDialogProps =
+  | BuilderDialogProps
+  | QuestionBankDialogProps;
+
+function isBuilderDialogProps(
+  props: AIQuestionGeneratorDialogProps,
+): props is BuilderDialogProps {
+  return "selectedSourceFiles" in props;
+}
+
+export function AIQuestionGeneratorDialog(
+  props: AIQuestionGeneratorDialogProps,
+) {
+  const { isGenerating, onOpenChange, open, selectedMockTests } = props;
+  const availableSourceFiles = props.availableSourceFiles ?? [];
   const [sourceFilesWithPages, setSourceFilesWithPages] = useState<
     SourceFileWithPages[]
   >([]);
+  const [localAiMCCount, setLocalAiMCCount] = useState(0);
+  const [localAiTFCount, setLocalAiTFCount] = useState(0);
+  const [localAiShortCount, setLocalAiShortCount] = useState(0);
   const [variants, setVariants] = useState(1);
   const [difficulty, setDifficulty] = useState<"easy" | "standard" | "hard">(
     "standard",
   );
   const [category, setCategory] = useState("");
+  const [localIsDragging, setLocalIsDragging] = useState(false);
 
-  const hasSource =
-    selectedMockTests.length > 0 || sourceFilesWithPages.length > 0;
+  const isBuilderDialog = isBuilderDialogProps(props);
+  const aiMCCount = isBuilderDialog ? props.aiMCCount : localAiMCCount;
+  const aiTFCount = isBuilderDialog ? props.aiTFCount : localAiTFCount;
+  const aiShortCount = isBuilderDialog ? props.aiShortCount : localAiShortCount;
+  const selectedSourceFiles = isBuilderDialog ? props.selectedSourceFiles : [];
+  const isDragging = isBuilderDialog ? props.isDragging : localIsDragging;
+  const hasSource = isBuilderDialog
+    ? selectedMockTests.length > 0 || selectedSourceFiles.length > 0
+    : selectedMockTests.length > 0 || sourceFilesWithPages.length > 0;
 
-  const handleFileSelectWithPages = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const submit = () => {
+    if (isBuilderDialog) {
+      void props.onGenerate();
+      return;
+    }
+
+    void props.onGenerate({
+      sourceFilesWithPages,
+      aiMCCount,
+      aiTFCount,
+      aiShortCount,
+      variants,
+      difficulty,
+      category,
+      selectedMockTests,
+    });
+  };
+
+  const handleFileSelectWithPages = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const newFilesWithPages = files.map((file) => ({
         file,
         startPage: 1,
-        endPage: 10, // Default range
+        endPage: 10,
       }));
       setSourceFilesWithPages((prev) => [...prev, ...newFilesWithPages]);
     }
@@ -119,27 +162,49 @@ export function AIQuestionGeneratorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>AI ашиглан асуулт үүсгэх</DialogTitle>
           <DialogDescription>
-            Медлегийн сангаас файл сонгоод асуулт үүсгэх хуудсыг зааж өгнө үү.
+            Медлэгийн сангийн файлууд эсвэл шинэ файл дээр тулгуурлан асуулт
+            үүсгэнэ.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6 py-4">
-          {/* Source Selection */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Эх сурвалж сонгох</Label>
-              <div className="space-y-2 max-h-32 overflow-auto border rounded p-2">
-                {/* Mock tests selection - keeping for compatibility */}
+              <div className="max-h-40 space-y-2 overflow-auto rounded border p-2">
                 <p className="text-sm text-muted-foreground">
-                  Медлегийн сангийн файлууд:
+                  Медлэгийн сангийн файлууд:
                 </p>
-                {/* TODO: Load actual source files from backend */}
-                <div className="text-sm text-muted-foreground">
-                  Медлегийн сангийн файлууд энд гарч ирнэ
-                </div>
+                {availableSourceFiles.length === 0 ? (
+                  <div className="text-sm text-muted-foreground">
+                    Медлэгийн санд хараахан файл алга байна.
+                  </div>
+                ) : (
+                  availableSourceFiles.map((source) => (
+                    <label
+                      key={source.id}
+                      className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted"
+                    >
+                      <Checkbox
+                        checked={selectedMockTests.includes(source.id)}
+                        onCheckedChange={(checked) =>
+                          props.onToggleTest(source.id, checked === true)
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          {source.originalName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(source.uploadedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </label>
+                  ))
+                )}
               </div>
             </div>
 
@@ -148,26 +213,50 @@ export function AIQuestionGeneratorDialog({
               <div
                 className={
                   isDragging
-                    ? "border-2 border-dashed rounded-lg p-6 text-center transition-colors border-primary bg-primary/5"
-                    : "border-2 border-dashed rounded-lg p-6 text-center transition-colors border-muted-foreground/25"
+                    ? "rounded-lg border-2 border-dashed border-primary bg-primary/5 p-6 text-center transition-colors"
+                    : "rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 text-center transition-colors"
                 }
-                onDragLeave={onDragLeave}
-                onDragOver={onDragOver}
-                onDrop={(e) => {
-                  onDrop(e);
-                  const files = Array.from(e.dataTransfer.files);
-                  const newFilesWithPages = files.map((file) => ({
-                    file,
-                    startPage: 1,
-                    endPage: 10,
-                  }));
-                  setSourceFilesWithPages((prev) => [
-                    ...prev,
-                    ...newFilesWithPages,
-                  ]);
-                }}
+                onDragEnter={
+                  isBuilderDialog
+                    ? props.onDragOver
+                    : (e) => {
+                        e.preventDefault();
+                        setLocalIsDragging(true);
+                      }
+                }
+                onDragOver={
+                  isBuilderDialog
+                    ? props.onDragOver
+                    : (e) => {
+                        e.preventDefault();
+                        setLocalIsDragging(true);
+                      }
+                }
+                onDragLeave={
+                  isBuilderDialog
+                    ? props.onDragLeave
+                    : () => setLocalIsDragging(false)
+                }
+                onDrop={
+                  isBuilderDialog
+                    ? props.onDrop
+                    : (e) => {
+                        e.preventDefault();
+                        setLocalIsDragging(false);
+                        const files = Array.from(e.dataTransfer.files);
+                        const newFilesWithPages = files.map((file) => ({
+                          file,
+                          startPage: 1,
+                          endPage: 10,
+                        }));
+                        setSourceFilesWithPages((prev) => [
+                          ...prev,
+                          ...newFilesWithPages,
+                        ]);
+                      }
+                }
               >
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="mb-2 text-sm text-muted-foreground">
                   PDF файлыг энд чирж оруулна уу
                 </p>
                 <label htmlFor="ai-source-files">
@@ -181,16 +270,19 @@ export function AIQuestionGeneratorDialog({
                   accept=".pdf"
                   className="hidden"
                   multiple
-                  onChange={handleFileSelectWithPages}
+                  onChange={
+                    isBuilderDialog
+                      ? props.onFileSelect
+                      : handleFileSelectWithPages
+                  }
                 />
               </div>
 
-              {/* Selected files with page ranges */}
-              {sourceFilesWithPages.length > 0 && (
+              {!isBuilderDialog && sourceFilesWithPages.length > 0 && (
                 <div className="space-y-2">
                   {sourceFilesWithPages.map((item) => (
                     <div key={item.file.name} className="rounded-lg border p-3">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="mb-2 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
                           <span className="text-sm font-medium">
@@ -243,10 +335,36 @@ export function AIQuestionGeneratorDialog({
                   ))}
                 </div>
               )}
+
+              {isBuilderDialog && selectedSourceFiles.length > 0 && (
+                <div className="space-y-2">
+                  {selectedSourceFiles.map((file) => (
+                    <div
+                      key={`${file.name}-${file.size}`}
+                      className="rounded-lg border p-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          <span className="text-sm font-medium">
+                            {file.name}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => props.onRemoveSourceFile(file.name)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Question Configuration */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Асуултын төрөл</Label>
@@ -258,9 +376,11 @@ export function AIQuestionGeneratorDialog({
                     min="0"
                     value={aiMCCount}
                     onChange={(e) =>
-                      setAiMCCount(parseInt(e.target.value) || 0)
+                      (isBuilderDialog
+                        ? props.setAiMCCount
+                        : setLocalAiMCCount)(parseInt(e.target.value) || 0)
                     }
-                    className="w-20 h-8"
+                    className="h-8 w-20"
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -270,9 +390,11 @@ export function AIQuestionGeneratorDialog({
                     min="0"
                     value={aiTFCount}
                     onChange={(e) =>
-                      setAiTFCount(parseInt(e.target.value) || 0)
+                      (isBuilderDialog
+                        ? props.setAiTFCount
+                        : setLocalAiTFCount)(parseInt(e.target.value) || 0)
                     }
-                    className="w-20 h-8"
+                    className="h-8 w-20"
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -282,9 +404,11 @@ export function AIQuestionGeneratorDialog({
                     min="0"
                     value={aiShortCount}
                     onChange={(e) =>
-                      setAiShortCount(parseInt(e.target.value) || 0)
+                      (isBuilderDialog
+                        ? props.setAiShortCount
+                        : setLocalAiShortCount)(parseInt(e.target.value) || 0)
                     }
-                    className="w-20 h-8"
+                    className="h-8 w-20"
                   />
                 </div>
               </div>
@@ -292,7 +416,7 @@ export function AIQuestionGeneratorDialog({
 
             <div className="space-y-2">
               <Label>Асуултын тоо</Label>
-              <div className="h-9 flex items-center px-3 border rounded-md bg-muted">
+              <div className="flex h-9 items-center rounded-md border bg-muted px-3">
                 {totalQuestions}
               </div>
 
@@ -338,7 +462,6 @@ export function AIQuestionGeneratorDialog({
             </div>
           </div>
 
-          {/* Summary */}
           <div className="rounded-lg bg-muted p-4">
             <div className="flex items-center justify-between text-sm">
               <span>Нийт асуулт:</span>
@@ -353,7 +476,7 @@ export function AIQuestionGeneratorDialog({
             Болих
           </Button>
           <Button
-            onClick={onGenerate}
+            onClick={submit}
             disabled={isGenerating || !hasSource || totalQuestions === 0}
           >
             {isGenerating
