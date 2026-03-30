@@ -103,7 +103,9 @@ export default function QuestionBankPage() {
       {tests.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Одоогоор жишиг шалгалт оруулаагүй байна</p>
+            <p className="text-muted-foreground">
+              Одоогоор жишиг шалгалт оруулаагүй байна
+            </p>
             <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
               Эхний шалгалтаа оруулах
             </Button>
