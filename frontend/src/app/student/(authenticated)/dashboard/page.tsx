@@ -96,7 +96,7 @@ export default function StudentDashboard() {
           <StudentDashboardScheduleCard exams={myExams} studentClass={studentClass} />
         </div>
 
-        <StudentExamsOverviewPanel exams={myExams} today={getLocalDateString()} />
+        <StudentExamsOverviewPanel exams={myExams} studentClass={studentClass} today={getLocalDateString()} />
       </div>
     </div>
   )
