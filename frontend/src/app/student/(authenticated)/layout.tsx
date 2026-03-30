@@ -1,17 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  ChevronLeft,
-  ChevronRight,
+  Bell,
   ClipboardList,
   LayoutDashboard,
-  Lightbulb,
+  LogOut,
+  Moon,
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
-import { ThemeToggleButton } from "@/components/theme-toggle-button"
 import { notifyStudentSessionChange, useStudentSession } from "@/hooks/use-student-session"
 import { cn } from "@/lib/utils"
 
@@ -28,7 +27,6 @@ export default function StudentLayout({
   const router = useRouter()
   const pathname = usePathname()
   const { studentName } = useStudentSession()
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true)
 
   useEffect(() => {
     if (!studentName) {
@@ -49,94 +47,79 @@ export default function StudentLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#eaf6ff] text-foreground">
-      <header className="border-b border-[#d6e7fb] bg-[#edf7ff] dark:border-[#101820] dark:bg-[#000000]">
-        <div className="flex h-[70px] w-full items-center justify-between px-4 sm:px-6">
+    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)] text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(42,92,255,0.38),rgba(10,18,55,0.14)_52%,transparent_78%)] blur-[136px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[linear-gradient(180deg,rgba(70,120,255,0.18)_0%,rgba(70,120,255,0.04)_55%,transparent_100%)]" />
+
+      <header className="relative z-10">
+        <div className="flex h-[82px] w-full items-center justify-between px-5 py-4 sm:px-6 lg:px-8 xl:px-10">
           <Link href="/student/dashboard" className="font-semibold">
             <BrandLogo
               className="gap-2"
-              textClassName="text-sm font-semibold text-foreground sm:text-base"
+              textClassName="text-base font-semibold text-[#F5FAFF]"
             />
           </Link>
-          <div className="flex items-center gap-4">
-            <ThemeToggleButton />
-            <span className="text-sm font-medium text-[#6984a3]">{studentName}</span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Гарах
-            </button>
-          </div>
-        </div>
-      </header>
 
-      <div className="flex min-h-[calc(100vh-70px)]">
-        <aside
-          className={cn(
-            "flex flex-col border-r border-[#d6e7fb] bg-[#edf7ff] px-3 py-4 transition-all duration-200 dark:border-[#101820] dark:bg-[#000000]",
-            isSidebarCollapsed ? "w-[84px]" : "w-[200px]",
-          )}
-        >
-          <div
-            className={cn("mb-4 flex", isSidebarCollapsed ? "justify-center" : "justify-end")}
-          >
-            <button
-              type="button"
-              onClick={() => setIsSidebarCollapsed((current) => !current)}
-              className="rounded-md border p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:border-[#1B2A36] dark:bg-[#000000] dark:hover:bg-[#081018]"
-              aria-label={
-                isSidebarCollapsed ? "Хажуу самбарыг дэлгэх" : "Хажуу самбарыг хумих"
-              }
-            >
-              {isSidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </button>
-          </div>
-          <nav className="flex flex-col gap-1">
+          <nav className="flex h-[49px] items-center gap-2 rounded-full bg-[linear-gradient(111.84deg,rgba(6,11,38,0.94)_59.3%,rgba(26,31,55,0)_100%)] p-1">
             {navItems.map((item) => {
               const Icon = item.icon
+              const active = pathname === item.href || pathname.startsWith(item.href + "/")
 
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  title={isSidebarCollapsed ? item.label : undefined}
                   className={cn(
-                    "flex items-center rounded-[12px] px-3 py-3 text-sm font-medium transition-colors",
-                    isSidebarCollapsed ? "justify-center" : "gap-3",
-                    pathname === item.href || pathname.startsWith(item.href + "/")
-                      ? "bg-[#4f9cf9] text-white shadow-[0_10px_20px_rgba(79,156,249,0.22)] dark:border dark:border-[rgba(56,189,248,0.55)] dark:bg-[#022638]"
-                      : "text-[#587492] hover:bg-[#e0effd] dark:hover:bg-[#081018]",
+                    "flex h-10 items-center justify-center gap-[6px] rounded-full px-4 text-sm font-medium",
+                    active
+                      ? "bg-[#001933] text-white shadow-[0px_3.5px_5.5px_rgba(0,0,0,0.02)]"
+                      : "text-[#A4ADB5]",
                   )}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {!isSidebarCollapsed ? <span>{item.label}</span> : null}
+                  <Icon className="h-5 w-5 shrink-0" />
+                  <span>{item.label}</span>
                 </Link>
               )
             })}
           </nav>
-          {!isSidebarCollapsed ? (
-            <div className="sticky bottom-4 mt-auto rounded-[18px] bg-[#fff4d7] px-4 py-5 text-[#df8620]">
-              <div className="flex items-start gap-2">
-                <Lightbulb className="mt-0.5 h-4 w-4 shrink-0" />
-                <p className="text-xs font-semibold leading-6">
-                  Өдрийн зөвлөгөө
-                  <br />
-                  Шалгалт эхлэхээс өмнө 3 удаа гүнзгий амьсгал аваарай!
-                </p>
-              </div>
-            </div>
-          ) : null}
-        </aside>
 
-        <main className="content-surface flex-1 overflow-auto bg-[#eaf6ff] p-4 md:p-5">
-          {children}
-        </main>
-      </div>
+          <div className="isolate flex h-6 items-center gap-2">
+            <button
+              type="button"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[#C2C9D0] transition hover:bg-[rgba(255,255,255,0.08)] hover:text-white"
+              aria-label="Мэдэгдэл"
+            >
+              <Bell className="h-4 w-4 stroke-[1.75]" />
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[#C2C9D0] transition hover:bg-[rgba(255,255,255,0.08)] hover:text-white"
+              aria-label="Гарах"
+            >
+              <LogOut className="h-4 w-4 stroke-[1.75]" />
+            </button>
+            <button
+              type="button"
+              className="relative h-6 w-[46px] overflow-hidden rounded-[21.2308px] bg-[#A2D1FD] shadow-[inset_0px_2.12308px_3.18462px_#72BBFF]"
+              aria-label="Theme switch"
+            >
+              <span className="absolute inset-0 rounded-[21.2308px] bg-[linear-gradient(180deg,#E0FDFF_0%,#A2D1FD_100%)] opacity-90" />
+              <span className="absolute left-[7px] top-[4px] h-[2px] w-[2px] rounded-full bg-[#DEE5F3]" />
+              <span className="absolute left-[10px] top-[10px] h-[1px] w-[1px] rounded-full bg-[#DEE5F3]" />
+              <span className="absolute left-[14px] top-[6px] h-[1.5px] w-[1.5px] rounded-full bg-[#DEE5F3]" />
+              <span className="absolute right-[10px] top-[6px] h-[10px] w-[16px] rounded-full bg-white/95 blur-[0.2px]" />
+              <span className="absolute right-[15px] top-[9px] h-[7px] w-[10px] rounded-full bg-white" />
+              <span className="absolute right-[2px] top-[2px] z-10 h-5 w-5 rounded-full bg-[rgba(255,193,135,0.96)] shadow-[-0.88px_1.47px_1.17px_rgba(183,183,183,0.35),0px_0px_2.65px_rgba(255,193,135,0.6),inset_0px_-0.59px_1.17px_#FFA149,inset_0px_0.59px_1.17px_#FFD0A5]" />
+              <Moon className="absolute left-[6px] top-[4px] h-4 w-4 text-[#C2C9D0]" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="relative z-10 min-h-[calc(100vh-82px)] w-full">
+        {children}
+      </main>
     </div>
   )
 }

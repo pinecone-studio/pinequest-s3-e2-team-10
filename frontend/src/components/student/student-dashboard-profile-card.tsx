@@ -98,20 +98,20 @@ export function StudentDashboardProfileCard({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <div className="h-[100px] w-full max-w-[780px] rounded-[24px] border border-[#cfe5ff] bg-white p-[21px] shadow-[0_10px_24px_rgba(102,157,214,0.08)]">
+      <div className="h-[135px] w-full rounded-[16px] bg-[linear-gradient(126.97deg,rgba(6,11,38,0.74)_28.26%,rgba(26,31,55,0.5)_91.2%)] p-[20px] backdrop-blur-[60px]">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-[21px]">
-            <Avatar className="h-[60px] w-[60px] border-[3px] border-[#d6e8ff]">
+          <div className="flex min-w-0 items-end gap-4">
+            <Avatar className="h-[60px] w-[60px] border border-[rgba(0,113,223,0.20)] p-[1px]">
               <AvatarImage src={profile.image} alt={profile.name} className="object-cover" />
               <AvatarFallback className="bg-[#68a8ff] text-lg font-bold text-white">
                 {getInitials(profile.name)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate font-sans text-[18px] font-semibold text-[#1f2937]">
+              <p className="truncate font-sans text-[24px] font-semibold leading-[29px] text-[#E1E6EB]">
                 {profile.name}
               </p>
-              <p className="mt-1 truncate font-sans text-[14px] italic text-[#5B646F]">
+              <p className="mt-1 truncate font-sans text-[14px] font-normal italic leading-[17px] text-[#C2C9D0]">
                 &quot;{profile.bio}&quot;
               </p>
             </div>
@@ -120,7 +120,7 @@ export function StudentDashboardProfileCard({
           <DialogTrigger asChild>
             <button
               type="button"
-              className="rounded-full p-2 text-slate-700 transition hover:bg-[#edf5ff]"
+              className="rounded-full p-2 text-[#C2C9D0] transition hover:bg-[rgba(255,255,255,0.08)]"
               aria-label="Профайл засах"
             >
               <Pencil className="h-5 w-5" />
