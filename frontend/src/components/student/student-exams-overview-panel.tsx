@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Clock3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Exam, ExamResult } from "@/lib/mock-data"
+import type { Exam } from "@/lib/mock-data"
 
 const tabs = [
   { id: "all", label: "Бүгд" },
@@ -12,46 +12,42 @@ const tabs = [
   { id: "results", label: "Дүн" },
 ] as const
 
-function getInitials(title: string) {
-  return title.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("")
-}
-
-function getGrade(score: number, total: number) {
-  const percentage = Math.round((score / total) * 100)
-  if (percentage >= 90) return { label: "A", tone: "text-[#159947] bg-[#d9f8e5]" }
-  if (percentage >= 80) return { label: "B+", tone: "text-[#2f64ff] bg-[#dbe7ff]" }
-  return { label: "C", tone: "text-[#a16207] bg-[#fef3c7]" }
-}
+const dashboardRecentResults = [
+  { id: "cs", subject: "Мэдээлэл зүй", short: "МЗ", score: "98/100", grade: { label: "A", tone: "text-[#E8F5E9] bg-[#62D84E]" } },
+  { id: "mn", subject: "Монгол хэл", short: "МХ", score: "85/100", grade: { label: "B+", tone: "text-[#E6F2FF] bg-[#4A8CFF]" } },
+  { id: "history", subject: "Түүх", short: "Тү", score: "85/100", grade: { label: "A-", tone: "text-[#E8F5E9] bg-[#62D84E]" } },
+  { id: "bio", subject: "Биологи", short: "Би", score: "88/100", grade: { label: "B+", tone: "text-[#E6F2FF] bg-[#4A8CFF]" } },
+] as const
 
 export function StudentExamsOverviewPanel({
   exams,
-  results,
   today,
 }: {
   exams: Exam[]
-  results: ExamResult[]
   today: string
 }) {
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["id"]>("all")
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["id"]>("results")
   const scheduledExams = useMemo(() => exams.filter((exam) => exam.status === "scheduled"), [exams])
   const visibleExams = activeTab === "results" ? [] : scheduledExams
-  const visibleResults = activeTab === "scheduled" ? [] : results
+  const visibleResults = activeTab === "scheduled" ? [] : dashboardRecentResults
 
   return (
-    <section className="w-full max-w-[520px] rounded-[28px] border border-[#cfe5ff] bg-white p-6 shadow-[0_12px_28px_rgba(102,157,214,0.08)]">
-      <h1 className="font-sans text-[20px] font-bold text-[#1f2937]">Миний шалгалтууд</h1>
-      <p className="mt-2 font-sans text-[13px] font-normal text-[#7b8490]">
+    <section className="h-auto w-full rounded-[16px] bg-[linear-gradient(126.97deg,rgba(6,11,38,0.74)_28.26%,rgba(26,31,55,0.5)_91.2%)] p-5 backdrop-blur-[60px] xl:sticky xl:top-0 xl:max-h-[calc(100vh-132px)] xl:min-h-[720px] xl:w-[440px] xl:overflow-y-auto">
+      <h1 className="font-sans text-[20px] font-medium leading-6 text-[#F0F3F5]">Миний шалгалтууд</h1>
+      <p className="mt-[7px] font-sans text-[14px] font-normal leading-5 text-[#C2C9D0]">
         Мэдлэгээ баталгаажуулах мөч ирлээ. Амжилт хүсье!
       </p>
 
-      <div className="mt-5 grid grid-cols-3 rounded-[18px] bg-[#edf3fb] p-1">
+      <div className="mt-5 grid h-11 grid-cols-3 rounded-full border border-[#E6F2FF] bg-[#003366] p-2 shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-[14px] px-4 py-2.5 font-sans text-[14px] font-medium ${
-              activeTab === tab.id ? "bg-white text-[#1f4068] shadow-[0_2px_8px_rgba(31,64,104,0.16)]" : "text-[#28476d]"
+            className={`rounded-full px-4 py-1 font-sans text-[14px] font-medium leading-5 ${
+              activeTab === tab.id
+                ? "bg-[#3D7CFF] text-[#F5FAFF] shadow-[0px_8px_18px_rgba(61,124,255,0.35)]"
+                : "text-[#F9FAFB]"
             }`}
           >
             {tab.label}
@@ -59,31 +55,31 @@ export function StudentExamsOverviewPanel({
         ))}
       </div>
 
-      <div className="mt-5 rounded-[22px] bg-[#e3f0ff] px-5 py-4 text-[#2b3440]">
-        <p className="font-sans text-[14px] leading-6">
-          <span className="font-semibold">Мэдэгдэл:</span> 2026.03.13 18:00 цагт Геометрийн шалгалтын дүн системд орно.
+      <div className="mt-[28px] rounded-[16px] bg-[rgba(255,255,255,0.08)] px-5 py-5 text-[#FFFFFF] backdrop-blur-[60px]">
+        <p className="font-sans text-[14px] font-semibold leading-[17px]">
+          Мэдэгдэл: 2026.03.13 18:00 цагт Геометрийн шалгалтын дүн системд орно.
         </p>
       </div>
 
       {visibleExams.length > 0 ? (
-        <div className="mt-8">
-          <h2 className="font-sans text-[14px] font-semibold text-[#5B646F]">Удахгүй болох шалгалтууд</h2>
-          <div className="mt-4 space-y-5">
+        <div className="mt-5">
+          <h2 className="font-sans text-[14px] font-semibold leading-5 text-[#C2C9D0]">Удахгүй болох шалгалтууд</h2>
+          <div className="mt-5 space-y-4">
             {visibleExams.map((exam) => {
               const schedule = exam.scheduledClasses[0]
               const isToday = schedule?.date === today
               return (
-                <article key={exam.id} className="rounded-[22px] border border-[#cfe5ff] bg-[#eff6ff] px-5 py-5 shadow-[0_8px_18px_rgba(102,157,214,0.08)]">
+                <article key={exam.id} className={`rounded-[16px] p-[17px] ${isToday ? "bg-[linear-gradient(126.97deg,#060C29_28.26%,rgba(4,12,48,0.5)_91.2%)]" : "bg-[linear-gradient(126.97deg,rgba(6,11,38,0.74)_28.26%,rgba(26,31,55,0.5)_91.2%)]"}`}>
                   <div className="flex items-start justify-between gap-4">
-                    <p className="font-sans text-[17px] font-semibold text-[#1f2937]">{exam.title}</p>
-                    {isToday ? <span className="rounded-full bg-[#d9f8e5] px-3 py-1 text-[14px] text-[#159947]">Бэлэн</span> : null}
+                    <p className="font-sans text-[16px] font-bold leading-6 text-[#F5FAFF]">{exam.title}</p>
+                    {isToday ? <span className="rounded-full bg-[#00C853] px-2 py-0.5 text-[12px] font-medium text-[#E8F5E9]">Бэлэн</span> : null}
                   </div>
-                  <div className="mt-3 flex items-center gap-3 text-[14px] text-[#6b7280]">
-                    <Clock3 className="h-4 w-4" />
+                  <div className="mt-2 flex items-center gap-3 text-[12px] text-[#C2C9D0]">
+                    <Clock3 className="h-[14px] w-[14px]" />
                     <span>{exam.duration} мин</span>
                     <span>{isToday ? `Өнөөдөр · ${schedule?.time}` : `${schedule?.date} · ${schedule?.time}`}</span>
                   </div>
-                  <Button asChild variant="ghost" className="mt-5 h-[40px] w-full rounded-[12px] border border-[#cfe5ff] bg-[#e3f0ff] text-[#334e73] hover:bg-[#d6e8ff]">
+                  <Button asChild variant="ghost" className={`mt-3 h-[44px] w-full rounded-[12px] text-[14px] font-medium ${isToday ? "bg-[#007FFF] text-[#E6F2FF] hover:bg-[#0B86FF]" : "bg-[rgba(255,255,255,0.08)] text-[#6F7982] hover:bg-[rgba(255,255,255,0.12)]"}`}>
                     <Link href={`/student/exams/${exam.id}`}>Дэлгэрэнгүй</Link>
                   </Button>
                 </article>
@@ -94,24 +90,22 @@ export function StudentExamsOverviewPanel({
       ) : null}
 
       {visibleResults.length > 0 ? (
-        <div className="mt-8">
-          <h2 className="font-sans text-[14px] font-semibold text-[#5B646F]">Сүүлийн дүнгүүд</h2>
+        <div className="mt-5">
+          <h2 className="font-sans text-[14px] font-semibold leading-5 text-[#C2C9D0]">Сүүлийн дүнгүүд</h2>
           <div className="mt-4 space-y-4">
             {visibleResults.map((result) => {
-              const exam = exams.find((entry) => entry.id === result.examId)
-              const grade = getGrade(result.score, result.totalPoints)
               return (
-                <Link key={`${result.examId}-${result.studentId}`} href={`/student/reports/${result.examId}`} className="flex items-center justify-between rounded-[18px] border border-[#cfe5ff] bg-[#f8fbff] px-4 py-4 transition hover:bg-[#f1f7ff]">
+                <Link key={result.id} href="/student/reports/e1" className="flex items-center justify-between rounded-[16px] bg-[linear-gradient(126.97deg,#060C29_28.26%,rgba(4,12,48,0.5)_91.2%)] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_24px_rgba(0,0,0,0.14)] transition hover:bg-[rgba(255,255,255,0.08)]">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#cfe5ff] bg-white text-[18px] text-[#1f4068]">
-                      {getInitials(exam?.title || "Ш")}
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#F0F3F5] bg-transparent text-[12px] text-[#F5FAFF]">
+                      {result.short}
                     </div>
                     <div>
-                      <p className="font-sans text-[15px] font-semibold text-[#1f2937]">{exam?.title || "Шалгалт"}</p>
-                      <p className="text-[14px] text-[#5B646F]">{result.score}/{result.totalPoints}</p>
+                      <p className="font-sans text-[14px] font-medium leading-5 text-[#F5FAFF]">{result.subject}</p>
+                      <p className="text-[12px] leading-4 text-[#C2C9D0]">{result.score}</p>
                     </div>
                   </div>
-                  <span className={`rounded-full px-4 py-2 text-[18px] font-semibold ${grade.tone}`}>{grade.label}</span>
+                  <span className={`rounded-full px-3 py-1 text-[14px] font-bold leading-5 ${result.grade.tone}`}>{result.grade.label}</span>
                 </Link>
               )
             })}
