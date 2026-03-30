@@ -41,13 +41,13 @@ export function StudentExamsOverviewPanel({
   const visibleNotices = activeTab === "all" ? dashboardNotices : []
 
   return (
-    <section className="h-auto w-full rounded-[20px] border border-[#DCE8F3] bg-white p-5 shadow-[0_6px_24px_rgba(114,144,179,0.10)] xl:min-h-[720px]">
+    <section className="box-border h-[814px] w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-5 shadow-[0_6px_24px_rgba(114,144,179,0.10)] xl:h-full xl:w-[440px]">
       <h1 className="font-sans text-[22px] font-semibold leading-6 text-[#2F3845]">Шинэ содон 🎉</h1>
       <p className="mt-[7px] font-sans text-[14px] font-normal leading-5 text-[#687386]">
         Чамд зориулсан хамгийн сүүлийн үеийн мэдээллүүд.
       </p>
 
-      <div className="mt-5 grid h-[44px] grid-cols-3 rounded-full bg-[#0B4078] p-1 shadow-[0_10px_22px_rgba(52,94,145,0.20)]">
+      <div className="mt-5 grid h-[44px] w-full grid-cols-3 rounded-full bg-[#003366] p-1 shadow-[0_10px_22px_rgba(52,94,145,0.20)]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -67,7 +67,7 @@ export function StudentExamsOverviewPanel({
       {visibleExams.length > 0 ? (
         <div className="mt-5">
           <h2 className="font-sans text-[14px] font-semibold leading-5 text-[#7A8698]">Удахгүй болох шалгалтууд</h2>
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 space-y-5">
             {visibleExams.map((exam) => {
               const schedule = exam.scheduledClasses[0]
               const isToday = schedule?.date === today
@@ -93,7 +93,7 @@ export function StudentExamsOverviewPanel({
       ) : null}
 
       {visibleNotices.length > 0 ? (
-        <div className="mt-5 space-y-4">
+        <div className="mt-5 space-y-5">
           {visibleNotices.map((notice) => (
             <article key={notice.id} className={`rounded-[18px] border border-[#E1EAF4] px-5 py-4 ${notice.tone}`}>
               <p className="text-[14px] font-semibold leading-7 text-[#2F3845]">
@@ -107,7 +107,7 @@ export function StudentExamsOverviewPanel({
       {visibleResults.length > 0 ? (
         <div className="mt-5">
           <h2 className="font-sans text-[14px] font-semibold leading-5 text-[#7A8698]">Сүүлийн дүнгүүд</h2>
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-5">
             {visibleResults.map((result) => {
               return (
                 <Link key={result.id} href="/student/reports/e1" className="flex items-center justify-between rounded-[18px] border border-[#DFE8F2] bg-[#F8FBFF] px-3 py-3 transition hover:bg-[#F0F6FF]">

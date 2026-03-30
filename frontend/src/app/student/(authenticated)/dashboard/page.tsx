@@ -46,7 +46,7 @@ export default function StudentDashboard() {
   )
 
   return (
-    <div className="flex min-h-[calc(100vh-82px)] flex-col gap-5 px-10 pb-[28px] pt-[18px]">
+    <div className="mx-auto flex h-full w-full max-w-[1360px] flex-col gap-5 overflow-hidden pb-[28px] pt-[18px]">
       <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0">
           <h1 className="font-sans text-[33px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#2D3642]">
@@ -77,8 +77,8 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      <div className="grid flex-1 gap-5 xl:grid-cols-[minmax(0,1fr)_402px]">
-        <div className="space-y-5">
+      <div className="grid min-h-0 flex-1 gap-5 xl:grid-cols-[900px_440px] xl:gap-[20px]">
+        <div className="flex min-h-0 flex-col gap-[20px] xl:w-[900px]">
           <StudentDashboardProfileCard studentName={studentName} />
           <StudentDashboardScheduleCard exams={myExams} studentClass={studentClass} />
         </div>

@@ -47,8 +47,8 @@ export default function StudentLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#DCEAF9] text-[#2C3440]">
-      <div className="mx-auto min-h-[calc(100vh-20px)] w-full max-w-[1440px] rounded-[2px] bg-[#FDFEFE] shadow-[0_10px_35px_rgba(110,150,190,0.10)]">
+    <div className="min-h-screen bg-[#F6FAFE] text-[#2C3440]">
+      <div className="mx-auto min-h-screen w-full max-w-[1440px] bg-[#F6FAFE] shadow-[0_10px_35px_rgba(110,150,190,0.10)]">
         <header className="relative z-10">
           <div className="grid min-h-[82px] grid-cols-[1fr_auto_1fr] items-center px-[42px] pt-5">
             <Link href="/student/dashboard" className="justify-self-start font-semibold">
