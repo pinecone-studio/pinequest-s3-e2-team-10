@@ -57,7 +57,7 @@ export function StudentDashboardScheduleCard({
   )
 
   return (
-    <section className="w-full rounded-[20px] border border-[#DCE8F3] bg-white p-[18px] shadow-[0_6px_24px_rgba(114,144,179,0.10)]">
+    <section className="font-sans h-[659px] w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-[18px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] xl:h-[659px] xl:max-w-[900px]">
       <div className="flex items-center justify-center gap-8">
         <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F7F3FB] text-[#7B6CA8]">
           <ChevronLeft className="h-5 w-5" />
@@ -67,16 +67,16 @@ export function StudentDashboardScheduleCard({
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
-      <div className="mt-4 grid grid-cols-[72px_repeat(7,minmax(0,1fr))] gap-x-2 gap-y-1">
+      <div className="mt-4 grid grid-cols-[92px_repeat(7,minmax(0,1fr))] gap-2">
         <div />
         {weekDates.map((entry, index) => (
-          <div key={entry.key} className="pb-2 text-center text-[15px] font-medium text-[#4B5563]">
+          <div key={entry.key} className="flex h-10 items-center justify-center text-center text-[15px] font-medium text-[#4B5563]">
             {weekdayLabels[index]}
           </div>
         ))}
         {timeSlots.map((time) => (
           <div key={time} className="contents">
-            <div className="pt-3 text-center text-[14px] font-medium text-[#2B86FF]">{time}</div>
+            <div className="flex min-h-[64px] items-start justify-center pt-5 text-center text-[14px] font-medium text-[#2B86FF]">{time}</div>
             {weekDates.map((entry) => {
               const event = eventsByCell.get(`${entry.key}-${time.slice(0, 2)}`)
               return (

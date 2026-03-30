@@ -98,7 +98,7 @@ export function StudentDashboardProfileCard({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <div className="w-full rounded-[20px] border border-[#DCE8F3] bg-white px-[18px] py-[20px] shadow-[0_6px_24px_rgba(114,144,179,0.10)]">
+      <div className="h-[102px] w-full rounded-[20px] border border-[#DCE8F3] bg-white p-[21px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] xl:max-w-[900px]">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-end gap-4">
             <Avatar className="h-[58px] w-[58px] border border-[#E3EDF6] p-[1px] shadow-sm">
