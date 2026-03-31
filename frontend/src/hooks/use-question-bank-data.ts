@@ -68,5 +68,6 @@ export function useQuestionBankData({
     questionBank,
     setQuestionBank,
     sourceFiles,
+    setSourceFiles,
   };
 }
