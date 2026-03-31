@@ -1,7 +1,7 @@
 "use client"
 
-import { type ChangeEvent, useState } from "react"
-import { Pencil } from "lucide-react"
+import { useRef, useState } from "react"
+import { Camera, Pencil } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,35 +16,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { notifyStudentSessionChange } from "@/hooks/use-student-session"
-
-const STORAGE_KEYS = {
-  bio: "studentProfileBio",
-  image: "studentProfileImage",
-} as const
-
-const defaultBio = "Би ирээдүйд Дизайнер болно."
+import { useStudentDashboardProfile } from "@/hooks/use-student-dashboard-profile"
 
 type StudentDashboardProfileCardProps = {
+  studentId: string
   studentName: string
-}
-
-type ProfileState = {
-  name: string
-  bio: string
-  image: string
-}
-
-function getStoredProfile(studentName: string): ProfileState {
-  if (typeof window === "undefined") {
-    return { name: studentName, bio: defaultBio, image: "" }
-  }
-
-  return {
-    name: localStorage.getItem("studentName") || studentName,
-    bio: localStorage.getItem(STORAGE_KEYS.bio) || defaultBio,
-    image: localStorage.getItem(STORAGE_KEYS.image) || "",
-  }
 }
 
 function getInitials(name: string) {
@@ -57,56 +33,60 @@ function getInitials(name: string) {
 }
 
 export function StudentDashboardProfileCard({
+  studentId,
   studentName,
 }: StudentDashboardProfileCardProps) {
+  const imageInputRef = useRef<HTMLInputElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const [profile, setProfile] = useState<ProfileState>(() => getStoredProfile(studentName))
-  const [draft, setDraft] = useState<ProfileState>(() => getStoredProfile(studentName))
+  const { defaultBio, draft, handleImageChange, isUploadingImage, persistProfile, profile, setDraft } =
+    useStudentDashboardProfile(studentId, studentName)
 
   const handleOpenChange = (open: boolean) => {
     if (open) setDraft(profile)
     setIsOpen(open)
   }
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      setDraft((current) => ({ ...current, image: String(reader.result || "") }))
-    }
-    reader.readAsDataURL(file)
-  }
-
   const handleSave = () => {
-    const nextProfile = {
+    persistProfile({
       name: draft.name.trim() || studentName,
       bio: draft.bio.trim() || defaultBio,
       image: draft.image,
-    }
-
-    localStorage.setItem("studentName", nextProfile.name)
-    localStorage.setItem(STORAGE_KEYS.bio, nextProfile.bio)
-    if (nextProfile.image) localStorage.setItem(STORAGE_KEYS.image, nextProfile.image)
-    else localStorage.removeItem(STORAGE_KEYS.image)
-
-    notifyStudentSessionChange()
-    setProfile(nextProfile)
+      imageUploadId: draft.imageUploadId,
+    })
     setIsOpen(false)
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <div className="h-[102px] w-full rounded-[20px] border border-[#DCE8F3] bg-white p-[21px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] xl:max-w-[900px]">
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(event) => void handleImageChange(event, true)}
+        />
+
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-end gap-4">
-            <Avatar className="h-[58px] w-[58px] border border-[#E3EDF6] p-[1px] shadow-sm">
-              <AvatarImage src={profile.image} alt={profile.name} className="object-cover" />
-              <AvatarFallback className="bg-[#D8E9FF] text-lg font-bold text-[#4E87C7]">
-                {getInitials(profile.name)}
-              </AvatarFallback>
-            </Avatar>
+            <button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              className="group relative shrink-0 cursor-pointer rounded-full disabled:cursor-not-allowed disabled:opacity-70"
+              aria-label="Профайлын зураг сонгох"
+              disabled={isUploadingImage}
+            >
+              <Avatar className="h-[58px] w-[58px] border border-[#E3EDF6] p-[1px] shadow-sm transition group-hover:brightness-95">
+                <AvatarImage src={profile.image} alt={profile.name} className="object-cover" />
+                <AvatarFallback className="bg-[#D8E9FF] text-lg font-bold text-[#4E87C7]">
+                  {getInitials(profile.name)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-[#213047]/0 text-white transition group-hover:bg-[#213047]/35">
+                <Camera className="h-4 w-4 opacity-0 transition group-hover:opacity-100" />
+              </span>
+            </button>
+
             <div className="min-w-0">
               <p className="truncate font-sans text-[24px] font-semibold leading-[29px] text-[#2F3845]">
                 {profile.name}
@@ -114,13 +94,16 @@ export function StudentDashboardProfileCard({
               <p className="mt-1 truncate font-sans text-[14px] font-normal italic leading-[17px] text-[#667284]">
                 &quot;{profile.bio}&quot;
               </p>
+              {isUploadingImage ? (
+                <p className="mt-1 text-[12px] font-medium text-[#4A9DFF]">Зураг R2 рүү хадгалж байна...</p>
+              ) : null}
             </div>
           </div>
 
           <DialogTrigger asChild>
             <button
               type="button"
-              className="rounded-full p-2 text-[#7B8797] transition hover:bg-[#F4F8FC]"
+              className="cursor-pointer rounded-full p-2 text-[#7B8797] transition hover:bg-[#F4F8FC]"
               aria-label="Профайл засах"
             >
               <Pencil className="h-5 w-5" />
@@ -138,7 +121,14 @@ export function StudentDashboardProfileCard({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="student-profile-image">Зураг</Label>
-            <Input id="student-profile-image" type="file" accept="image/*" onChange={handleImageChange} />
+            <Input
+              id="student-profile-image"
+              type="file"
+              accept="image/*"
+              onChange={(event) => void handleImageChange(event, true)}
+              disabled={isUploadingImage}
+              className="cursor-pointer"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="student-profile-name">Нэр</Label>
@@ -146,6 +136,7 @@ export function StudentDashboardProfileCard({
               id="student-profile-name"
               value={draft.name}
               onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+              className="cursor-pointer"
             />
           </div>
           <div className="space-y-2">
@@ -154,15 +145,16 @@ export function StudentDashboardProfileCard({
               id="student-profile-bio"
               value={draft.bio}
               onChange={(event) => setDraft((current) => ({ ...current, bio: event.target.value }))}
+              className="cursor-pointer"
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+          <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="cursor-pointer">
             Болих
           </Button>
-          <Button type="button" onClick={handleSave}>
+          <Button type="button" onClick={handleSave} disabled={isUploadingImage} className="cursor-pointer">
             Хадгалах
           </Button>
         </DialogFooter>
