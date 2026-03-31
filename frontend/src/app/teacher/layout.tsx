@@ -2,14 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, BookOpen, ClipboardList, FileText, LayoutDashboard, Users } from "lucide-react";
+import { Bell, BookOpen, ClipboardList, FileText, LayoutDashboard, Users, type LucideIcon } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { teacher } from "@/lib/mock-data-helpers";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+const navItems: NavItem[] = [
   { href: "/teacher/dashboard", label: "Хяналтын самбар", icon: LayoutDashboard },
   { href: "/teacher/classes", label: "Ангиуд", icon: Users },
   { href: "/teacher/sources", label: "Мэдлэгийн сан", icon: FileText },
@@ -74,7 +80,7 @@ function SidebarNav({
   navItems,
   pathname,
 }: {
-  navItems: typeof navItems;
+  navItems: NavItem[];
   pathname: string;
 }) {
   return (
