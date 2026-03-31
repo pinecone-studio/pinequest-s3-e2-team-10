@@ -17,7 +17,7 @@ const statCards = [
 ] as const
 
 export default function StudentDashboard() {
-  const { studentClass, studentName } = useStudentSession()
+  const { studentClass, studentId, studentName } = useStudentSession()
   const [allExams, setAllExams] = useState<Exam[]>(legacyExams)
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function StudentDashboard() {
 
       <div className="grid min-h-0 flex-1 gap-5 xl:grid-cols-[900px_440px] xl:gap-[20px]">
         <div className="flex min-h-0 flex-col gap-[20px] xl:w-[900px]">
-          <StudentDashboardProfileCard studentName={studentName} />
+          <StudentDashboardProfileCard studentId={studentId} studentName={studentName} />
           <StudentDashboardScheduleCard exams={myExams} studentClass={studentClass} />
         </div>
 

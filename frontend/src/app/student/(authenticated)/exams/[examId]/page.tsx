@@ -16,6 +16,22 @@ import {
 } from "@/lib/student-exam-time"
 import { getStudentExams } from "@/lib/student-exams"
 
+function StudentExamPageLoadingState() {
+  return (
+    <div className="flex min-h-[55vh] flex-col items-center justify-center gap-4 text-center">
+      <div className="rounded-full bg-sky-100 p-4 text-sky-700">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      </div>
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold text-slate-900">Шалгалтын мэдээллийг ачаалж байна</h1>
+        <p className="max-w-md text-sm leading-6 text-slate-600">
+          Түр хүлээнэ үү. Таны сонгосон шалгалтын мэдээллийг backend-ээс авч байна.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function ExamDetailPage({ params }: { params: Promise<{ examId: string }> }) {
   const { examId } = use(params)
   const router = useRouter()
@@ -23,6 +39,7 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
   const [countdown, setCountdown] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [allExams, setAllExams] = useState<Exam[]>(legacyExams)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     let isMounted = true
@@ -35,6 +52,9 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
       } catch (loadError) {
         if (!isMounted) return
         console.warn("Failed to refresh exam details from the backend.", loadError)
+      } finally {
+        if (!isMounted) return
+        setIsLoading(false)
       }
     }
 
@@ -63,6 +83,10 @@ export default function ExamDetailPage({ params }: { params: Promise<{ examId: s
     const interval = setInterval(updateCountdown, 1000)
     return () => clearInterval(interval)
   }, [isTodayExam, schedule])
+
+  if (isLoading) {
+    return <StudentExamPageLoadingState />
+  }
 
   if (!exam) {
     return (
