@@ -41,7 +41,7 @@ export default function SourcesPage() {
           description:
             error instanceof Error
               ? error.message
-              : "Медлэгийн сангийн файлуудыг ачаалж чадсангүй.",
+              : "Мэдлэгийн сангийн файлуудыг ачаалж чадсангүй.",
           variant: "destructive",
         });
       } finally {
@@ -84,7 +84,7 @@ export default function SourcesPage() {
       setNewFileName("");
       toast({
         title: "Амжилттай",
-        description: "Файл медлэгийн санд хадгалагдлаа.",
+        description: "Файл мэдлэгийн санд хадгалагдлаа.",
       });
     } catch (error) {
       toast({
@@ -119,7 +119,7 @@ export default function SourcesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Медлэгийн сан</h1>
+        <h1 className="text-2xl font-bold">Мэдлэгийн сан</h1>
         <p className="text-muted-foreground">
           Асуулт үүсгэхдээ ашиглах материал, ном, файлууд.
         </p>

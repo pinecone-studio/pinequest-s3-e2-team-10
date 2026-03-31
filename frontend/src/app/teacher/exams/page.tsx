@@ -76,8 +76,8 @@ export default function ExamsPage() {
             Шалгалт үүсгэж, зохион байгуулах хэсэг.
           </p>
         </div>
-        <Link href="/teacher/question-bank">
-          <Button>Асуултын сан / Шалгалт үүсгэх</Button>
+        <Link href="/teacher/question-bank/create">
+          <Button>Шинэ асуултууд үүсгэх</Button>
         </Link>
       </div>
 

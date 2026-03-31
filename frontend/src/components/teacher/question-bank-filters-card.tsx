@@ -1,9 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -14,11 +12,9 @@ import {
 import type { QuestionBankCategory } from "@/lib/question-bank-api";
 import { Search } from "lucide-react";
 
+export const CREATE_CATEGORY_FILTER_VALUE = "__create_category__";
+
 type QuestionBankFiltersCardProps = {
-  isCreatingCategory: boolean;
-  newCategoryName: string;
-  onCreateCategory: () => void;
-  onNewCategoryNameChange: (value: string) => void;
   onSearchQueryChange: (value: string) => void;
   onSelectedCategoryFilterChange: (value: string) => void;
   onSelectedDifficultyChange: (value: string) => void;
@@ -29,10 +25,6 @@ type QuestionBankFiltersCardProps = {
 };
 
 export function QuestionBankFiltersCard({
-  isCreatingCategory,
-  newCategoryName,
-  onCreateCategory,
-  onNewCategoryNameChange,
   onSearchQueryChange,
   onSelectedCategoryFilterChange,
   onSelectedDifficultyChange,
@@ -71,6 +63,9 @@ export function QuestionBankFiltersCard({
                   {category.name}
                 </SelectItem>
               ))}
+              <SelectItem value={CREATE_CATEGORY_FILTER_VALUE}>
+                + Шинэ ангилал нэмэх
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -85,24 +80,6 @@ export function QuestionBankFiltersCard({
               <SelectItem value="hard">Хэцүү</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="flex flex-col gap-3 border-t pt-4 md:flex-row md:items-end">
-          <div className="flex-1 space-y-2">
-            <Label>Шинэ ангилал</Label>
-            <Input
-              placeholder="Жишээ: Математик"
-              value={newCategoryName}
-              onChange={(event) => onNewCategoryNameChange(event.target.value)}
-            />
-          </div>
-          <Button
-            variant="secondary"
-            onClick={onCreateCategory}
-            disabled={isCreatingCategory}
-          >
-            Create new category
-          </Button>
         </div>
       </CardContent>
     </Card>
