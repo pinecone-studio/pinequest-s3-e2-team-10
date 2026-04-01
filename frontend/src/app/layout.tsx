@@ -9,9 +9,12 @@ export const metadata: Metadata = {
   description: "Learning Management System - Exam Module",
   generator: "v0.app",
   icons: {
-    icon: "/dolphin-favicon-32x32.png",
-    shortcut: "/dolphin-favicon-32x32.png",
-    apple: "/dolphin-apple-icon.png",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-light-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/icon-light-32x32.png",
+    apple: "/apple-icon.png",
   },
 };
 

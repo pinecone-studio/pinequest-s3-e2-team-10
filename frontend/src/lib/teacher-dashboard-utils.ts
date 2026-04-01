@@ -13,10 +13,30 @@ export const teacherWeekDays = [
   { full: "Ням", short: "НЯ" },
 ]
 
+const mongolianMonthNames = [
+  "нэгдүгээр сарын",
+  "хоёрдугаар сарын",
+  "гуравдугаар сарын",
+  "дөрөвдүгээр сарын",
+  "тавдугаар сарын",
+  "зургаадугаар сарын",
+  "долоодугаар сарын",
+  "наймдугаар сарын",
+  "есдүгээр сарын",
+  "аравдугаар сарын",
+  "арваннэгдүгээр сарын",
+  "арванхоёрдугаар сарын",
+]
+
 export const teacherTimeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
-export const formatHeaderDate = (value: Date) => value.toLocaleDateString("mn-MN", { year: "numeric", month: "long", day: "numeric" })
-export const formatCompactDate = (value: string) => new Date(`${value}T00:00:00`).toLocaleDateString("mn-MN", { month: "2-digit", day: "2-digit" })
+export const formatHeaderDate = (value: Date) => `${value.getFullYear()} оны ${mongolianMonthNames[value.getMonth()]} ${value.getDate()}`
+export const formatCompactDate = (value: string) => {
+  const date = new Date(`${value}T00:00:00`)
+  return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`
+}
 export const formatTeacherCalendarTitle = (value: Date) => `${value.getMonth() + 1}-р сар ${value.getFullYear()} он`
+export const formatIsoDate = (value: Date) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`
+export const formatTimeLabel = (value: Date) => `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`
 
 export function getGreetingLabel(value: Date) {
   const hour = value.getHours()
@@ -38,7 +58,7 @@ export function getTeacherWeekDates(baseDate: Date) {
   return teacherWeekDays.map((day, index) => {
     const date = new Date(monday)
     date.setDate(monday.getDate() + index)
-    return { date: date.toISOString().split("T")[0], day: day.full, shortDay: day.short, displayDate: date.toLocaleDateString("mn-MN", { month: "2-digit", day: "2-digit" }) }
+    return { date: formatIsoDate(date), day: day.full, shortDay: day.short, displayDate: `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}` }
   })
 }
 

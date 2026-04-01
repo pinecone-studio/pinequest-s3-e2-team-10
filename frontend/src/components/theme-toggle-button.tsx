@@ -1,7 +1,7 @@
 "use client"
 
 import { useSyncExternalStore } from "react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
 export function ThemeToggleButton({ className }: { className?: string }) {
