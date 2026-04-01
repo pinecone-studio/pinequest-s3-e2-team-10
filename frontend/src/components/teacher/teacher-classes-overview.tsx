@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { CalendarDays, Clock3 } from "lucide-react"
+import { useCurrentTime } from "@/hooks/use-current-time"
 import type { Class, ExamResult } from "@/lib/mock-data-types"
 import type { TeacherExam } from "@/lib/teacher-exams"
 import { buildClassOverviewMetrics, buildExamInsightCards } from "@/lib/teacher-classes-overview"
+import { formatHeaderDate, formatTimeLabel } from "@/lib/teacher-dashboard-utils"
 import { TeacherClassesHeader } from "@/components/teacher/teacher-classes-header"
 import { TeacherClassScoreChart } from "@/components/teacher/teacher-class-score-chart"
 import { OverviewInsightCard } from "@/components/teacher/teacher-classes-overview-cards"
@@ -13,17 +14,12 @@ import type { TeacherStudentRegistrationInput } from "@/lib/teacher-student-regi
 
 export function TeacherClassesOverview(props: TeacherClassesOverviewProps) {
   const { classData, classOptions, examResults, onAddStudent, onClassChange, onSemesterChange, selectedExam, selectedExamResults, selectedSemester, semesterOptions, visibleCompletedExams } = props
-  const [now, setNow] = useState(() => new Date())
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
+  const now = useCurrentTime()
 
   const metrics = buildClassOverviewMetrics({ classData, exams: visibleCompletedExams, results: examResults })
   const statCards = buildExamInsightCards(selectedExam, selectedExamResults)
-  const currentDateLabel = now.toLocaleDateString("mn-MN", { year: "numeric", month: "long", day: "numeric" })
-  const currentTimeLabel = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+  const currentDateLabel = now ? formatHeaderDate(now) : "Огноо ачаалж байна"
+  const currentTimeLabel = now ? formatTimeLabel(now) : "--:--"
 
   return (
     <div className="space-y-5">

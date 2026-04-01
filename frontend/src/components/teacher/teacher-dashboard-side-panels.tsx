@@ -1,23 +1,20 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
+import { useCurrentTime } from "@/hooks/use-current-time"
 import { classes, examResults } from "@/lib/mock-data"
 import { saveDashboardAnnouncement } from "@/lib/dashboard-announcements"
+import { formatIsoDate, formatTimeLabel } from "@/lib/teacher-dashboard-utils"
 import { cn } from "@/lib/utils"
 
 export function TeacherDashboardSidePanels(props: { selectedClassId: string }) {
   const { selectedClassId } = props
   const [announcementClassId, setAnnouncementClassId] = useState("all")
   const [message, setMessage] = useState("")
-  const [currentTime, setCurrentTime] = useState(() => new Date())
+  const currentTime = useCurrentTime()
   const chart = useMemo(() => buildChartModel(), [])
   const activeAnnouncementClassId = selectedClassId !== "all" ? selectedClassId : announcementClassId
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setCurrentTime(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
 
   return (
     <div className="flex min-w-0 w-full flex-col gap-5">
@@ -31,8 +28,8 @@ export function TeacherDashboardSidePanels(props: { selectedClassId: string }) {
       <section className="rounded-[16px] border border-[#ededed] bg-[linear-gradient(233deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] p-5 shadow-[50px_38px_102px_rgba(120,118,148,0.14)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)]">
         <h2 className="text-[20px] font-bold leading-none text-[#4c4c66] dark:text-[#e6f2ff]">Мэдэгдэл илгээх</h2>
         <div className="mt-[7px] flex items-center gap-3 text-[12px] text-[#6f6c99] dark:text-[#c2c9d0]">
-          <span className="flex items-center gap-1.5"><Image src="/calendar-small.svg" alt="" width={14} height={14} />{currentTime.toLocaleDateString("sv-SE")}</span>
-          <span className="flex items-center gap-1.5"><Image src="/clock-small.svg" alt="" width={14} height={14} />Өнөөдөр · {currentTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+          <span className="flex items-center gap-1.5"><Image src="/calendar-small.svg" alt="" width={14} height={14} />{currentTime ? formatIsoDate(currentTime) : "----/--/--"}</span>
+          <span className="flex items-center gap-1.5"><Image src="/clock-small.svg" alt="" width={14} height={14} />Өнөөдөр · {currentTime ? formatTimeLabel(currentTime) : "--:--"}</span>
         </div>
         <div className="relative mt-4">
           <Image src="/list-bullets-small.svg" alt="" width={16} height={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2" />
