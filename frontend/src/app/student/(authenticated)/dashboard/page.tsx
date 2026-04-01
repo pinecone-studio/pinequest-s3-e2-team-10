@@ -1,7 +1,7 @@
 "use client"
 
+import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
-import { CalendarDays, Medal, Trophy } from "lucide-react"
 import { StudentDashboardProfileCard } from "@/components/student/student-dashboard-profile-card"
 import { StudentDashboardScheduleCard } from "@/components/student/student-dashboard-schedule-card"
 import { StudentExamsOverviewPanel } from "@/components/student/student-exams-overview-panel"
@@ -11,9 +11,9 @@ import { getLocalDateString } from "@/lib/student-exam-time"
 import { getStudentExams } from "@/lib/student-exams"
 
 const statCards = [
-  { label: "Нийт амжилт", value: "92.4%", detail: "+1.2%", icon: Trophy },
-  { label: "Мэдээлэл зүй", value: "98 A", detail: "Сүүлийн дүн", icon: Medal },
-  { label: "Энэ 7 хоногт", value: "3", detail: "Өгөх шалгалт", icon: CalendarDays },
+  { label: "Нийт амжилт", value: "92.4%", detail: "+1.2%", iconPath: "/trophyIcon.svg" },
+  { label: "Мэдээлэл зүй", value: "98 A", detail: "Сүүлийн дүн", iconPath: "/dunIcon.svg" },
+  { label: "Энэ 7 хоногт", value: "3", detail: "Өгөх шалгалт", iconPath: "/calendarIcon.svg" },
 ] as const
 
 export default function StudentDashboard() {
@@ -58,11 +58,16 @@ export default function StudentDashboard() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
           {statCards.map((item) => {
-            const Icon = item.icon
             return (
               <div key={item.label} className="flex items-center gap-3">
-                <div className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-[#D9E8F4] bg-[#F3F9FF] text-[#39424E] dark:border-white/10 dark:bg-white/8 dark:text-[#edf4ff]">
-                  <Icon className="h-[26px] w-[26px] stroke-[1.7]" />
+                <div className="flex h-[56px] w-[56px] items-center justify-center rounded-xl border border-[#D9E8F4] bg-[#F3F9FF] text-[#39424E] dark:border-white/10 dark:bg-white/8 dark:text-[#edf4ff]">
+                  <Image
+                    src={item.iconPath}
+                    alt=""
+                    width={26}
+                    height={26}
+                    className="h-[26px] w-[26px] object-contain"
+                  />
                 </div>
                 <div>
                   <p className="text-[14px] leading-5 text-[#7A8698] dark:text-[#9eacc3]">{item.label}</p>
