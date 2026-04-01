@@ -43,7 +43,10 @@ export default function QuestionBankPage() {
   const totalQuestionCount = data.questionBank.reduce(
     (sum, category) =>
       sum +
-      category.topics.reduce((topicSum, topic) => topicSum + topic.questions.length, 0),
+      category.topics.reduce(
+        (topicSum, topic) => topicSum + topic.questions.length,
+        0,
+      ),
     0,
   );
 
@@ -51,24 +54,7 @@ export default function QuestionBankPage() {
     <TeacherPageShell>
       <TeacherPageHeader
         title="Асуултын сан"
-        description="Эх сурвалж, ангилал, сэдэв, асуултуудаа нэг урсгалаар удирдаж, аль анги болон түвшинд ашиглах сангаа цэгцтэй хадгална."
         icon={BookOpen}
-        eyebrow={
-          <>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
-              <FolderTree className="h-4 w-4 text-[#5b91fc]" />
-              {data.questionBank.length} ангилал
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
-              <Shapes className="h-4 w-4 text-[#5b91fc]" />
-              {totalTopicCount} сэдэв
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
-              <BookOpen className="h-4 w-4 text-[#5b91fc]" />
-              {totalQuestionCount} асуулт
-            </span>
-          </>
-        }
         actions={
           <>
             <Button asChild>
@@ -159,7 +145,6 @@ export default function QuestionBankPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </TeacherPageShell>
   );
 }
