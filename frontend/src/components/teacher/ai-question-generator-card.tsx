@@ -1,26 +1,16 @@
 "use client";
 
-import { useState, type ChangeEvent, type DragEvent } from "react";
 import { AIQuestionSettingsPanel } from "@/components/teacher/ai-question-settings-panel";
 import { AIQuestionSourceSelector } from "@/components/teacher/ai-question-source-selector";
 import {
-  defaultAIQuestionTypeCounts,
-  type AIQuestionTypeCounts,
   type QuestionGeneratorPayload,
-  type SourceFileWithPages,
 } from "@/components/teacher/ai-question-generator-dialog-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { getAIQuestionCount } from "@/hooks/ai-question-builder";
+import { useAiQuestionGeneratorCard } from "@/hooks/use-ai-question-generator-card";
 import { FileStack, Sparkles } from "lucide-react";
 import type { UploadRecord } from "@/lib/uploads-api";
-
-const createSourceFileEntry = (file: File): SourceFileWithPages => ({
-  file,
-  startPage: 1,
-  endPage: 10,
-});
+import { cn } from "@/lib/utils";
 
 type Props = {
   availableSourceFiles: UploadRecord[];
@@ -39,77 +29,7 @@ export function AIQuestionGeneratorCard({
   onToggleTest,
   selectedMockTests,
 }: Props) {
-  const [sourceFilesWithPages, setSourceFilesWithPages] = useState<
-    SourceFileWithPages[]
-  >([]);
-  const [questionTypeCounts, setQuestionTypeCounts] = useState<AIQuestionTypeCounts>(
-    defaultAIQuestionTypeCounts,
-  );
-  const [variants, setVariants] = useState(1);
-  const [difficulty, setDifficulty] = useState<"easy" | "standard" | "hard">(
-    "standard",
-  );
-  const [isDragging, setIsDragging] = useState(false);
-
-  const totalQuestionCount = getAIQuestionCount(questionTypeCounts);
-  const hasSource =
-    selectedMockTests.length > 0 || sourceFilesWithPages.length > 0;
-
-  const updateQuestionTypeCount = (
-    type: keyof AIQuestionTypeCounts,
-    value: number,
-  ) => setQuestionTypeCounts((current) => ({ ...current, [type]: value }));
-
-  const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files ? Array.from(event.target.files) : [];
-    if (files.length > 0) {
-      setSourceFilesWithPages((current) => [
-        ...current,
-        ...files.map(createSourceFileEntry),
-      ]);
-    }
-    event.target.value = "";
-  };
-
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    const files = Array.from(event.dataTransfer.files);
-    if (files.length > 0) {
-      setSourceFilesWithPages((current) => [
-        ...current,
-        ...files.map(createSourceFileEntry),
-      ]);
-    }
-  };
-
-  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-  };
-
-  const updatePageRange = (
-    fileName: string,
-    field: "startPage" | "endPage",
-    value: number,
-  ) => {
-    setSourceFilesWithPages((current) =>
-      current.map((item) =>
-        item.file.name === fileName ? { ...item, [field]: value } : item,
-      ),
-    );
-  };
-
-  const removeSourceFile = (fileName: string) => {
-    setSourceFilesWithPages((current) =>
-      current.filter((item) => item.file.name !== fileName),
-    );
-  };
+  const card = useAiQuestionGeneratorCard(selectedMockTests);
 
   return (
     <Card
@@ -139,7 +59,7 @@ export function AIQuestionGeneratorCard({
               AI draft
             </div>
             <div className="mt-1 text-2xl font-semibold text-[#20335f]">
-              {totalQuestionCount * variants}
+              {card.totalQuestionCount * card.variants}
             </div>
             <div className="text-xs text-[#7b8bb1]">үүсэх асуулт</div>
           </div>
@@ -155,48 +75,48 @@ export function AIQuestionGeneratorCard({
         <AIQuestionSourceSelector
           availableSourceFiles={availableSourceFiles}
           isBuilderDialog={false}
-          isDragging={isDragging}
-          onDragEnter={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onFileSelect={handleFileSelect}
+          isDragging={card.isDragging}
+          onDragEnter={card.handleDragOver}
+          onDragLeave={card.handleDragLeave}
+          onDragOver={card.handleDragOver}
+          onDrop={card.handleDrop}
+          onFileSelect={card.handleFileSelect}
           onRemoveBuilderFile={() => {}}
-          onRemoveLocalFile={removeSourceFile}
+          onRemoveLocalFile={card.removeSourceFile}
           onToggleTest={onToggleTest}
-          onUpdatePageRange={updatePageRange}
+          onUpdatePageRange={card.updatePageRange}
           selectedBuilderFiles={[]}
           selectedMockTests={selectedMockTests}
-          sourceFilesWithPages={sourceFilesWithPages}
+          sourceFilesWithPages={card.sourceFilesWithPages}
         />
 
         <AIQuestionSettingsPanel
-          difficulty={difficulty}
-          onDifficultyChange={setDifficulty}
-          onQuestionTypeCountChange={updateQuestionTypeCount}
-          onVariantsChange={setVariants}
-          questionTypeCounts={questionTypeCounts}
-          totalQuestionCount={totalQuestionCount}
-          variants={variants}
+          difficulty={card.difficulty}
+          onDifficultyChange={card.setDifficulty}
+          onQuestionTypeCountChange={card.updateQuestionTypeCount}
+          onVariantsChange={card.setVariants}
+          questionTypeCounts={card.questionTypeCounts}
+          totalQuestionCount={card.totalQuestionCount}
+          variants={card.variants}
         />
 
         <Button
           className="h-12 w-full rounded-2xl text-base"
-          disabled={isGenerating || !hasSource || totalQuestionCount === 0}
+          disabled={isGenerating || !card.hasSource || card.totalQuestionCount === 0}
           onClick={() =>
             void onGenerate({
-              difficulty,
-              questionTypeCounts,
+              difficulty: card.difficulty,
+              questionTypeCounts: card.questionTypeCounts,
               selectedMockTests,
-              sourceFilesWithPages,
-              variants,
+              sourceFilesWithPages: card.sourceFilesWithPages,
+              variants: card.variants,
             })
           }
         >
           <Sparkles className="mr-2 h-4 w-4" />
           {isGenerating
             ? "AI асуулт бэлдэж байна..."
-            : `${totalQuestionCount * variants} асуулт бэлдүүлэх`}
+            : `${card.totalQuestionCount * card.variants} асуулт бэлдүүлэх`}
         </Button>
       </CardContent>
     </Card>
