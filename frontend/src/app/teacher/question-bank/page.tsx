@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useQuestionBankBuilder } from "@/hooks/use-question-bank-builder";
 import { useQuestionBankData } from "@/hooks/use-question-bank-data";
-import { BookOpen, FolderTree, Plus, Shapes } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 
 export default function QuestionBankPage() {
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
@@ -36,19 +36,6 @@ export default function QuestionBankPage() {
     selectedCategoryFilter: builder.selectedCategoryFilter,
     selectedDifficulty: builder.selectedDifficulty,
   });
-  const totalTopicCount = data.questionBank.reduce(
-    (sum, category) => sum + category.topics.length,
-    0,
-  );
-  const totalQuestionCount = data.questionBank.reduce(
-    (sum, category) =>
-      sum +
-      category.topics.reduce(
-        (topicSum, topic) => topicSum + topic.questions.length,
-        0,
-      ),
-    0,
-  );
 
   return (
     <TeacherPageShell>

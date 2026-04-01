@@ -66,7 +66,7 @@ export default function CreateExamPage() {
 
   const {
     moveQuestion,
-    removeQuestion,
+    removeQuestion: removeSelectedQuestion,
     selectedQuestionIds,
     selectedQuestions,
     toggleQuestion,
@@ -128,7 +128,7 @@ export default function CreateExamPage() {
           </div>
           <CreateExamSelectedQuestionsPanel
             onMoveQuestion={moveQuestion}
-            onRemoveQuestion={removeQuestion}
+            onRemoveQuestion={removeSelectedQuestion}
             selectedQuestions={selectedQuestions}
           />
         </div>
