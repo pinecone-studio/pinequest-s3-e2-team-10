@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { classes } from "@/lib/mock-data"
 import { teacher } from "@/lib/mock-data-helpers"
+import { useCurrentTime } from "@/hooks/use-current-time"
 import { useTeacherDashboardMetrics } from "@/hooks/use-teacher-dashboard-metrics"
 import { formatHeaderDate, formatIsoDate, getAcademicWeekLabel, getGreetingLabel, getTeacherWeekDates } from "@/lib/teacher-dashboard-utils"
 import { TeacherDashboardHero } from "@/components/teacher/teacher-dashboard-hero"
@@ -12,13 +13,7 @@ import { TeacherDashboardSidePanels } from "@/components/teacher/teacher-dashboa
 export default function TeacherDashboard() {
   const [selectedClassId, setSelectedClassId] = useState("all")
   const [weekOffset, setWeekOffset] = useState(0)
-  const [now, setNow] = useState<Date | null>(null)
-
-  useEffect(() => {
-    setNow(new Date())
-    const timer = window.setInterval(() => setNow(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
+  const now = useCurrentTime()
 
   const metrics = useTeacherDashboardMetrics(selectedClassId)
   const currentDate = now ?? new Date("2024-01-01T00:00:00")

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { CalendarDays, Clock3 } from "lucide-react"
+import { useCurrentTime } from "@/hooks/use-current-time"
 import type { Class, ExamResult } from "@/lib/mock-data-types"
 import type { TeacherExam } from "@/lib/teacher-exams"
 import { buildClassOverviewMetrics, buildExamInsightCards } from "@/lib/teacher-classes-overview"
@@ -14,13 +14,7 @@ import type { TeacherStudentRegistrationInput } from "@/lib/teacher-student-regi
 
 export function TeacherClassesOverview(props: TeacherClassesOverviewProps) {
   const { classData, classOptions, examResults, onAddStudent, onClassChange, onSemesterChange, selectedExam, selectedExamResults, selectedSemester, semesterOptions, visibleCompletedExams } = props
-  const [now, setNow] = useState<Date | null>(null)
-
-  useEffect(() => {
-    setNow(new Date())
-    const timer = window.setInterval(() => setNow(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
+  const now = useCurrentTime()
 
   const metrics = buildClassOverviewMetrics({ classData, exams: visibleCompletedExams, results: examResults })
   const statCards = buildExamInsightCards(selectedExam, selectedExamResults)

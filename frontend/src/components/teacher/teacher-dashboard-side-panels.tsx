@@ -1,7 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
+import { useCurrentTime } from "@/hooks/use-current-time"
 import { classes, examResults } from "@/lib/mock-data"
 import { saveDashboardAnnouncement } from "@/lib/dashboard-announcements"
 import { formatIsoDate, formatTimeLabel } from "@/lib/teacher-dashboard-utils"
@@ -11,15 +12,9 @@ export function TeacherDashboardSidePanels(props: { selectedClassId: string }) {
   const { selectedClassId } = props
   const [announcementClassId, setAnnouncementClassId] = useState("all")
   const [message, setMessage] = useState("")
-  const [currentTime, setCurrentTime] = useState<Date | null>(null)
+  const currentTime = useCurrentTime()
   const chart = useMemo(() => buildChartModel(), [])
   const activeAnnouncementClassId = selectedClassId !== "all" ? selectedClassId : announcementClassId
-
-  useEffect(() => {
-    setCurrentTime(new Date())
-    const timer = window.setInterval(() => setCurrentTime(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
 
   return (
     <div className="flex min-w-0 w-full flex-col gap-5">
