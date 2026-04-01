@@ -34,7 +34,7 @@ export function TeacherClassScoreChart({
     <div className="h-[427px] w-full max-w-[856px]">
       <ChartContainer className="h-[427px] w-full" config={chartConfig}>
         <LineChart data={chartData} margin={{ top: 12, right: 8, left: 4, bottom: 8 }}>
-          <CartesianGrid stroke="#edf1f8" strokeDasharray="0" vertical={false} />
+          <CartesianGrid className="stroke-[#edf1f8] dark:stroke-[#23304d]" strokeDasharray="0" vertical={false} />
           <XAxis axisLine={false} dataKey="questionLabel" tickLine={false} tickMargin={12} />
           <YAxis
             axisLine={false}
@@ -79,12 +79,12 @@ export function TeacherClassScoreChart({
         </LineChart>
       </ChartContainer>
       {!exam ? (
-        <p className="px-4 pb-2 text-sm text-[#97a3b7]">
+        <p className="px-4 pb-2 text-sm text-[#97a3b7] dark:text-[#aeb8d2]">
           Одоогоор completed шалгалт сонгогдоогүй байна. Chart layout-ийг урьдчилан харуулж байна.
         </p>
       ) : null}
       {exam && chartLines.length === 0 ? (
-        <p className="px-4 pb-2 text-sm text-[#97a3b7]">
+        <p className="px-4 pb-2 text-sm text-[#97a3b7] dark:text-[#aeb8d2]">
           Энэ шалгалтад онооны өгөгдөл хараахан бүртгэгдээгүй байна.
         </p>
       ) : null}

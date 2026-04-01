@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { CalendarDays, Clock3 } from "lucide-react"
 import type { Class, ExamResult } from "@/lib/mock-data-types"
 import type { TeacherExam } from "@/lib/teacher-exams"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { buildClassOverviewMetrics, buildExamInsightCards } from "@/lib/teacher-classes-overview"
 import { TeacherClassesHeader } from "@/components/teacher/teacher-classes-header"
 import { TeacherClassScoreChart } from "@/components/teacher/teacher-class-score-chart"
@@ -39,22 +38,14 @@ export function TeacherClassesOverview(props: TeacherClassesOverviewProps) {
         semesterOptions={semesterOptions}
       />
 
-      <section className="grid gap-4 xl:grid-cols-[900px_440px] xl:items-start">
-        <div className="flex h-[724px] flex-col rounded-[30px] bg-white/96 px-4 pb-[45px] pt-4 shadow-[0_24px_68px_rgba(170,190,225,0.2)]">
+      <section className="grid gap-5 xl:grid-cols-[900px_440px] xl:items-start">
+        <div className="flex h-[724px] flex-col rounded-[16px] border border-[#ededed] bg-[linear-gradient(233deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] px-[18px] pb-[18px] pt-4 shadow-[50px_38px_102px_rgba(120,118,148,0.14)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)]">
           <div className="mb-3 w-full max-w-[856px] self-center pl-[40px]">
-            <div className="flex flex-wrap items-center gap-3">
-              <Select defaultValue="exam-result">
-                <SelectTrigger className="h-[42px] min-w-[196px] rounded-full border border-[#e5e9f2] bg-white px-4 text-[20px] font-semibold text-[#5b5b73] shadow-none">
-                  <SelectValue placeholder="Шалгалтын дүн" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem className="text-[14px]" value="exam-result">Шалгалтын дүн</SelectItem>
-                  <SelectItem className="text-[14px]" value="exam-quality">Шалгалтын чанар</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <h2 className="text-[20px] font-semibold leading-none text-[#5b5b73] dark:text-[#f0f3f5]">
+              Шалгалтын чанар
+            </h2>
 
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-medium text-[#a1acc2]">
+            <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-medium text-[#a1acc2] dark:text-[#c2c9d0]">
               <span className="inline-flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} />{currentDateLabel}</span>
               <span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" strokeWidth={1.8} />Өнөөдөр - {currentTimeLabel}</span>
             </div>

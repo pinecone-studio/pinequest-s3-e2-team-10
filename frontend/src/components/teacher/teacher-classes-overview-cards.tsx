@@ -22,16 +22,16 @@ export function OverviewMetricCard({
   const min = Math.min(...metric.trend)
 
   return (
-    <div className="rounded-[16px] border border-[#ededed] bg-[linear-gradient(237deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] px-3 py-4 shadow-[50px_38px_102px_rgba(120,118,148,0.08)]">
+    <div className="rounded-[16px] border border-[#ededed] bg-[linear-gradient(237deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] px-3 py-4 shadow-[50px_38px_102px_rgba(120,118,148,0.08)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(127deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:backdrop-blur">
       <div className="flex items-start gap-2">
-        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border border-[#eef1f8] bg-white/70">
+        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border border-[#eef1f8] bg-white/70 dark:border-[rgba(224,225,226,0.08)] dark:bg-[rgba(6,11,38,0.74)]">
           {metric.icon ? (
             <Image
               src={metric.icon}
               alt=""
               width={16}
               height={16}
-              className="object-contain"
+              className="object-contain dark:brightness-[3.6] dark:contrast-[0.92]"
             />
           ) : (
             <div
@@ -42,7 +42,7 @@ export function OverviewMetricCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="truncate text-[12px] font-medium leading-[14px] text-[#4c4c66]">
+            <p className="truncate text-[12px] font-medium leading-[14px] text-[#4c4c66] dark:text-[#c7d2ee]">
               {metric.label}
             </p>
             <span
@@ -52,7 +52,7 @@ export function OverviewMetricCard({
               {metric.delta}
             </span>
           </div>
-          <p className="mt-1 text-[30px] font-normal leading-none text-[#141a1f]">
+          <p className="mt-1 text-[30px] font-normal leading-none text-[#141a1f] dark:text-[#f8fbff]">
             {metric.value}
           </p>
         </div>
@@ -92,16 +92,16 @@ export function OverviewInsightCard({
   }
 }) {
   return (
-    <div className="flex h-[108px] flex-col rounded-[18px] border border-[#d8deea] bg-white px-4 py-2.5">
+    <div className="flex h-[108px] flex-col rounded-[16px] border border-[#ededed] bg-[linear-gradient(233deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] px-4 py-2.5 shadow-[50px_38px_102px_rgba(120,118,148,0.14)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)]">
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#141a1f]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#141a1f] dark:text-[#c2c9d0]">
           {card.label}
         </p>
         <span className={`text-[11px] font-semibold ${card.deltaClassName}`}>
           {card.delta}
         </span>
       </div>
-      <p className="mt-1.5 text-[24px] leading-none text-[#454561]">{card.value}</p>
+      <p className="mt-1.5 text-[24px] leading-none text-[#454561] dark:text-[#f0f3f5]">{card.value}</p>
       <Sparkline height={24} trend={card.trend} />
     </div>
   )
@@ -120,7 +120,7 @@ function Sparkline({
         <path
           d={buildSparklinePath(trend, height)}
           fill="none"
-          stroke="#c4cad6"
+          className="stroke-[#c4cad6] dark:stroke-[#4f5e85]"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2.2"
