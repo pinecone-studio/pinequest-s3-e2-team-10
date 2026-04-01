@@ -9,93 +9,75 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { AIQuestionTypeCounts } from "@/components/teacher/ai-question-generator-dialog-types";
 
 type AIQuestionSettingsPanelProps = {
-  aiMCCount: number;
-  aiShortCount: number;
-  aiTFCount: number;
-  category: string;
   difficulty: "easy" | "standard" | "hard";
-  finalQuestionCount: number;
-  onAiMCCountChange: (value: number) => void;
-  onAiShortCountChange: (value: number) => void;
-  onAiTFCountChange: (value: number) => void;
-  onCategoryChange: (value: string) => void;
   onDifficultyChange: (value: "easy" | "standard" | "hard") => void;
+  onQuestionTypeCountChange: (
+    type: keyof AIQuestionTypeCounts,
+    value: number,
+  ) => void;
   onVariantsChange: (value: number) => void;
-  totalQuestions: number;
+  questionTypeCounts: AIQuestionTypeCounts;
+  totalQuestionCount: number;
   variants: number;
 };
 
-function QuestionTypeCounter({
-  label,
-  value,
-  onChange,
-}: {
+const questionTypeOptions: Array<{
+  key: keyof AIQuestionTypeCounts;
   label: string;
-  value: number;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <Label className="text-sm">{label}</Label>
-      <Input
-        type="number"
-        min="0"
-        value={value}
-        onChange={(event) => onChange(parseInt(event.target.value) || 0)}
-        className="h-8 w-20"
-      />
-    </div>
-  );
-}
+}> = [
+  { key: "multipleChoice", label: "Сонгох хариулттай" },
+  { key: "trueFalse", label: "Үнэн / худал" },
+  { key: "matching", label: "Харгалзуулах" },
+  { key: "ordering", label: "Дараалуулах" },
+  { key: "shortAnswer", label: "Богино хариулт" },
+];
 
 export function AIQuestionSettingsPanel({
-  aiMCCount,
-  aiShortCount,
-  aiTFCount,
-  category,
   difficulty,
-  finalQuestionCount,
-  onAiMCCountChange,
-  onAiShortCountChange,
-  onAiTFCountChange,
-  onCategoryChange,
   onDifficultyChange,
+  onQuestionTypeCountChange,
   onVariantsChange,
-  totalQuestions,
+  questionTypeCounts,
+  totalQuestionCount,
   variants,
 }: AIQuestionSettingsPanelProps) {
   return (
-    <>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Асуултын төрөл</Label>
-          <div className="space-y-2">
-            <QuestionTypeCounter
-              label="Сонгох хариулттай"
-              value={aiMCCount}
-              onChange={onAiMCCountChange}
-            />
-            <QuestionTypeCounter
-              label="Үнэн/Худал"
-              value={aiTFCount}
-              onChange={onAiTFCountChange}
-            />
-            <QuestionTypeCounter
-              label="Богино хариулт"
-              value={aiShortCount}
-              onChange={onAiShortCountChange}
-            />
-          </div>
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <Label>Нийт хэдэн асуулт бэлдүүлэх вэ?</Label>
+        <div className="flex h-11 items-center rounded-md border bg-muted px-3 text-sm font-medium">
+          {totalQuestionCount}
         </div>
+      </div>
 
+      <div className="space-y-2">
+        <Label>Асуултын төрөл</Label>
+        <div className="grid gap-3 md:grid-cols-2">
+          {questionTypeOptions.map((option) => (
+            <div key={option.key} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+              <Label className="text-sm">{option.label}</Label>
+              <Input
+                type="number"
+                min="0"
+                value={questionTypeCounts[option.key]}
+                onChange={(event) =>
+                  onQuestionTypeCountChange(
+                    option.key,
+                    parseInt(event.target.value) || 0,
+                  )
+                }
+                className="h-9 w-24"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label>Асуултын тоо</Label>
-          <div className="flex h-9 items-center rounded-md border bg-muted px-3">
-            {totalQuestions}
-          </div>
-
           <Label>Хувилбарын тоо</Label>
           <Select
             value={variants.toString()}
@@ -111,7 +93,9 @@ export function AIQuestionSettingsPanel({
               <SelectItem value="4">4 хувилбар</SelectItem>
             </SelectContent>
           </Select>
+        </div>
 
+        <div className="space-y-2">
           <Label>Түвшин</Label>
           <Select value={difficulty} onValueChange={onDifficultyChange}>
             <SelectTrigger>
@@ -123,24 +107,17 @@ export function AIQuestionSettingsPanel({
               <SelectItem value="hard">Хэцүү</SelectItem>
             </SelectContent>
           </Select>
-
-          <Label>Ангилал</Label>
-          <Input
-            placeholder="Жишээ: Математик"
-            value={category}
-            onChange={(event) => onCategoryChange(event.target.value)}
-          />
         </div>
       </div>
 
       <div className="rounded-lg bg-muted p-4">
         <div className="flex items-center justify-between text-sm">
-          <span>Нийт асуулт:</span>
+          <span>Нийт үүсэх асуулт</span>
           <span className="font-medium">
-            {finalQuestionCount} ({totalQuestions} × {variants} хувилбар)
+            {totalQuestionCount * variants} ({totalQuestionCount} × {variants} хувилбар)
           </span>
         </div>
       </div>
-    </>
+    </div>
   );
 }

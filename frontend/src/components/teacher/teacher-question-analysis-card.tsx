@@ -14,10 +14,11 @@ type QuestionStat = {
 }
 
 function getQuestionTypeLabel(type: string) {
-  if (type === 'multiple-choice') return 'Сонгох хариулттай'
-  if (type === 'true-false') return 'Үнэн/Худал'
-  if (type === 'short-answer') return 'Богино хариулт'
-  if (type === 'essay') return 'Эсээ'
+  if (type === 'multiple-choice') return 'Songoh hariulttai'
+  if (type === 'true-false') return 'Unen / Hudal'
+  if (type === 'matching') return 'Matching'
+  if (type === 'ordering') return 'Ordering'
+  if (type === 'short-answer') return 'Bogino hariult'
   return type
 }
 
@@ -29,10 +30,9 @@ export function TeacherQuestionAnalysisCard({
   return (
     <Card className="rounded-[1.5rem] border-slate-200 shadow-sm">
       <CardHeader>
-        <CardTitle>Асуултын шинжилгээ</CardTitle>
+        <CardTitle>Asuultiin shinjilgee</CardTitle>
         <CardDescription>
-          Асуултуудыг багшийн үүсгэсэн дарааллаар нь харуулж, тус бүрийн гүйцэтгэлийг нэг
-          дороос харна.
+          Asuult buriin guitsetgeliig neg dor haruulna.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -46,7 +46,7 @@ export function TeacherQuestionAnalysisCard({
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-semibold text-slate-900">
-                      Асуулт {index + 1}
+                      Asuult {index + 1}
                     </span>
                     <Badge variant="outline" className="text-xs">
                       {getQuestionTypeLabel(stat.type)}
@@ -58,12 +58,12 @@ export function TeacherQuestionAnalysisCard({
                   <div className="text-lg font-bold text-slate-900">
                     {Math.round(stat.failRate)}%
                   </div>
-                  <div className="text-xs text-slate-500">алдааны хувь</div>
+                  <div className="text-xs text-slate-500">aldaanii huv</div>
                 </div>
               </div>
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-xs text-slate-500">
-                  <span>Зөв хариулсан</span>
+                  <span>Zov hariulsan</span>
                   <span>
                     {stat.correctCount}/{stat.totalCount}
                   </span>

@@ -12,19 +12,44 @@ export function ExamBuilderAddQuestionCard({
   return (
     <Card>
       <CardContent className="py-4">
-        <p className="mb-3 text-sm text-muted-foreground">Асуулт нэмэх</p>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Эсвэл өөр асуулт бэлдүүлэх
+        </p>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => onAddQuestion("multiple-choice")}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAddQuestion("multiple-choice")}
+          >
             Сонгох хариулттай
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onAddQuestion("true-false")}>
-            Үнэн/Худал
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAddQuestion("true-false")}
+          >
+            Үнэн / худал
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onAddQuestion("short-answer")}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAddQuestion("matching")}
+          >
+            Харгалзуулах
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAddQuestion("ordering")}
+          >
+            Дараалуулах
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAddQuestion("short-answer")}
+          >
             Богино хариулт
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => onAddQuestion("essay")}>
-            Эсээ
           </Button>
         </div>
       </CardContent>

@@ -2,82 +2,34 @@
 
 import { useState } from 'react'
 import type { Exam } from '@/lib/mock-data'
-import type { NewQuestion, QuestionType, ScheduleEntry } from '@/components/teacher/exam-builder-types'
+import type { ScheduleEntry } from '@/components/teacher/exam-builder-types'
+import {
+  defaultAIQuestionTypeCounts,
+  type AIQuestionTypeCounts,
+} from '@/components/teacher/ai-question-generator-dialog-types'
+import { createAiQuestions, createQuestion } from '@/hooks/ai-question-builder'
 import { useAiSourceFiles } from '@/hooks/use-ai-source-files'
-
-function createQuestion(type: QuestionType, id: string): NewQuestion {
-  return {
-    id,
-    type,
-    question: '',
-    points:
-      type === 'essay' ? 15 : type === 'short-answer' ? 10 : type === 'true-false' ? 5 : 10,
-    options: type === 'multiple-choice' ? ['', '', '', ''] : undefined,
-    correctAnswer: type === 'true-false' ? 'True' : '',
-  }
-}
-
-function createAiQuestions(
-  mcCount: number,
-  tfCount: number,
-  shortCount: number,
-): NewQuestion[] {
-  const seed = Date.now()
-  return [
-    ...Array.from({ length: mcCount }, (_, index) =>
-      createQuestion('multiple-choice', `ai-mc-${seed}-${index}`),
-    ).map((question, index) => ({
-      ...question,
-      question: `AI Generated Multiple Choice Question ${index + 1}: What is the correct answer for this topic?`,
-      options: [
-        'Option A - First choice',
-        'Option B - Second choice',
-        'Option C - Third choice',
-        'Option D - Fourth choice',
-      ],
-      correctAnswer: 'Option A - First choice',
-    })),
-    ...Array.from({ length: tfCount }, (_, index) =>
-      createQuestion('true-false', `ai-tf-${seed}-${index}`),
-    ).map((question, index) => ({
-      ...question,
-      question: `AI Generated True/False Question ${index + 1}: This statement about the topic is correct.`,
-    })),
-    ...Array.from({ length: shortCount }, (_, index) =>
-      createQuestion('short-answer', `ai-sa-${seed}-${index}`),
-    ).map((question, index) => ({
-      ...question,
-      question: `AI Generated Short Answer Question ${index + 1}: Briefly explain this concept.`,
-      correctAnswer: 'Expected answer',
-    })),
-  ]
-}
 
 export function useExamBuilder() {
   const [examTitle, setExamTitle] = useState('')
-  const [questions, setQuestions] = useState<NewQuestion[]>([])
+  const [questions, setQuestions] = useState<ReturnType<typeof createQuestion>[]>([])
   const [duration, setDuration] = useState(60)
   const aiSourceFiles = useAiSourceFiles()
   const [reportReleaseMode, setReportReleaseMode] =
     useState<Exam['reportReleaseMode']>('after-all-classes-complete')
   const [showAIDialog, setShowAIDialog] = useState(false)
-  const [aiMCCount, setAiMCCount] = useState(0)
-  const [aiTFCount, setAiTFCount] = useState(0)
-  const [aiShortCount, setAiShortCount] = useState(0)
+  const [aiQuestionTypeCounts, setAiQuestionTypeCounts] =
+    useState<AIQuestionTypeCounts>(defaultAIQuestionTypeCounts)
   const [selectedMockTests, setSelectedMockTests] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([])
 
-  const addQuestion = (type: QuestionType) => {
+  const addQuestion = (type: Parameters<typeof createQuestion>[0]) => {
     setQuestions((current) => [...current, createQuestion(type, `new-${Date.now()}`)])
   }
-
-  const updateQuestion = (id: string, updates: Partial<NewQuestion>) => {
-    setQuestions((current) =>
-      current.map((question) => (question.id === id ? { ...question, ...updates } : question)),
-    )
+  const updateQuestion = (id: string, updates: Partial<(typeof questions)[number]>) => {
+    setQuestions((current) => current.map((question) => (question.id === id ? { ...question, ...updates } : question)))
   }
-
   const updateOption = (questionId: string, optionIndex: number, value: string) => {
     setQuestions((current) =>
       current.map((question) => {
@@ -88,44 +40,30 @@ export function useExamBuilder() {
       }),
     )
   }
-
   const removeQuestion = (id: string) => {
     setQuestions((current) => current.filter((question) => question.id !== id))
   }
-
   const generateAIQuestions = async () => {
     setIsGenerating(true)
     await new Promise((resolve) => setTimeout(resolve, 1500))
-    setQuestions((current) => [
-      ...current,
-      ...createAiQuestions(aiMCCount, aiTFCount, aiShortCount),
-    ])
+    setQuestions((current) => [...current, ...createAiQuestions(aiQuestionTypeCounts)])
     setIsGenerating(false)
     setShowAIDialog(false)
   }
-
   const addScheduleEntry = () => {
-    setScheduleEntries((current) => {
-      if (current.some((entry) => !entry.classId && !entry.date && !entry.time)) {
-        return current
-      }
-
-      return [...current, { classId: '', date: '', time: '' }]
-    })
+    setScheduleEntries((current) =>
+      current.some((entry) => !entry.classId && !entry.date && !entry.time)
+        ? current
+        : [...current, { classId: '', date: '', time: '' }],
+    )
   }
-
-  const updateScheduleEntry = (
-    index: number,
-    field: keyof ScheduleEntry,
-    value: string,
-  ) => {
+  const updateScheduleEntry = (index: number, field: keyof ScheduleEntry, value: string) => {
     setScheduleEntries((current) => {
       const updated = [...current]
       updated[index] = { ...updated[index], [field]: value }
       return updated
     })
   }
-
   const removeScheduleEntry = (index: number) => {
     setScheduleEntries((current) => current.filter((_, entryIndex) => entryIndex !== index))
   }
@@ -134,9 +72,7 @@ export function useExamBuilder() {
     ...aiSourceFiles,
     addQuestion,
     addScheduleEntry,
-    aiMCCount,
-    aiShortCount,
-    aiTFCount,
+    aiQuestionTypeCounts,
     duration,
     examTitle,
     generateAIQuestions,
@@ -147,9 +83,7 @@ export function useExamBuilder() {
     removeScheduleEntry,
     scheduleEntries,
     selectedMockTests,
-    setAiMCCount,
-    setAiShortCount,
-    setAiTFCount,
+    setAiQuestionTypeCounts,
     setDuration,
     setExamTitle,
     setQuestions,

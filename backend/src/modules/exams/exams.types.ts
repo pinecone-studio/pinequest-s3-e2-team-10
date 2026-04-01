@@ -1,8 +1,9 @@
 export const examQuestionTypes = [
   'multiple-choice',
   'true-false',
+  'matching',
+  'ordering',
   'short-answer',
-  'essay',
 ] as const;
 
 export const examStatuses = ['draft', 'scheduled', 'completed'] as const;
@@ -74,6 +75,8 @@ export type AIGenerateQuestionsDto = {
   sourceFiles: AIGenerateQuestionSourceFileDto[];
   mcCount: number;
   tfCount: number;
+  matchingCount: number;
+  orderingCount: number;
   shortAnswerCount: number;
   variants: number;
   difficulty: 'easy' | 'standard' | 'hard';

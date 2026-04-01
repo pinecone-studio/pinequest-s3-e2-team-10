@@ -27,15 +27,15 @@ export function TeacherExamReviewDialog(props: {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader className="space-y-3">
-          <DialogTitle>{selectedStudent ? `${selectedStudent.name} · ${className}` : "Илгээсэн сурагч"}</DialogTitle>
+          <DialogTitle>{selectedStudent ? `${selectedStudent.name} · ${className}` : "Ilgeesen suragch"}</DialogTitle>
           <DialogDescription>
-            {selectedStudent ? "Энд тухайн сурагчийн задгай хариултууд, одоогийн оноо, хүлээгдэж буй үнэлгээний төлөв харагдана." : "Сурагчийн хариултыг шалгах цонх."}
+            {selectedStudent ? "End suragchiin zadgai hariultuud bolon onoog haraad unelj bolno." : "Suragchiin hariultiig shalgah tsonh."}
           </DialogDescription>
           {selectedResult ? (
             <div className="grid gap-3 md:grid-cols-3">
-              <DialogMetric label="Одоогийн оноо" value={`${selectedResult.score}/${selectedResult.totalPoints}`} />
-              <DialogMetric label="Илгээсэн хугацаа" value={new Date(selectedResult.submittedAt).toLocaleString("mn-MN")} />
-              <DialogMetric label="Үнэлгээний төлөв" value={reviewQuestions.length > 0 ? `${reviewQuestions.length} задгай хариултад оноо өгөх шаардлагатай.` : "Энэ сурагчийн бүх задгай хариултад оноо өгч дууссан байна."} />
+              <DialogMetric label="Odoogiin onoo" value={`${selectedResult.score}/${selectedResult.totalPoints}`} />
+              <DialogMetric label="Ilgeesen hugatsaa" value={new Date(selectedResult.submittedAt).toLocaleString("mn-MN")} />
+              <DialogMetric label="Unelgeenii tuluv" value={reviewQuestions.length > 0 ? `${reviewQuestions.length} zadgai hariultad onoo ogoh shaardlagatai.` : "Buh zadgai hariultyg unelsen baina."} />
             </div>
           ) : null}
         </DialogHeader>
@@ -48,21 +48,21 @@ export function TeacherExamReviewDialog(props: {
               <div key={question.id} className="rounded-2xl border border-sky-100 bg-sky-50/30 p-4">
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-sky-700">
-                    Асуулт {exam.questions.findIndex((entry) => entry.id === question.id) + 1} · {question.type === "essay" ? "Эсээ" : "Богино хариулт"} · {question.points} оноо
+                    Asuult {exam.questions.findIndex((entry) => entry.id === question.id) + 1} · Bogino hariult · {question.points} onoo
                   </p>
                   <h3 className="text-base font-semibold text-slate-900">{question.question}</h3>
                   <p className="text-sm text-slate-600">
-                    {reviewState === "pending" ? "Энэ хариулт одоогоор үнэлгээ хүлээж байна. Доор оноо оруулж хадгална уу." : "Энэ хариултад оноо өгсөн байна. Хэрэв шаардлагатай бол оноог шинэчилж болно."}
+                    {reviewState === "pending" ? "Ene hariult odoogoor unelgee huleej baina. Door onoo oruulj hadgalna uu." : "Ene hariultad onoo ogson baina. Shaardlagatai bol shinechilj bolno."}
                   </p>
                 </div>
 
                 <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Сурагчийн хариулт</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Suragchiin hariult</p>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{answer?.answer}</p>
                   </div>
                   <div className="rounded-xl border-2 border-sky-200 bg-white p-4 shadow-sm">
-                    <label htmlFor={`score-${question.id}`} className="text-sm font-semibold text-slate-700">Өгөх оноо</label>
+                    <label htmlFor={`score-${question.id}`} className="text-sm font-semibold text-slate-700">Ogoh onoo</label>
                     <Input
                       id={`score-${question.id}`}
                       type="number"
@@ -74,7 +74,7 @@ export function TeacherExamReviewDialog(props: {
                       className="mt-3 h-12 border-2 border-sky-300 bg-sky-50 text-base font-semibold text-slate-900 shadow-none focus-visible:border-sky-500 focus-visible:ring-sky-200"
                     />
                     <p className="mt-2 text-xs leading-5 text-slate-500">
-                      0-{question.points} хүртэл оноо оруулна. Хадгалсны дараа сурагчийн тайлан болон нийт оноо шууд шинэчлэгдэнэ.
+                      0-{question.points} hurtel onoo oruulna. Hadgalsnii daraa tailan shinechlegdene.
                     </p>
                   </div>
                 </div>
@@ -83,15 +83,15 @@ export function TeacherExamReviewDialog(props: {
           }) : (
             <div className="flex items-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-600">
               <AlertCircle className="h-4 w-4" />
-              Энэ сурагчид гараар үнэлэх задгай хариулт алга.
+              Ene suragchid garaar uneleh zadgai hariult alga.
             </div>
           ) : null}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Хаах</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Haah</Button>
           <Button onClick={onSave} disabled={isSaving || reviewQuestions.length === 0}>
-            {isSaving ? "Хадгалж байна..." : "Үнэлгээ хадгалах"}
+            {isSaving ? "Hadgalj baina..." : "Unelgee hadgalah"}
           </Button>
         </DialogFooter>
       </DialogContent>

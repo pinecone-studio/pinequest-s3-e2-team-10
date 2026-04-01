@@ -1,6 +1,9 @@
 "use client";
 
-import { BuilderSourceFileList, LocalSourceFileList } from "@/components/teacher/ai-question-file-lists";
+import {
+  BuilderSourceFileList,
+  LocalSourceFileList,
+} from "@/components/teacher/ai-question-file-lists";
 import { AIQuestionUploadDropzone } from "@/components/teacher/ai-question-upload-dropzone";
 import type { SourceFileWithPages } from "@/components/teacher/ai-question-generator-dialog-types";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,9 +54,6 @@ export function AIQuestionSourceSelector({
       <div className="space-y-2">
         <Label>Эх сурвалж сонгох</Label>
         <div className="max-h-40 space-y-2 overflow-auto rounded border p-2">
-          <p className="text-sm text-muted-foreground">
-            Медлэгийн сангийн файлууд:
-          </p>
           {availableSourceFiles.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               Медлэгийн санд хараахан файл алга байна.
@@ -66,10 +66,14 @@ export function AIQuestionSourceSelector({
               >
                 <Checkbox
                   checked={selectedMockTests.includes(source.id)}
-                  onCheckedChange={(checked) => onToggleTest(source.id, checked === true)}
+                  onCheckedChange={(checked) =>
+                    onToggleTest(source.id, checked === true)
+                  }
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{source.originalName}</p>
+                  <p className="truncate text-sm font-medium">
+                    {source.originalName}
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(source.uploadedAt).toLocaleDateString()}
                   </p>
@@ -90,7 +94,10 @@ export function AIQuestionSourceSelector({
       />
 
       {isBuilderDialog ? (
-        <BuilderSourceFileList files={selectedBuilderFiles} onRemove={onRemoveBuilderFile} />
+        <BuilderSourceFileList
+          files={selectedBuilderFiles}
+          onRemove={onRemoveBuilderFile}
+        />
       ) : (
         <LocalSourceFileList
           files={sourceFilesWithPages}

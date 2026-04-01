@@ -24,12 +24,15 @@ export async function generateQuestionBankAIQuestions({
   onComplete: () => void;
   payload: {
     sourceFilesWithPages: { file: File; startPage: number; endPage: number }[];
-    aiMCCount: number;
-    aiTFCount: number;
-    aiShortCount: number;
+    questionTypeCounts: {
+      multipleChoice: number;
+      trueFalse: number;
+      matching: number;
+      ordering: number;
+      shortAnswer: number;
+    };
     variants: number;
     difficulty: "easy" | "standard" | "hard";
-    category: string;
     selectedMockTests: string[];
   };
   questionBank: QuestionBankCategory[];
@@ -38,8 +41,14 @@ export async function generateQuestionBankAIQuestions({
   setIsGenerating: (value: boolean) => void;
   sourceFiles: UploadRecord[];
 }) {
-  const totalQuestions = payload.aiMCCount + payload.aiTFCount + payload.aiShortCount;
-  if (totalQuestions === 0) {
+  const totalQuestionCount =
+    payload.questionTypeCounts.multipleChoice +
+    payload.questionTypeCounts.trueFalse +
+    payload.questionTypeCounts.matching +
+    payload.questionTypeCounts.ordering +
+    payload.questionTypeCounts.shortAnswer;
+
+  if (totalQuestionCount === 0) {
     toast({ title: "Алдаа", description: "Асуултын тоо оруулна уу.", variant: "destructive" });
     return;
   }
@@ -65,13 +74,14 @@ export async function generateQuestionBankAIQuestions({
             endPage: item.endPage,
           })),
         ],
-        mcCount: payload.aiMCCount,
-        tfCount: payload.aiTFCount,
-        shortAnswerCount: payload.aiShortCount,
+        mcCount: payload.questionTypeCounts.multipleChoice,
+        tfCount: payload.questionTypeCounts.trueFalse,
+        matchingCount: payload.questionTypeCounts.matching,
+        orderingCount: payload.questionTypeCounts.ordering,
+        shortAnswerCount: payload.questionTypeCounts.shortAnswer,
         variants: payload.variants,
         difficulty: payload.difficulty,
         category:
-          payload.category ||
           questionBank.find((item) => item.id === builderCategoryId)?.name ||
           "Ерөнхий",
       },

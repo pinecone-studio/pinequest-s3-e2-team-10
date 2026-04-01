@@ -2,12 +2,11 @@
 
 import * as React from 'react'
 import { AIQuestionGeneratorDialog } from '@/components/teacher/ai-question-generator-dialog'
+import type { AIQuestionTypeCounts } from '@/components/teacher/ai-question-generator-dialog-types'
 
 export function EditExamAiDialog({
   addAiSourceFiles,
-  aiMCCount,
-  aiShortCount,
-  aiTFCount,
+  aiQuestionTypeCounts,
   generateAIQuestions,
   isAiSourceDragging,
   isGenerating,
@@ -15,17 +14,13 @@ export function EditExamAiDialog({
   removeAiSourceFile,
   selectedMockTests,
   selectedSourceFiles,
-  setAiMCCount,
-  setAiShortCount,
-  setAiTFCount,
+  setAiQuestionTypeCounts,
   setIsAiSourceDragging,
   setSelectedMockTests,
   setShowAIDialog,
 }: {
   addAiSourceFiles: (files: FileList) => void
-  aiMCCount: number
-  aiShortCount: number
-  aiTFCount: number
+  aiQuestionTypeCounts: AIQuestionTypeCounts
   generateAIQuestions: () => Promise<void>
   isAiSourceDragging: boolean
   isGenerating: boolean
@@ -33,9 +28,7 @@ export function EditExamAiDialog({
   removeAiSourceFile: (fileName: string) => void
   selectedMockTests: string[]
   selectedSourceFiles: File[]
-  setAiMCCount: (value: number) => void
-  setAiShortCount: (value: number) => void
-  setAiTFCount: (value: number) => void
+  setAiQuestionTypeCounts: (value: AIQuestionTypeCounts) => void
   setIsAiSourceDragging: (value: boolean) => void
   setSelectedMockTests: React.Dispatch<React.SetStateAction<string[]>>
   setShowAIDialog: (value: boolean) => void
@@ -62,9 +55,7 @@ export function EditExamAiDialog({
 
   return (
     <AIQuestionGeneratorDialog
-      aiMCCount={aiMCCount}
-      aiShortCount={aiShortCount}
-      aiTFCount={aiTFCount}
+      aiQuestionTypeCounts={aiQuestionTypeCounts}
       isGenerating={isGenerating}
       onGenerate={generateAIQuestions}
       isDragging={isAiSourceDragging}
@@ -82,9 +73,7 @@ export function EditExamAiDialog({
       open={open}
       selectedSourceFiles={selectedSourceFiles}
       selectedMockTests={selectedMockTests}
-      setAiMCCount={setAiMCCount}
-      setAiShortCount={setAiShortCount}
-      setAiTFCount={setAiTFCount}
+      setAiQuestionTypeCounts={setAiQuestionTypeCounts}
     />
   )
 }

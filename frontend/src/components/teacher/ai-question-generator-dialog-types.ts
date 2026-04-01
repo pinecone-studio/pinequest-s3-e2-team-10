@@ -7,14 +7,27 @@ export interface SourceFileWithPages {
   endPage: number;
 }
 
+export type AIQuestionTypeCounts = {
+  multipleChoice: number;
+  trueFalse: number;
+  matching: number;
+  ordering: number;
+  shortAnswer: number;
+};
+
+export const defaultAIQuestionTypeCounts: AIQuestionTypeCounts = {
+  multipleChoice: 1,
+  trueFalse: 1,
+  matching: 1,
+  ordering: 1,
+  shortAnswer: 1,
+};
+
 export type QuestionGeneratorPayload = {
   sourceFilesWithPages: SourceFileWithPages[];
-  aiMCCount: number;
-  aiTFCount: number;
-  aiShortCount: number;
+  questionTypeCounts: AIQuestionTypeCounts;
   variants: number;
   difficulty: "easy" | "standard" | "hard";
-  category: string;
   selectedMockTests: string[];
 };
 
@@ -28,9 +41,7 @@ type SharedProps = {
 };
 
 export type BuilderDialogProps = SharedProps & {
-  aiMCCount: number;
-  aiTFCount: number;
-  aiShortCount: number;
+  aiQuestionTypeCounts: AIQuestionTypeCounts;
   isDragging: boolean;
   onDragLeave: (event: DragEvent<HTMLDivElement>) => void;
   onDragOver: (event: DragEvent<HTMLDivElement>) => void;
@@ -39,9 +50,7 @@ export type BuilderDialogProps = SharedProps & {
   onGenerate: () => void | Promise<void>;
   onRemoveSourceFile: (fileName: string) => void;
   selectedSourceFiles: File[];
-  setAiMCCount: (value: number) => void;
-  setAiTFCount: (value: number) => void;
-  setAiShortCount: (value: number) => void;
+  setAiQuestionTypeCounts: (value: AIQuestionTypeCounts) => void;
 };
 
 export type QuestionBankDialogProps = SharedProps & {
