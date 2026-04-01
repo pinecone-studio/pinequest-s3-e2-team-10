@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,10 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { ScheduleEntry } from "@/components/teacher/exam-builder-types";
 import { ALL_CLASSES_OPTION } from "@/lib/exams-api";
 import { classes, type Exam } from "@/lib/mock-data";
-import type { ScheduleEntry } from "@/components/teacher/exam-builder-types";
-type QuestionCounts = Record<"multiple-choice" | "true-false" | "short-answer" | "essay", number>;
+
+type QuestionCounts = Record<
+  "multiple-choice" | "true-false" | "matching" | "ordering" | "short-answer",
+  number
+>;
 
 export function ExamBuilderSummaryCard({
   duration,
@@ -48,17 +52,20 @@ export function ExamBuilderSummaryCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Шалгалтын хураангуй</CardTitle>
+        <CardTitle>Shalgaltiin huraanguy</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <SummaryStat label="Асуулт" value={questionTotal} />
-          <SummaryStat label="Нийт оноо" value={totalPoints} />
-          <SummaryStat label="Сонгох хариулттай" value={questionCounts["multiple-choice"]} />
-          <SummaryStat label="Үнэн/Худал" value={questionCounts["true-false"]} />
+        <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-3 xl:grid-cols-5">
+          <SummaryStat label="Asuult" value={questionTotal} />
+          <SummaryStat label="Niit onoo" value={totalPoints} />
+          <SummaryStat label="Songoh hariulttai" value={questionCounts["multiple-choice"]} />
+          <SummaryStat label="Unen / Hudal" value={questionCounts["true-false"]} />
+          <SummaryStat label="Matching" value={questionCounts["matching"]} />
+          <SummaryStat label="Ordering" value={questionCounts["ordering"]} />
+          <SummaryStat label="Bogino hariult" value={questionCounts["short-answer"]} />
         </div>
         <div className="flex items-center gap-4">
-          <Label>Хугацаа (минут)</Label>
+          <Label>Hugatsaa (minut)</Label>
           <Input
             type="number"
             value={duration}
@@ -68,7 +75,7 @@ export function ExamBuilderSummaryCard({
         </div>
 
         <div className="space-y-2">
-          <Label>Сурагчдад шалгалтын дүн харагдах хугацаа</Label>
+          <Label>Suragchdad shalgaltiin dun haragdah hugatsaa</Label>
           <Select
             value={reportReleaseMode}
             onValueChange={(value) =>
@@ -76,37 +83,37 @@ export function ExamBuilderSummaryCard({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Шалгалтын дүн харагдах хугацааг сонгоно уу" />
+              <SelectValue placeholder="Shalgaltiin dun haragdah hugatsaag songono uu" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="after-all-classes-complete">
-                Товлогдсон бүх анги дууссаны дараа
+                Tovlogdson buh angi duussanii daraa
               </SelectItem>
               <SelectItem value="immediately">
-                Сурагч бүр илгээсний дараа
+                Suragch bur ilgeesnii daraa
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between mb-3">
-            <Label>Шалгалт товлох</Label>
+        <div className="border-t pt-4">
+          <div className="mb-3 flex items-center justify-between">
+            <Label>Shalgalt tovloh</Label>
             <Button variant="outline" size="sm" onClick={onAddScheduleEntry}>
-              Ангийн хуваарь нэмэх
+              Angiin huvaari nemekh
             </Button>
           </div>
 
           {scheduleEntries.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Одоогоор анги товлоогүй байна
+              Odoogoor angi tovlogoogui baina
             </p>
           ) : (
             <div className="space-y-3">
               {scheduleEntries.map((entry, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 border rounded-lg"
+                  className="flex items-center gap-3 rounded-lg border p-3"
                 >
                   <Select
                     value={entry.classId}
@@ -115,11 +122,11 @@ export function ExamBuilderSummaryCard({
                     }
                   >
                     <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Анги" />
+                      <SelectValue placeholder="Angi" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={ALL_CLASSES_OPTION}>
-                        Бүх анги
+                        Buh angi
                       </SelectItem>
                       {classes.map((classEntry) => (
                         <SelectItem key={classEntry.id} value={classEntry.id}>
@@ -149,7 +156,7 @@ export function ExamBuilderSummaryCard({
                     size="sm"
                     onClick={() => onRemoveScheduleEntry(index)}
                   >
-                    Устгах
+                    Ustgah
                   </Button>
                 </div>
               ))}
@@ -163,7 +170,7 @@ export function ExamBuilderSummaryCard({
 
 function SummaryStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="p-3 bg-muted rounded-lg">
+    <div className="rounded-lg bg-muted p-3">
       <div className="text-2xl font-bold">{value}</div>
       <div className="text-sm text-muted-foreground">{label}</div>
     </div>

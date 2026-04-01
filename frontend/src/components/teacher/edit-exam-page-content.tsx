@@ -38,9 +38,7 @@ export function EditExamPageContent({
   const {
     addQuestion,
     addScheduleEntry,
-    aiMCCount,
-    aiShortCount,
-    aiTFCount,
+    aiQuestionTypeCounts,
     addAiSourceFiles,
     duration,
     examTitle,
@@ -55,9 +53,7 @@ export function EditExamPageContent({
     scheduleEntries,
     selectedAiSourceFiles,
     selectedMockTests,
-    setAiMCCount,
-    setAiShortCount,
-    setAiTFCount,
+    setAiQuestionTypeCounts,
     setDuration,
     setExamTitle,
     setIsAiSourceDragging,
@@ -82,8 +78,9 @@ export function EditExamPageContent({
     "multiple-choice": questions.filter((q) => q.type === "multiple-choice")
       .length,
     "true-false": questions.filter((q) => q.type === "true-false").length,
+    matching: questions.filter((q) => q.type === "matching").length,
+    ordering: questions.filter((q) => q.type === "ordering").length,
     "short-answer": questions.filter((q) => q.type === "short-answer").length,
-    essay: questions.filter((q) => q.type === "essay").length,
   };
 
   return (
@@ -151,9 +148,7 @@ export function EditExamPageContent({
       </div>
       <EditExamAiDialog
         addAiSourceFiles={addAiSourceFiles}
-        aiMCCount={aiMCCount}
-        aiShortCount={aiShortCount}
-        aiTFCount={aiTFCount}
+        aiQuestionTypeCounts={aiQuestionTypeCounts}
         generateAIQuestions={generateAIQuestions}
         isAiSourceDragging={isAiSourceDragging}
         isGenerating={isGenerating}
@@ -161,9 +156,7 @@ export function EditExamPageContent({
         removeAiSourceFile={removeAiSourceFile}
         selectedMockTests={selectedMockTests}
         selectedSourceFiles={selectedAiSourceFiles}
-        setAiMCCount={setAiMCCount}
-        setAiShortCount={setAiShortCount}
-        setAiTFCount={setAiTFCount}
+        setAiQuestionTypeCounts={setAiQuestionTypeCounts}
         setIsAiSourceDragging={setIsAiSourceDragging}
         setSelectedMockTests={setSelectedMockTests}
         setShowAIDialog={setShowAIDialog}

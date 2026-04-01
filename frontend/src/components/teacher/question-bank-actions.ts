@@ -44,10 +44,7 @@ export async function createQuestionBankCategoryAction({
     onCreated?.(createdCategory.id);
     setNewCategoryName("");
     setBuilderNewCategoryName("");
-    toast({
-      title: "Амжилттай",
-      description: `"${createdCategory.name}" ангилал үүслээ.`,
-    });
+    toast({ title: "Амжилттай", description: `"${createdCategory.name}" ангилал үүслээ.` });
   } catch (error) {
     toast({
       title: "Алдаа",
@@ -57,6 +54,15 @@ export async function createQuestionBankCategoryAction({
   } finally {
     setIsCreatingCategory(false);
   }
+}
+
+function questionNeedsConfiguredAnswer(question: NewQuestion) {
+  return (
+    question.type === "multiple-choice" ||
+    question.type === "true-false" ||
+    question.type === "matching" ||
+    question.type === "ordering"
+  );
 }
 
 export async function saveQuestionBankQuestionSet({
@@ -77,6 +83,10 @@ export async function saveQuestionBankQuestionSet({
   setQuestionBank: Dispatch<SetStateAction<QuestionBankCategory[]>>;
 }) {
   const hasEmptyQuestion = builderQuestions.some((question) => !question.question.trim());
+  const hasIncompleteConfiguredQuestion = builderQuestions.some(
+    (question) => questionNeedsConfiguredAnswer(question) && !question.correctAnswer?.trim(),
+  );
+
   if (!builderCategoryId) {
     toast({ title: "Алдаа", description: "Ангилал сонгоно уу.", variant: "destructive" });
     return;
@@ -89,6 +99,14 @@ export async function saveQuestionBankQuestionSet({
     toast({
       title: "Алдаа",
       description: "Хамгийн багадаа нэг бүрэн асуулт оруулна уу.",
+      variant: "destructive",
+    });
+    return;
+  }
+  if (hasIncompleteConfiguredQuestion) {
+    toast({
+      title: "Алдаа",
+      description: "Зөв хариулт шаарддаг асуултуудын тохиргоог бүрэн оруулна уу.",
       variant: "destructive",
     });
     return;

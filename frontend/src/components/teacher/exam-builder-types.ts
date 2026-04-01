@@ -3,8 +3,9 @@ import type { ExamQuestion } from '@/lib/mock-data'
 export type QuestionType =
   | 'multiple-choice'
   | 'true-false'
+  | 'matching'
+  | 'ordering'
   | 'short-answer'
-  | 'essay'
 
 export interface NewQuestion extends Omit<ExamQuestion, 'id'> {
   id: string

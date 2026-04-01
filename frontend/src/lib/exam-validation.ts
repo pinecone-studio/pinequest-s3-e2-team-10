@@ -8,6 +8,18 @@ export type ExamValidationIssue = {
   section: ExamValidationSection
 }
 
+function requiresOptions(question: NewQuestion) {
+  return (
+    question.type === 'multiple-choice' ||
+    question.type === 'matching' ||
+    question.type === 'ordering'
+  )
+}
+
+function requiresCorrectAnswer(question: NewQuestion) {
+  return question.type !== 'short-answer'
+}
+
 export function validateExamPayloadInput({
   examTitle,
   duration,
@@ -36,29 +48,22 @@ export function validateExamPayloadInput({
 
   questions.forEach((question, index) => {
     if (!question.question.trim()) {
-      errors.push({
-        message: `${index + 1}-р асуултын текст хоосон байна.`,
-        section: 'questions',
-      })
+      errors.push({ message: `${index + 1}-р асуултын текст хоосон байна.`, section: 'questions' })
     }
 
     if (!Number.isInteger(question.points) || question.points <= 0) {
-      errors.push({
-        message: `${index + 1}-р асуултын оноо 0-ээс их байх ёстой.`,
-        section: 'questions',
-      })
+      errors.push({ message: `${index + 1}-р асуултын оноо 0-ээс их байх ёстой.`, section: 'questions' })
     }
 
     if (
-      question.type === 'multiple-choice' &&
-      (!question.options ||
-        question.options.length < 2 ||
-        question.options.some((option) => !option.trim()))
+      requiresOptions(question) &&
+      (!question.options || question.options.length < 2 || question.options.some((option) => !option.trim()))
     ) {
-      errors.push({
-        message: `${index + 1}-р сонгох асуултад дор хаяж 2 бөглөсөн сонголт хэрэгтэй.`,
-        section: 'questions',
-      })
+      errors.push({ message: `${index + 1}-р асуултад дор хаяж 2 бөглөсөн мөр хэрэгтэй.`, section: 'questions' })
+    }
+
+    if (requiresCorrectAnswer(question) && !question.correctAnswer?.trim()) {
+      errors.push({ message: `${index + 1}-р асуултын зөв хариултыг бүрэн тохируулна уу.`, section: 'questions' })
     }
   })
 
@@ -67,24 +72,16 @@ export function validateExamPayloadInput({
     const values = [entry.classId.trim(), entry.date.trim(), entry.time.trim()]
     const filledCount = values.filter(Boolean).length
 
-    if (filledCount === 0) {
-      return
-    }
+    if (filledCount === 0) return
 
     if (filledCount < values.length) {
-      errors.push({
-        message: `${index + 1}-р хуваарьт анги, огноо, цагийг бүрэн оруулна уу.`,
-        section: 'schedule',
-      })
+      errors.push({ message: `${index + 1}-р хуваарьт анги, огноо, цагийг бүрэн оруулна уу.`, section: 'schedule' })
       return
     }
 
     const scheduleKey = values.join('::')
     if (seenSchedules.has(scheduleKey)) {
-      errors.push({
-        message: `${index + 1}-р хуваарь давхардсан байна.`,
-        section: 'schedule',
-      })
+      errors.push({ message: `${index + 1}-р хуваарь давхардсан байна.`, section: 'schedule' })
       return
     }
 
@@ -95,43 +92,25 @@ export function validateExamPayloadInput({
     (entry) => entry.classId.trim() === ALL_CLASSES_OPTION && entry.date.trim() && entry.time.trim(),
   )
   const explicitEntries = scheduleEntries.filter(
-    (entry) =>
-      entry.classId.trim() !== ALL_CLASSES_OPTION &&
-      entry.classId.trim() &&
-      entry.date.trim() &&
-      entry.time.trim(),
+    (entry) => entry.classId.trim() !== ALL_CLASSES_OPTION && entry.classId.trim() && entry.date.trim() && entry.time.trim(),
   )
 
   allClassesEntries.forEach((entry, index) => {
     const overlapsExplicit = explicitEntries.some(
-      (explicitEntry) =>
-        explicitEntry.date.trim() === entry.date.trim() &&
-        explicitEntry.time.trim() === entry.time.trim(),
+      (explicitEntry) => explicitEntry.date.trim() === entry.date.trim() && explicitEntry.time.trim() === entry.time.trim(),
     )
 
     if (overlapsExplicit) {
-      errors.push({
-        message: `Бүх анги гэсэн ${index + 1}-р хуваарь өөр ангитай ижил өдөр, цаг дээр давхцаж байна.`,
-        section: 'schedule',
-      })
+      errors.push({ message: `Бүх анги гэсэн ${index + 1}-р хуваарь өөр ангитай ижил өдөр, цаг дээр давхцаж байна.`, section: 'schedule' })
     }
   })
 
   if (status === 'scheduled' && questions.length === 0) {
-    errors.push({
-      message: 'Шалгалт үүсгэхийн өмнө дор хаяж нэг асуулт нэмнэ үү.',
-      section: 'questions',
-    })
+    errors.push({ message: 'Шалгалт үүсгэхийн өмнө дор хаяж нэг асуулт нэмнэ үү.', section: 'questions' })
   }
 
-  if (
-    status === 'scheduled' &&
-    !scheduleEntries.some((entry) => entry.classId && entry.date && entry.time)
-  ) {
-    errors.push({
-      message: 'Шалгалт үүсгэхийн өмнө дор хаяж нэг бүрэн хуваарь оруулна уу.',
-      section: 'schedule',
-    })
+  if (status === 'scheduled' && !scheduleEntries.some((entry) => entry.classId && entry.date && entry.time)) {
+    errors.push({ message: 'Шалгалт үүсгэхийн өмнө дор хаяж нэг бүрэн хуваарь оруулна уу.', section: 'schedule' })
   }
 
   return errors

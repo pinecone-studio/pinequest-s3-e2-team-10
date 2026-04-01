@@ -5,80 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type {
-  NewQuestion,
-  QuestionType,
-} from "@/components/teacher/exam-builder-types";
-
-export function getQuestionTypeLabel(type: QuestionType) {
-  if (type === "multiple-choice") return "Сонгох хариулттай";
-  if (type === "true-false") return "Үнэн/Худал";
-  if (type === "short-answer") return "Богино хариулт";
-  return "Эсээ";
-}
-
-function MultipleChoiceEditor({
-  question,
-  onUpdateOption,
-  onUpdateQuestion,
-}: {
-  question: NewQuestion;
-  onUpdateOption: (questionId: string, optionIndex: number, value: string) => void;
-  onUpdateQuestion: (id: string, updates: Partial<NewQuestion>) => void;
-}) {
-  if (question.type !== "multiple-choice" || !question.options) return null;
-
-  return (
-    <div className="space-y-2">
-      {question.options.map((option, optionIndex) => (
-        <div key={optionIndex} className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full border text-xs">
-            {String.fromCharCode(65 + optionIndex)}
-          </div>
-          <Input
-            placeholder={`Сонголт ${String.fromCharCode(65 + optionIndex)}`}
-            value={option}
-            onChange={(event) =>
-              onUpdateOption(question.id, optionIndex, event.target.value)
-            }
-            className="flex-1"
-          />
-        </div>
-      ))}
-      <div className="mt-2 flex items-center gap-2">
-        <Label className="text-sm text-muted-foreground">Зөв хариулт:</Label>
-        <Select
-          value={question.correctAnswer}
-          onValueChange={(value) =>
-            onUpdateQuestion(question.id, { correctAnswer: value })
-          }
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Сонгох" />
-          </SelectTrigger>
-          <SelectContent>
-            {question.options.map((option, optionIndex) => (
-              <SelectItem
-                key={optionIndex}
-                value={option || `Сонголт ${String.fromCharCode(65 + optionIndex)}`}
-              >
-                {String.fromCharCode(65 + optionIndex)}: {option || "(хоосон)"}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  );
-}
+import {
+  ChoiceEditor,
+  getQuestionTypeLabel,
+} from "@/components/teacher/exam-builder-question-editors";
+import {
+  MatchingEditor,
+  OrderingEditor,
+} from "@/components/teacher/exam-builder-structured-question-editors";
+import type { NewQuestion } from "@/components/teacher/exam-builder-types";
 
 export function ExamBuilderQuestionCard({
   index,
@@ -100,9 +37,7 @@ export function ExamBuilderQuestionCard({
           <div className="flex items-center gap-3">
             <div>
               <div className="text-sm font-semibold">Асуулт {index + 1}</div>
-              <div className="text-xs text-muted-foreground capitalize">
-                {getQuestionTypeLabel(question.type)}
-              </div>
+              <div className="text-xs text-muted-foreground capitalize">{getQuestionTypeLabel(question.type)}</div>
             </div>
             <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
           </div>
@@ -110,43 +45,28 @@ export function ExamBuilderQuestionCard({
             <Input
               type="number"
               value={question.points}
-              onChange={(event) =>
-                onUpdateQuestion(question.id, {
-                  points: parseInt(event.target.value) || 0,
-                })
-              }
+              onChange={(event) => onUpdateQuestion(question.id, { points: parseInt(event.target.value) || 0 })}
               className="h-8 w-20"
             />
             <span className="text-sm text-muted-foreground">оноо</span>
-            <Button variant="ghost" size="sm" onClick={() => onRemoveQuestion(question.id)}>
-              Устгах
-            </Button>
+            <Button variant="ghost" size="sm" onClick={() => onRemoveQuestion(question.id)}>Устгах</Button>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
-          placeholder={`Асуулт ${index + 1}-ийг бичнэ үү`}
+          placeholder={`Асуулт ${index + 1}-ийн тайлбар эсвэл өгүүлбэрийг бичнэ үү`}
           value={question.question}
-          onChange={(event) =>
-            onUpdateQuestion(question.id, { question: event.target.value })
-          }
+          onChange={(event) => onUpdateQuestion(question.id, { question: event.target.value })}
           className="resize-none"
         />
-        <MultipleChoiceEditor
-          question={question}
-          onUpdateOption={onUpdateOption}
-          onUpdateQuestion={onUpdateQuestion}
-        />
+        <ChoiceEditor question={question} onUpdateOption={onUpdateOption} onUpdateQuestion={onUpdateQuestion} />
+        <MatchingEditor question={question} onUpdateOption={onUpdateOption} onUpdateQuestion={onUpdateQuestion} />
+        <OrderingEditor question={question} onUpdateOption={onUpdateOption} onUpdateQuestion={onUpdateQuestion} />
         {question.type === "true-false" ? (
           <div className="flex items-center gap-4">
             <Label className="text-sm text-muted-foreground">Зөв хариулт:</Label>
-            <Select
-              value={question.correctAnswer}
-              onValueChange={(value) =>
-                onUpdateQuestion(question.id, { correctAnswer: value })
-              }
-            >
+            <Select value={question.correctAnswer} onValueChange={(value) => onUpdateQuestion(question.id, { correctAnswer: value })}>
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
@@ -157,9 +77,7 @@ export function ExamBuilderQuestionCard({
             </Select>
           </div>
         ) : null}
-        {question.type === "short-answer" || question.type === "essay" ? (
-          <div className="border-b border-dashed" />
-        ) : null}
+        {question.type === "short-answer" ? <div className="border-b border-dashed" /> : null}
       </CardContent>
     </Card>
   );

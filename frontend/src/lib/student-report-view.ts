@@ -1,32 +1,36 @@
-import type { Exam, ExamResult } from "@/lib/mock-data"
+import type { Exam, ExamResult } from "@/lib/mock-data";
 
 export const questionTypeLabels = {
-  "multiple-choice": "Сонгох",
-  "true-false": "Үнэн/худал",
+  "multiple-choice": "Сонгох хариулттай",
+  "true-false": "Үнэн / худал",
+  matching: "Харгалзуулах",
+  ordering: "Дараалуулах",
   "short-answer": "Богино хариулт",
-  essay: "Эсээ",
-} as const
+} as const;
 
 export function getStudentExamSchedule(exam: Exam, studentClass: string) {
-  return exam.scheduledClasses.find((entry) => entry.classId === studentClass) ?? exam.scheduledClasses[0]
+  return (
+    exam.scheduledClasses.find((entry) => entry.classId === studentClass) ??
+    exam.scheduledClasses[0]
+  );
 }
 
 export function getResultPercentage(result: ExamResult) {
-  return Math.round((result.score / result.totalPoints) * 100)
+  return Math.round((result.score / result.totalPoints) * 100);
 }
 
 export function isManualReviewQuestionType(type: Exam["questions"][number]["type"]) {
-  return type === "short-answer" || type === "essay"
+  return type === "short-answer";
 }
 
 export function getAnswerReviewState(
   question: Exam["questions"][number],
   answer: ExamResult["answers"][number] | undefined,
 ) {
-  const hasAnswer = Boolean(answer?.answer?.trim())
+  const hasAnswer = Boolean(answer?.answer?.trim());
 
   if (!hasAnswer) {
-    return "unanswered" as const
+    return "unanswered" as const;
   }
 
   if (isManualReviewQuestionType(question.type)) {
@@ -34,45 +38,44 @@ export function getAnswerReviewState(
       typeof answer?.awardedPoints === "number" ||
       typeof answer?.isCorrect === "boolean"
       ? "graded"
-      : "pending"
+      : "pending";
   }
 
-  return answer?.isCorrect ? "correct" : "wrong"
+  return answer?.isCorrect ? "correct" : "wrong";
 }
 
 export function getReportMetrics(exam: Exam, result: ExamResult) {
-  const answerMap = new Map(result.answers.map((entry) => [entry.questionId, entry]))
-  let correctCount = 0
-  let wrongCount = 0
-  let unansweredCount = 0
-  let pendingReviewCount = 0
+  const answerMap = new Map(result.answers.map((entry) => [entry.questionId, entry]));
+  let correctCount = 0;
+  let wrongCount = 0;
+  let unansweredCount = 0;
+  let pendingReviewCount = 0;
 
   exam.questions.forEach((question) => {
-    const answer = answerMap.get(question.id)
-
-    const reviewState = getAnswerReviewState(question, answer)
+    const answer = answerMap.get(question.id);
+    const reviewState = getAnswerReviewState(question, answer);
 
     if (reviewState === "unanswered") {
-      unansweredCount += 1
-      return
+      unansweredCount += 1;
+      return;
     }
 
     if (reviewState === "pending") {
-      pendingReviewCount += 1
-      return
+      pendingReviewCount += 1;
+      return;
     }
 
     if (reviewState === "graded") {
-      return
+      return;
     }
 
     if (reviewState === "correct") {
-      correctCount += 1
-      return
+      correctCount += 1;
+      return;
     }
 
-    wrongCount += 1
-  })
+    wrongCount += 1;
+  });
 
   return {
     totalQuestions: exam.questions.length,
@@ -81,15 +84,15 @@ export function getReportMetrics(exam: Exam, result: ExamResult) {
     unansweredCount,
     pendingReviewCount,
     percentage: getResultPercentage(result),
-  }
+  };
 }
 
 export function getExamLetterGrade(percentage: number) {
-  if (percentage >= 90) return "A"
-  if (percentage >= 80) return "B+"
-  if (percentage >= 70) return "B"
-  if (percentage >= 60) return "C"
-  return "F"
+  if (percentage >= 90) return "A";
+  if (percentage >= 80) return "B+";
+  if (percentage >= 70) return "B";
+  if (percentage >= 60) return "C";
+  return "F";
 }
 
 export function getStudentInitials(name: string) {
@@ -98,5 +101,5 @@ export function getStudentInitials(name: string) {
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join("")
+    .join("");
 }
