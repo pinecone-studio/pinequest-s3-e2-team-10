@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   Bell,
   BookOpen,
-  BookOpenText,
   ClipboardList,
   LayoutDashboard,
   LogOut,
@@ -23,7 +22,6 @@ export type NavItem = { href: string; label: string; icon: LucideIcon };
 export const teacherNavItems: NavItem[] = [
   { href: "/teacher/dashboard", label: "Хянах самбар", icon: LayoutDashboard },
   { href: "/teacher/classes", label: "Ангиуд", icon: Users },
-  { href: "/teacher/sources", label: "Мэдлэгийн сан", icon: BookOpenText },
   { href: "/teacher/question-bank", label: "Асуултын сан", icon: BookOpen },
   { href: "/teacher/exams", label: "Шалгалтууд", icon: ClipboardList },
 ];

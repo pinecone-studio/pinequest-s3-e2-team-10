@@ -7,11 +7,10 @@ import {
   CREATE_CATEGORY_FILTER_VALUE,
   QuestionBankFiltersCard,
 } from "@/components/teacher/question-bank-filters-card";
+import { QuestionBankSourcePanel } from "@/components/teacher/question-bank-source-panel";
 import {
   TeacherPageHeader,
   TeacherPageShell,
-  TeacherPageStatCard,
-  TeacherPageStatGrid,
 } from "@/components/teacher/teacher-page-primitives";
 import { QuestionBankResults } from "@/components/teacher/question-bank-results";
 import { Button } from "@/components/ui/button";
@@ -52,65 +51,64 @@ export default function QuestionBankPage() {
     <TeacherPageShell>
       <TeacherPageHeader
         title="Асуултын сан"
-        description="Эх сурвалж файлууд, ангиллууд, сэдвүүд, асуултуудаа нэг цэгээс удирдаж дараагийн дизайн шилжилтэд бэлэн болгоно."
+        description="Эх сурвалж, ангилал, сэдэв, асуултуудаа нэг урсгалаар удирдаж, аль анги болон түвшинд ашиглах сангаа цэгцтэй хадгална."
         icon={BookOpen}
-        eyebrow={<span>Сангийн бүтэц болон логик одоогийн байдлаараа хадгалагдана.</span>}
+        eyebrow={
+          <>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
+              <FolderTree className="h-4 w-4 text-[#5b91fc]" />
+              {data.questionBank.length} ангилал
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
+              <Shapes className="h-4 w-4 text-[#5b91fc]" />
+              {totalTopicCount} сэдэв
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#dde7ff] bg-white/80 px-3 py-1.5">
+              <BookOpen className="h-4 w-4 text-[#5b91fc]" />
+              {totalQuestionCount} асуулт
+            </span>
+          </>
+        }
         actions={
           <>
-          <Button variant="outline" asChild>
-            <Link href="/teacher/sources">Мэдлэгийн сан</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/teacher/question-bank/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Шинэ асуултууд үүсгэх
-            </Link>
-          </Button>
+            <Button asChild>
+              <Link href="/teacher/question-bank/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Шинэ асуултууд үүсгэх
+              </Link>
+            </Button>
           </>
         }
       />
 
-      <TeacherPageStatGrid>
-        <TeacherPageStatCard
-          icon={FolderTree}
-          label="Ангиллууд"
-          value={`${data.questionBank.length} ангилал`}
-        />
-        <TeacherPageStatCard
-          icon={Shapes}
-          label="Сэдвүүд"
-          tone="mint"
-          value={`${totalTopicCount} сэдэв`}
-        />
-        <TeacherPageStatCard
-          icon={BookOpen}
-          label="Нийт асуулт"
-          tone="violet"
-          value={`${totalQuestionCount} асуулт`}
-        />
-      </TeacherPageStatGrid>
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.72fr)]">
+        <div className="space-y-4">
+          <QuestionBankFiltersCard
+            onSearchQueryChange={builder.setSearchQuery}
+            onSelectedCategoryFilterChange={(value) => {
+              if (value === CREATE_CATEGORY_FILTER_VALUE) {
+                setIsCategoryDialogOpen(true);
+                return;
+              }
 
-      <QuestionBankFiltersCard
-        onSearchQueryChange={builder.setSearchQuery}
-        onSelectedCategoryFilterChange={(value) => {
-          if (value === CREATE_CATEGORY_FILTER_VALUE) {
-            setIsCategoryDialogOpen(true);
-            return;
-          }
+              builder.setSelectedCategoryFilter(value);
+            }}
+            onSelectedDifficultyChange={builder.setSelectedDifficulty}
+            questionBank={data.questionBank}
+            searchQuery={builder.searchQuery}
+            selectedCategoryFilter={builder.selectedCategoryFilter}
+            selectedDifficulty={builder.selectedDifficulty}
+          />
 
-          builder.setSelectedCategoryFilter(value);
-        }}
-        onSelectedDifficultyChange={builder.setSelectedDifficulty}
-        questionBank={data.questionBank}
-        searchQuery={builder.searchQuery}
-        selectedCategoryFilter={builder.selectedCategoryFilter}
-        selectedDifficulty={builder.selectedDifficulty}
-      />
+          <QuestionBankResults
+            categories={data.filteredCategories}
+            isLoading={data.isLoading}
+          />
+        </div>
 
-      <section className="space-y-4">
-        <QuestionBankResults
-          categories={data.filteredCategories}
-          isLoading={data.isLoading}
+        <QuestionBankSourcePanel
+          files={data.sourceFiles}
+          setSourceFiles={data.setSourceFiles}
         />
       </section>
 
@@ -161,6 +159,7 @@ export default function QuestionBankPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </TeacherPageShell>
   );
 }
