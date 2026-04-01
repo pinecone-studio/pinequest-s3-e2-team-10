@@ -71,37 +71,37 @@ export function TeacherClassesRosterPanel(props: {
 
   return (
     <>
-      <div className="h-[724px] w-[440px] rounded-[30px] bg-white/96 px-4 py-4 shadow-[0_24px_68px_rgba(170,190,225,0.2)]">
+      <div className="h-[724px] w-[440px] rounded-[16px] border border-[#ededed] bg-[linear-gradient(233deg,rgba(255,255,255,0.45)_4.4%,rgba(255,255,255,0.65)_61.8%,rgba(255,255,255,0.54)_119.9%)] px-4 py-4 shadow-[50px_38px_102px_rgba(120,118,148,0.14)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)]">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-[#5b5b73]">Сурагчдын бүртгэл</h2>
-            <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] font-medium text-[#a1acc2]">
+            <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-[#5b5b73] dark:text-[#e6f2ff]">Сурагчдын бүртгэл</h2>
+            <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] font-medium text-[#a1acc2] dark:text-[#c2c9d0]">
               <span className="inline-flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} />{date}</span>
               <span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" strokeWidth={1.8} />Өнөөдөр - {time}</span>
             </div>
           </div>
-          <Button className="h-8 rounded-full bg-[#e8eaee] px-3 text-xs font-semibold text-[#7f8796] shadow-none hover:bg-[#dde2e8]" onClick={() => handleOpenChange(true)} type="button">
+          <Button className="h-9 rounded-full bg-[#e8eaee] px-3 text-xs font-semibold text-[#7f8796] shadow-none hover:bg-[#dde2e8] dark:border dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] dark:text-[#c2c9d0] dark:hover:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] dark:hover:text-[#c2c9d0]" onClick={() => handleOpenChange(true)} type="button">
             <Plus className="mr-1 h-3.5 w-3.5" />
             Бүртгэл
           </Button>
         </div>
 
-        <p className="mt-4 text-sm text-[#707b92]">{classData.name} ангийн сурагчид бүртгэлтэй.</p>
+        <p className="mt-4 text-sm text-[#707b92] dark:text-[#c2c9d0]">{classData.name} ангийн сурагчид бүртгэлтэй.</p>
         <div className="mt-4 h-[592px] space-y-2 overflow-y-auto pr-1">
           {classData.students.map((student) => (
-            <div key={student.id} className="grid grid-cols-[38px_minmax(0,1fr)_10px] items-center gap-3 rounded-[18px] border border-[#edf2fb] bg-[#fbfdff] px-3 py-2.5">
-              <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#e5e9f3] bg-white text-[10px] font-semibold text-[#8d97aa]">{getInitials(student.name)}</div>
+            <div key={student.id} className="grid grid-cols-[38px_minmax(0,1fr)_10px] items-center gap-3 rounded-[8px] border border-[#edf2fb] bg-[#fbfdff] px-3 py-2.5 dark:border-[rgba(72,94,149,0.24)] dark:bg-[radial-gradient(62%_1.5px_at_50%_0%,rgba(167,182,214,0.22)_0%,rgba(167,182,214,0.09)_42%,rgba(167,182,214,0)_100%),radial-gradient(62%_1.5px_at_50%_100%,rgba(167,182,214,0.18)_0%,rgba(167,182,214,0.08)_42%,rgba(167,182,214,0)_100%),linear-gradient(180deg,#0d163f_0%,#0a1236_100%)] dark:shadow-[inset_0_0_8px_rgba(55,82,138,0.05)]">
+              <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#e5e9f3] bg-white text-[10px] font-semibold text-[#8d97aa] dark:border-[rgba(72,94,149,0.24)] dark:bg-[rgba(10,18,54,0.92)] dark:text-[#d6def1]">{getInitials(student.name)}</div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                  <p className="truncate text-[13px] font-semibold text-[#4f5467]">{student.name}</p>
-                  <p className="text-[11px] text-[#8b96ad]">ID: {student.id}</p>
+                  <p className="truncate text-[13px] font-semibold text-[#4f5467] dark:text-[#f0f3f5]">{student.name}</p>
+                  <p className="text-[11px] text-[#8b96ad] dark:text-[#aeb8d2]">ID: {student.id}</p>
                 </div>
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#a3adbf]">
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-[#a3adbf] dark:text-[#89939c]">
                   <span>{classData.name}</span>
                   <span>{student.email}</span>
                 </div>
               </div>
-              <div className="h-1.5 w-1.5 rounded-full bg-[#d9deea]" />
+              <div className="h-1.5 w-1.5 rounded-full bg-[#d9deea] dark:bg-[#36517f]" />
             </div>
           ))}
         </div>

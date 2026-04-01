@@ -43,7 +43,6 @@ export function TeacherHeader() {
         })}
       </nav>
       <div className="flex items-center gap-3">
-        <span className="hidden text-sm text-[#8ea4c5] dark:text-[#c2c9d0] xl:inline">Нэвтэрсэн хэрэглэгч: <span className="text-[#5d7397] dark:text-[#f9fafb]">{teacher.name}</span></span>
         <div className="flex items-center gap-3">
           <IconButton as="button" label="Notifications"><Bell className="h-[18px] w-[18px]" strokeWidth={1.85} /></IconButton>
           <IconButton as="link" href="/" label="Гарах"><LogOut className="h-[18px] w-[18px]" strokeWidth={1.8} /></IconButton>
