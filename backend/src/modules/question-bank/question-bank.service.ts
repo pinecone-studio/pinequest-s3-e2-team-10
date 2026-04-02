@@ -64,157 +64,133 @@ type CategorySeed = {
   topics: TopicSeed[];
 };
 
+const LEGACY_DEFAULT_CATEGORY_NAME = 'Математик';
+const LEGACY_DEFAULT_TOPIC_NAMES = [
+  'Алгебр',
+  'Функц ба график',
+  'Геометр',
+  'Магадлал ба статистик',
+  'Тооцоо ба уламжлалын суурь',
+];
+
 const DEFAULT_QUESTION_BANK_SEED: CategorySeed[] = [
   {
-    name: 'Математик',
+    name: '1-р бүлэг - Бүхэл тоо',
     topics: [
       {
-        name: 'Алгебр',
+        name: '1.2 сэдэв - Үржих, хуваах үйлдэл',
         questions: [
           {
             type: 'multiple-choice',
-            question: '2x + 7 = 19 тэгшитгэлийг бодоход x хэд вэ?',
-            options: ['5', '6', '7', '8'],
-            correctAnswer: '6',
+            question: '(-6) x 4 илэрхийллийн хариу хэд вэ?',
+            options: ['-24', '-10', '10', '24'],
+            correctAnswer: '-24',
             points: 8,
+            difficulty: 'easy',
+          },
+          {
+            type: 'multiple-choice',
+            question: '36 : (-9) илэрхийллийг бод.',
+            options: ['-4', '-3', '3', '4'],
+            correctAnswer: '-4',
+            points: 10,
+            difficulty: 'standard',
+          },
+          {
+            type: 'true-false',
+            question:
+              'Хоёр сөрөг бүхэл тоог үржүүлэхэд эерэг тоо гарна.',
+            correctAnswer: 'true',
+            points: 12,
             difficulty: 'easy',
           },
           {
             type: 'short-answer',
             question:
-              '3x - 4 = 17 бол бодолтын алхмаа богино тайлбартай бичээд x-ийн утгыг ол.',
-            correctAnswer: 'x = 7',
+              '(-48)-ыг 6-д хуваавал хэд гарах вэ? Бодолтоо бич.',
+            correctAnswer: '-8',
             points: 10,
             difficulty: 'standard',
           },
-          {
-            type: 'short-answer',
-            question:
-              'Квадрат тэгшитгэлийг ялгавар ашиглан бодох аргыг жишээтэй тайлбарла.',
-            correctAnswer:
-              'Ялгавар D = b² - 4ac-г олж, язгуурын томьёо ашиглана.',
-            points: 12,
-            difficulty: 'hard',
-          },
         ],
       },
+    ],
+  },
+  {
+    name: '2-р бүлэг - Бутархай',
+    topics: [
       {
-        name: 'Функц ба график',
+        name: '2.1 сэдэв - Бутархай нэмэх, хасах',
         questions: [
           {
             type: 'multiple-choice',
-            question: 'y = 2x + 1 функцийн налалт хэд вэ?',
-            options: ['1', '2', '-1', '0'],
-            correctAnswer: '2',
+            question: '1/4 + 2/4 нийлбэр хэд вэ?',
+            options: ['3/4', '2/8', '1/2', '3/8'],
+            correctAnswer: '3/4',
             points: 8,
             difficulty: 'easy',
           },
           {
             type: 'true-false',
             question:
-              'y = x² функцийн график нь доошоо нээгдсэн парабол байдаг.',
-            correctAnswer: 'false',
+              '5/6 - 1/6 = 4/6 тэнцэтгэл зөв.',
+            correctAnswer: 'true',
             points: 6,
             difficulty: 'easy',
           },
           {
             type: 'short-answer',
             question:
-              'f(x) = x² - 4x + 3 функцийн оройн цэгийн x координатыг ол.',
-            correctAnswer: '2',
+              '3/5 + 1/10 илэрхийллийг ижил нэртэй болгоод бод.',
+            correctAnswer: '7/10',
+            points: 10,
+            difficulty: 'standard',
+          },
+          {
+            type: 'short-answer',
+            question:
+              '7/8 - 3/8 ялгаврыг ол.',
+            correctAnswer: '4/8 буюу 1/2',
             points: 10,
             difficulty: 'standard',
           },
         ],
       },
       {
-        name: 'Геометр',
+        name: '2.2 сэдэв - Бутархай үржих, хуваах',
         questions: [
           {
             type: 'multiple-choice',
             question:
-              'Тэгш өнцөгт гурвалжны катетууд 6 ба 8 бол гипотенуз хэд вэ?',
-            options: ['10', '12', '14', '16'],
-            correctAnswer: '10',
+              '2/3 x 3/5 үржвэр хэд вэ?',
+            options: ['2/5', '6/15', '5/6', '1'],
+            correctAnswer: '2/5',
             points: 8,
-            difficulty: 'easy',
-          },
-          {
-            type: 'short-answer',
-            question:
-              'Радиус нь 5 см тойргийн талбайг π-ээр илэрхийл.',
-            correctAnswer: '25π',
-            points: 8,
-            difficulty: 'standard',
-          },
-          {
-            type: 'short-answer',
-            question:
-              'Пифагорын теоремыг ашиглан бодлого бодох ерөнхий дарааллыг тайлбарла.',
-            correctAnswer:
-              'Тэгш өнцөгт гурвалжны талуудыг таньж, a² + b² = c² томьёог хэрэглэнэ.',
-            points: 10,
-            difficulty: 'standard',
-          },
-        ],
-      },
-      {
-        name: 'Магадлал ба статистик',
-        questions: [
-          {
-            type: 'multiple-choice',
-            question:
-              'Шударга шоо нэг удаа хаяхад тэгш тоо буух магадлал хэд вэ?',
-            options: ['1/6', '1/3', '1/2', '2/3'],
-            correctAnswer: '1/2',
-            points: 6,
             difficulty: 'easy',
           },
           {
             type: 'true-false',
             question:
-              'Өгөгдлийн дундаж утга нь медиантай заавал тэнцүү байдаг.',
-            correctAnswer: 'false',
+              '1/2 : 1/4 = 2 тэнцэтгэл зөв.',
+            correctAnswer: 'true',
             points: 6,
             difficulty: 'easy',
           },
           {
             type: 'short-answer',
             question:
-              '4, 7, 7, 9, 13 өгөгдлийн медианыг ол.',
-            correctAnswer: '7',
+              '4/9 x 3/4 үржвэрийг хамгийн энгийн хэлбэрт бич.',
+            correctAnswer: '1/3',
             points: 8,
             difficulty: 'standard',
           },
-        ],
-      },
-      {
-        name: 'Тооцоо ба уламжлалын суурь',
-        questions: [
           {
             type: 'multiple-choice',
-            question: 'f(x) = x³ функцийн уламжлал аль нь вэ?',
-            options: ['x²', '2x', '3x²', '3x'],
-            correctAnswer: '3x²',
+            question: '3/7 : 9/14 илэрхийллийн хариу аль нь вэ?',
+            options: ['2/3', '3/2', '6/7', '7/6'],
+            correctAnswer: '2/3',
             points: 10,
             difficulty: 'standard',
-          },
-          {
-            type: 'short-answer',
-            question:
-              'f(x) = 5x² - 2x функцийн уламжлалыг бич.',
-            correctAnswer: '10x - 2',
-            points: 10,
-            difficulty: 'standard',
-          },
-          {
-            type: 'short-answer',
-            question:
-              'Уламжлалын бодит амьдрал дахь хэрэглээнээс нэг жишээ авч тайлбарла.',
-            correctAnswer:
-              'Хурдны агшин зуурын өөрчлөлтийг уламжлалаар илэрхийлж болно.',
-            points: 12,
-            difficulty: 'hard',
           },
         ],
       },
@@ -387,9 +363,10 @@ export class QuestionBankService {
         topics: parsed.topics ?? [],
         questions: parsed.questions ?? [],
       };
+      const didMigrateLegacySeed = this.replaceLegacyDefaultQuestionBank();
       const didSeedDefaults = this.ensureDefaultMathQuestionBank();
       this.localStoreLoaded = true;
-      if (didSeedDefaults) {
+      if (didMigrateLegacySeed || didSeedDefaults) {
         await this.persistLocalStore();
       }
     } catch (error) {
@@ -426,11 +403,15 @@ export class QuestionBankService {
   }
 
   private ensureDefaultMathQuestionBank() {
-    const hasMathCategory = this.localStore.categories.some(
-      (category) => category.name.trim().toLowerCase() === 'математик',
+    const hasDemoCategories = DEFAULT_QUESTION_BANK_SEED.every((categorySeed) =>
+      this.localStore.categories.some(
+        (category) =>
+          category.name.trim().toLowerCase() ===
+          categorySeed.name.trim().toLowerCase(),
+      ),
     );
 
-    if (hasMathCategory) {
+    if (hasDemoCategories) {
       return false;
     }
 
@@ -470,5 +451,46 @@ export class QuestionBankService {
     });
 
     return true;
+  }
+
+  private replaceLegacyDefaultQuestionBank() {
+    const legacyCategory = this.localStore.categories.find(
+      (category) =>
+        category.name.trim().toLowerCase() ===
+        LEGACY_DEFAULT_CATEGORY_NAME.toLowerCase(),
+    );
+
+    if (!legacyCategory) {
+      return false;
+    }
+
+    const legacyTopics = this.localStore.topics.filter(
+      (topic) => topic.categoryId === legacyCategory.id,
+    );
+
+    const hasOnlyLegacyTopics =
+      legacyTopics.length === LEGACY_DEFAULT_TOPIC_NAMES.length &&
+      LEGACY_DEFAULT_TOPIC_NAMES.every((name) =>
+        legacyTopics.some(
+          (topic) => topic.name.trim().toLowerCase() === name.toLowerCase(),
+        ),
+      );
+
+    if (!hasOnlyLegacyTopics) {
+      return false;
+    }
+
+    const legacyTopicIds = new Set(legacyTopics.map((topic) => topic.id));
+    this.localStore.categories = this.localStore.categories.filter(
+      (category) => category.id !== legacyCategory.id,
+    );
+    this.localStore.topics = this.localStore.topics.filter(
+      (topic) => !legacyTopicIds.has(topic.id),
+    );
+    this.localStore.questions = this.localStore.questions.filter(
+      (question) => !legacyTopicIds.has(question.topicId),
+    );
+
+    return this.ensureDefaultMathQuestionBank();
   }
 }
