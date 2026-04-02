@@ -60,7 +60,7 @@ export function useTeacherExamPageData({
         result.examId === examId &&
         (classStudentIds.has(result.studentId) || isMatchingDemoClassId(result.classId, classId)),
     )
-  }, [classData?.students, examId, results])
+  }, [classData?.students, classId, examId, results])
   const pendingResults = useMemo(() => {
     if (!exam) return []
     return filteredResults.filter((result) =>

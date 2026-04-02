@@ -10,7 +10,6 @@ import {
   chooseBucketMode,
   createDifficultyAccumulator,
   createEmptyExamQualityChartModel,
-  DIFFICULTY_META,
   formatPercent,
   getBucketKey,
   toPercent,

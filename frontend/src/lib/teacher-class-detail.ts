@@ -1,4 +1,4 @@
-import type { ExamResult, Student } from "@/lib/mock-data-types"
+import type { ExamResult } from "@/lib/mock-data-types"
 import type { TeacherExam } from "@/lib/teacher-exams"
 
 export type ExamDifficultyBucket = "easy" | "medium" | "hard"

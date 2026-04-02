@@ -17,7 +17,7 @@ export async function requestExam(url: string, init: RequestInit): Promise<Creat
 }
 
 async function getExamRequestError(response: Response) {
-  let message = "Шалгалтын хүсэлтийг backend дээр боловсруулах үед алдаа гарлаа."
+  const message = "Шалгалтын хүсэлтийг backend дээр боловсруулах үед алдаа гарлаа."
 
   try {
     const data = (await response.json()) as { message?: string | string[] }
