@@ -55,9 +55,14 @@ export function StudentExamsOverviewPanel(props: { exams: Exam[]; studentClass: 
       </div>
 
       {activeTab === "all" ? (
-        <div className="mt-5 space-y-5">
+        <div className="mt-5">
+          <p className="font-sans text-[14px] font-semibold leading-5 text-[#293138] dark:text-[#edf4ff]">
+            Өнөөдрийн онцлох мэдээ болон сонордуулга
+          </p>
+          <div className="mt-5 space-y-5">
           {announcement ? <article className="rounded-[18px] border border-[#D8E7FB] bg-[#E7F0FD] px-5 py-4 dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)]"><p className="text-[14px] font-semibold leading-7 text-[#2F3845] dark:text-[#edf4ff]">{announcement}</p></article> : null}
           {visibleNotices.map((notice) => <article key={notice.id} className={`rounded-[18px] border border-[#E1EAF4] px-5 py-4 dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] ${notice.tone}`}><p className="text-[14px] font-semibold leading-7 text-[#2F3845] dark:text-[#edf4ff]">{notice.title} <span className="font-normal dark:text-[#c4d0e3]">{notice.body}</span></p></article>)}
+          </div>
         </div>
       ) : null}
 
