@@ -49,10 +49,16 @@ function SelectField({
   value: string;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-[#5a5f80]">{label}</label>
-      <Select value={value || undefined} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className="h-11 w-full rounded-[18px] border-[#d8e2f6] bg-white px-4 text-sm text-[#4b4f72] shadow-none focus-visible:border-[#1864FB] focus-visible:ring-[#1864FB]/20">
+    <div className="space-y-3">
+      <label className="text-[14px] font-semibold text-[#4b4f72]">
+        {label}
+      </label>
+      <Select
+        value={value || undefined}
+        onValueChange={onChange}
+        disabled={disabled}
+      >
+        <SelectTrigger className="h-[60px] w-full rounded-[20px] border-[#d8e2f6] bg-white px-5 text-[14px] text-[#4b4f72] shadow-none focus-visible:border-[#1864FB] focus-visible:ring-[#1864FB]/20">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -84,9 +90,12 @@ export function QuestionBankSourceUploadForm({
   unit,
 }: Props) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-2">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#5a5f80]" htmlFor="source-name">
+        <label
+          className="text-[14px] font-semibold text-[#4b4f72]"
+          htmlFor="source-name"
+        >
           Эх сурвалжийн нэр
         </label>
         <Input
@@ -94,7 +103,7 @@ export function QuestionBankSourceUploadForm({
           placeholder="Жишээ: Математик 7-р анги"
           value={newSourceName}
           onChange={(event) => onNameChange(event.target.value)}
-          className="h-11 rounded-[18px] border-[#d8e2f6] bg-white px-4 text-sm text-[#4b4f72] shadow-none placeholder:text-[#b3bacf] focus-visible:border-[#1864FB] focus-visible:ring-[#1864FB]/20"
+          className="h-[36px] w-[400px] max-w-full rounded-[20px] border-[#d8e2f6] bg-white px-5 text-[14px] text-[#4b4f72] shadow-none placeholder:text-[#b3bacf] focus-visible:border-[#1864FB] focus-visible:ring-[#1864FB]/20"
         />
       </div>
 
@@ -132,7 +141,10 @@ export function QuestionBankSourceUploadForm({
       />
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#5a5f80]" htmlFor={fileInputId}>
+        <label
+          className="text-[14px] font-semibold text-[#4b4f72]"
+          htmlFor={fileInputId}
+        >
           PDF файл
         </label>
         <input
@@ -144,25 +156,27 @@ export function QuestionBankSourceUploadForm({
         />
         <label
           htmlFor={fileInputId}
-          className="flex min-h-20 cursor-pointer items-center justify-between gap-3 rounded-[18px] border border-dashed border-[#cfe0ff] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] px-4 py-4 transition hover:border-[#1864FB] hover:bg-[#f7faff]"
+          className="flex h-[50px] cursor-pointer items-center justify-between gap-4 rounded-[20px] border border-dashed border-[#cfe0ff] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] px-4 py-3 transition hover:border-[#1864FB] hover:bg-[#f7faff]"
         >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#eaf2ff] text-[#1864FB]">
-              <FileText className="h-5 w-5" />
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#eaf2ff] text-[#1864FB]">
+              <FileText className="h-4 w-4" />
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[#4b4f72]">
-                {selectedSourceFile ? selectedSourceFile.name : "PDF файл сонгох"}
+            <div className="min-w-0 space-y-0.5">
+              <p className="truncate text-[14px] font-semibold text-[#4b4f72]">
+                {selectedSourceFile
+                  ? selectedSourceFile.name
+                  : "PDF файл сонгох"}
               </p>
-              <p className="text-xs text-[#8b92ac]">
+              <p className="truncate text-[12px] text-[#8b92ac]">
                 {selectedSourceFile
                   ? `${formatFileSize(selectedSourceFile.size)} хэмжээтэй файл`
                   : "Нэг PDF файл оруулна уу"}
               </p>
             </div>
           </div>
-          <div className="inline-flex h-9 items-center rounded-full bg-[#1864FB] px-4 text-xs font-medium text-white shadow-[0_12px_24px_rgba(24,100,251,0.22)]">
-            <Upload className="mr-2 h-3.5 w-3.5" />
+          <div className="inline-flex h-8 shrink-0 items-center rounded-full bg-[#1864FB] px-3 text-[12px] font-medium text-white shadow-[0_12px_24px_rgba(24,100,251,0.22)]">
+            <Upload className="mr-1.5 h-3 w-3" />
             Файл сонгох
           </div>
         </label>
