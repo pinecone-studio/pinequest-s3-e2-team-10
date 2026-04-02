@@ -15,9 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
+import { StudentLoginDemoButtons } from "@/components/student/student-login-demo-buttons";
 import { notifyStudentSessionChange } from "@/hooks/use-student-session";
 import { students } from "@/lib/mock-data";
-import { judgeDemoStudents } from "@/lib/judge-demo-students";
 
 export default function StudentLoginPage() {
   const router = useRouter();
@@ -141,35 +141,10 @@ export default function StudentLoginPage() {
                   >
                     Нэвтрэх
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleDemoFill}
-                  >
-                    Дэмо хэрэглэгч
-                  </Button>
-
-                  <div className="space-y-2 pt-2">
-                    <p className="text-sm font-medium text-foreground">
-                      Шүүгчдийн дэмо нэвтрэлт
-                    </p>
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                      {judgeDemoStudents.map((judge) => (
-                        <Button
-                          key={judge.id}
-                          type="button"
-                          variant="outline"
-                          className="h-auto whitespace-normal px-3 py-2 text-left"
-                          onClick={() =>
-                            handleJudgeDemoFill(judge.email, judge.password)
-                          }
-                        >
-                          {judge.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
+                  <StudentLoginDemoButtons
+                    onDemoFill={handleDemoFill}
+                    onJudgeDemoFill={handleJudgeDemoFill}
+                  />
                 </form>
               </CardContent>
             </Card>

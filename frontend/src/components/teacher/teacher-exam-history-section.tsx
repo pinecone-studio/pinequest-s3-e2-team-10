@@ -3,24 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { classes } from "@/lib/mock-data";
 import type { TeacherExam } from "@/lib/teacher-exams";
-import { CalendarDays } from "lucide-react";
 import type { DateRange } from "react-day-picker";
+import { TeacherExamHistoryControls } from "@/components/teacher/teacher-exam-history-controls";
 
 const ALL_CLASSES_VALUE = "all";
 
@@ -67,72 +53,16 @@ export function TeacherExamHistorySection({
     <section className="mt-10 space-y-4 border-t border-slate-200 pt-8">
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-        <div className="hidden grid-cols-[minmax(0,1.6fr)_220px_220px_160px] items-center gap-4 border-b border-slate-200 pb-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 lg:grid">
-          <span>Нэр</span>
-          <span>Огноо</span>
-          <span>Анги</span>
-          <span />
-        </div>
-
-        <div className="mt-0 grid gap-3 pt-0 lg:mt-3 lg:grid-cols-[minmax(0,1.6fr)_220px_220px_160px] lg:items-center">
-          <Input
-            value={nameQuery}
-            onChange={(event) => setNameQuery(event.target.value)}
-            placeholder="Шалгалтын нэрээр хайх"
-            className="h-10 rounded-xl border-slate-200 bg-white"
-          />
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-10 justify-between rounded-xl border-slate-200 bg-white font-normal text-slate-700"
-              >
-                <span className="truncate">
-                  {formatDateRangeLabel(dateRange)}
-                </span>
-                <CalendarDays className="h-4 w-4 text-slate-400" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto p-0">
-              <Calendar
-                mode="range"
-                numberOfMonths={2}
-                selected={dateRange}
-                onSelect={setDateRange}
-              />
-              <div className="flex justify-end border-t border-slate-200 p-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDateRange(undefined)}
-                >
-                  Цэвэрлэх
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="h-10 w-full rounded-xl border-slate-200 bg-white">
-              <SelectValue placeholder="Анги сонгох" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL_CLASSES_VALUE}>Бүх анги</SelectItem>
-              {classOptions.map((classEntry) => (
-                <SelectItem key={classEntry.id} value={classEntry.id}>
-                  {classEntry.id}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className="text-sm text-slate-500">
-            {filteredExams.length} шалгалт
-          </div>
-        </div>
-      </div>
+      <TeacherExamHistoryControls
+        classOptions={classOptions.map((classEntry) => classEntry.id)}
+        dateRange={dateRange}
+        filteredExamCount={filteredExams.length}
+        nameQuery={nameQuery}
+        onClassChange={setSelectedClass}
+        onDateRangeChange={setDateRange}
+        onNameQueryChange={setNameQuery}
+        selectedClass={selectedClass}
+      />
 
       {filteredExams.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-8 text-center text-sm text-muted-foreground">
@@ -176,22 +106,6 @@ function buildHistoryReviewLink(exam: TeacherExam) {
   return firstSchedule
     ? `/teacher/classes/${firstSchedule.classId}/exam/${exam.id}`
     : `/teacher/exams/${exam.id}/monitoring`;
-}
-
-function formatDateRangeLabel(dateRange?: DateRange) {
-  if (!dateRange?.from && !dateRange?.to) {
-    return "Огноогоор шүүх";
-  }
-
-  if (dateRange?.from && !dateRange?.to) {
-    return `${formatDisplayDate(dateRange.from)}-с хойш`;
-  }
-
-  if (!dateRange?.from && dateRange?.to) {
-    return `${formatDisplayDate(dateRange.to)} хүртэл`;
-  }
-
-  return `${formatDisplayDate(dateRange.from!)} - ${formatDisplayDate(dateRange.to!)}`;
 }
 
 function formatExamDateSummary(exam: TeacherExam) {
@@ -253,12 +167,4 @@ function startOfDay(date: Date) {
 
 function endOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
-}
-
-function formatDisplayDate(date: Date) {
-  return new Intl.DateTimeFormat("mn-MN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
 }
