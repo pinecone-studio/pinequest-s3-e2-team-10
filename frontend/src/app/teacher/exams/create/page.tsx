@@ -13,7 +13,6 @@ import {
   TeacherPageShell,
   TeacherSurfaceCard,
 } from "@/components/teacher/teacher-page-primitives";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useExamBuilder } from "@/hooks/use-exam-builder";
 import { useExamCreation } from "@/hooks/use-exam-creation";
@@ -134,12 +133,6 @@ export default function CreateExamPage() {
         </div>
       </TeacherSurfaceCard>
       <TeacherSurfaceCard className="space-y-5">
-        <Input
-          placeholder="Шалгалтын нэр"
-          value={examTitle}
-          onChange={(event) => setExamTitle(event.target.value)}
-          className="text-xl font-semibold border-0 border-b rounded-none focus-visible:ring-0 px-0"
-        />
         <ExamBuilderQuestionList
           allowAddQuestion={false}
           onAddQuestion={addQuestion}
@@ -150,8 +143,10 @@ export default function CreateExamPage() {
         />
         <ExamBuilderSummaryCard
           duration={duration}
+          examTitle={examTitle}
           onAddScheduleEntry={addScheduleEntry}
           onDurationChange={setDuration}
+          onExamTitleChange={setExamTitle}
           onRemoveScheduleEntry={removeScheduleEntry}
           onReportReleaseModeChange={setReportReleaseMode}
           onScheduleEntryChange={updateScheduleEntry}

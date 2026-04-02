@@ -21,11 +21,13 @@ type QuestionCounts = Record<
 
 export function ExamBuilderSummaryCard({
   duration,
+  examTitle,
   onAddScheduleEntry,
   onDurationChange,
   onRemoveScheduleEntry,
   onReportReleaseModeChange,
   onScheduleEntryChange,
+  onExamTitleChange,
   questionCounts,
   questionTotal,
   reportReleaseMode,
@@ -33,8 +35,10 @@ export function ExamBuilderSummaryCard({
   totalPoints,
 }: {
   duration: number;
+  examTitle: string;
   onAddScheduleEntry: () => void;
   onDurationChange: (value: number) => void;
+  onExamTitleChange: (value: string) => void;
   onRemoveScheduleEntry: (index: number) => void;
   onReportReleaseModeChange: (value: Exam["reportReleaseMode"]) => void;
   onScheduleEntryChange: (
@@ -54,6 +58,18 @@ export function ExamBuilderSummaryCard({
         <CardTitle>Шалгалтын хураангуй</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-foreground">
+            Шалгалтын нэр
+          </Label>
+          <Input
+            placeholder="Шалгалтын нэр"
+            value={examTitle}
+            onChange={(event) => onExamTitleChange(event.target.value)}
+            className="h-11 w-full md:max-w-[420px]"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-3 xl:grid-cols-5">
           <SummaryStat label="Асуулт" value={questionTotal} />
           <SummaryStat label="Нийт оноо" value={totalPoints} />
