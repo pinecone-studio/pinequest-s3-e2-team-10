@@ -35,32 +35,24 @@ export default function StudentDashboard() {
     }
   }, [studentId])
 
-  const myExams = useMemo(
-    () => allExams.filter((exam) => exam.scheduledClasses.some((schedule) => schedule.classId === studentClass)),
-    [allExams, studentClass],
-  )
+  const myExams = useMemo(() => allExams.filter((exam) => exam.scheduledClasses.some((schedule) => schedule.classId === studentClass)), [allExams, studentClass])
   const studentResults = useMemo(() => allResults.filter((result) => result.studentId === studentId), [allResults, studentId])
+  const completedExamIds = useMemo(() => new Set(studentResults.map((result) => result.examId)), [studentResults])
   const statCards = useMemo(() => {
-    const average = studentResults.length
-      ? Math.round(studentResults.reduce((sum, result) => sum + (result.score / Math.max(result.totalPoints, 1)) * 100, 0) / studentResults.length)
-      : 0
-    const latestResult = [...studentResults].sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())[0]
+    const averagePercentage = studentResults.length ? Math.round(studentResults.reduce((sum, result) => sum + (result.score / Math.max(result.totalPoints, 1)) * 100, 0) / studentResults.length) : 0
+    const latestResult = [...studentResults].sort((left, right) => new Date(right.submittedAt).getTime() - new Date(left.submittedAt).getTime())[0]
     const latestExam = latestResult ? allExams.find((exam) => exam.id === latestResult.examId) : null
     const latestPercentage = latestResult ? Math.round((latestResult.score / Math.max(latestResult.totalPoints, 1)) * 100) : 0
     const now = new Date()
     const nextWeek = new Date(now)
     nextWeek.setDate(nextWeek.getDate() + 7)
-    const upcomingThisWeek = myExams.filter((exam) =>
-      exam.status === "scheduled" &&
-      exam.scheduledClasses.some((schedule) => {
-        if (schedule.classId !== studentClass) return false
-        const startsAt = new Date(`${schedule.date}T${schedule.time}:00`)
-        return startsAt >= now && startsAt <= nextWeek
-      }),
-    ).length
-
+    const upcomingThisWeek = myExams.filter((exam) => exam.status === "scheduled" && exam.scheduledClasses.some((schedule) => {
+      if (schedule.classId !== studentClass) return false
+      const startsAt = new Date(`${schedule.date}T${schedule.time}:00`)
+      return startsAt >= now && startsAt <= nextWeek
+    })).length
     return [
-      { label: "Нийт амжилт", value: `${average}%`, detail: `${studentResults.length} шалгалт`, iconPath: "/trophyIcon.svg" },
+      { label: "Нийт амжилт", value: `${averagePercentage}%`, detail: `${studentResults.length} шалгалт`, iconPath: "/trophyIcon.svg" },
       { label: latestExam?.title ?? "Сүүлийн шалгалт", value: latestResult ? `${latestPercentage}% ${getExamLetterGrade(latestPercentage)}` : "-", detail: "Сүүлийн дүн", iconPath: "/dunIcon.svg" },
       { label: "Энэ 7 хоногт", value: String(upcomingThisWeek), detail: "Өгөх шалгалт", iconPath: "/calendarIcon.svg" },
     ] as const
@@ -82,10 +74,7 @@ export default function StudentDashboard() {
               </div>
               <div>
                 <p className="text-[14px] leading-5 text-[#7A8698] dark:text-[#9eacc3]">{item.label}</p>
-                <div className="mt-1 flex items-end gap-1.5">
-                  <p className="text-[24px] font-semibold leading-none tracking-[-0.03em] text-[#39424E] dark:text-[#edf4ff]">{item.value}</p>
-                  <p className="text-[12px] font-medium text-[#4A9DFF]">{item.detail}</p>
-                </div>
+                <div className="mt-1 flex items-end gap-1.5"><p className="text-[24px] font-semibold leading-none tracking-[-0.03em] text-[#39424E] dark:text-[#edf4ff]">{item.value}</p><p className="text-[12px] font-medium text-[#4A9DFF]">{item.detail}</p></div>
               </div>
             </div>
           ))}
@@ -95,7 +84,7 @@ export default function StudentDashboard() {
       <div className="grid gap-[10px] sm:gap-5 xl:grid-cols-[900px_440px] xl:items-stretch xl:gap-[20px]">
         <div className="flex h-full flex-col gap-[10px] sm:gap-[20px] xl:w-[900px]">
           <StudentDashboardProfileCard mobileStats={mobileStatCards} studentId={studentId} studentName={studentName} />
-          <StudentDashboardScheduleCard exams={myExams} studentClass={studentClass} />
+          <StudentDashboardScheduleCard completedExamIds={completedExamIds} exams={myExams} studentClass={studentClass} />
         </div>
         <StudentExamsOverviewPanel exams={myExams} results={studentResults} studentClass={studentClass} today={getLocalDateString()} />
       </div>

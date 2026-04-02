@@ -43,9 +43,7 @@ export function StudentShellFrame(props: {
         <header className="relative z-10">
           <div className="flex items-center justify-between px-4 pb-0 pt-4 sm:px-6 lg:hidden">
             <Link href="/student/dashboard" className="inline-flex items-center font-semibold"><BrandLogo className="h-[34px] w-[132px]" /></Link>
-            <button type="button" onClick={() => setIsMenuOpen((current) => !current)} className={cn("flex h-10 w-10 items-center justify-center rounded-full", isDark ? "text-[#d5def0]" : "text-[#2D3642]")} aria-label="Цэс">
-              <Image src="/menu.svg" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
-            </button>
+            <button type="button" onClick={() => setIsMenuOpen((current) => !current)} className={cn("flex h-10 w-10 items-center justify-center rounded-full", isDark ? "text-[#d5def0]" : "text-[#2D3642]")} aria-label="Цэс"><Image src="/menu.svg" alt="" width={24} height={24} className="h-6 w-6 object-contain" /></button>
           </div>
           <StudentMobileMenu isDark={isDark} isOpen={isMenuOpen} items={navItems} onClose={() => setIsMenuOpen(false)} pathname={pathname} />
 
@@ -57,12 +55,7 @@ export function StudentShellFrame(props: {
                   const active = isStudentNavItemActive(pathname, item.href);
                   const Icon = "icon" in item ? item.icon : null;
                   const iconPath = "iconPath" in item ? item.iconPath : null;
-                  return (
-                    <Link key={item.href} href={item.href} className={cn("flex h-[38px] items-center justify-center gap-2 rounded-full px-5 text-[14px] font-medium", isDark ? active ? "border border-[rgba(224,225,226,0.18)] bg-[#001933] text-[#F5FAFF] shadow-[0_6px_16px_rgba(0,0,0,0.22)]" : "text-[#6F7982]" : active ? "bg-[linear-gradient(180deg,#5EB6FF_0%,#3CA6F5_100%)] text-white shadow-[0_8px_18px_rgba(76,170,242,0.35)]" : "text-[#697586]")}>
-                      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : <Image src={iconPath ?? ""} alt="" width={16} height={16} className={cn("h-4 w-4 shrink-0 object-contain", active && "brightness-0 invert")} />}
-                      <span>{item.label}</span>
-                    </Link>
-                  );
+                  return <Link key={item.href} href={item.href} className={cn("flex h-[38px] items-center justify-center gap-2 rounded-full px-5 text-[14px] font-medium", isDark ? active ? "border border-[rgba(224,225,226,0.18)] bg-[#001933] text-[#F5FAFF] shadow-[0_6px_16px_rgba(0,0,0,0.22)]" : "text-[#6F7982]" : active ? "bg-[linear-gradient(180deg,#5EB6FF_0%,#3CA6F5_100%)] text-white shadow-[0_8px_18px_rgba(76,170,242,0.35)]" : "text-[#697586]")}>{Icon ? <Icon className="h-4 w-4 shrink-0" /> : <Image src={iconPath ?? ""} alt="" width={16} height={16} className={cn("h-4 w-4 shrink-0 object-contain", active && "brightness-0 invert")} />}<span>{item.label}</span></Link>;
                 })}
               </nav>
               <div className="isolate flex items-center justify-self-end gap-3">
