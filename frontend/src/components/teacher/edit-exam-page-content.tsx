@@ -7,8 +7,6 @@ import { EditExamHeader } from "@/components/teacher/edit-exam-header";
 import { ExamBuilderQuestionList } from "@/components/teacher/exam-builder-question-list";
 import { ExamBuilderSummaryCard } from "@/components/teacher/exam-builder-summary-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import type { useExamBuilder } from "@/hooks/use-exam-builder";
 import type { useExamCreation } from "@/hooks/use-exam-creation";
@@ -98,17 +96,6 @@ export function EditExamPageContent({
         open={isDeleteDialogOpen}
       />
       <EditExamAlerts loadError={loadError} submissionError={submissionError} />
-      <Card>
-        <CardContent className="pt-6">
-          <Input
-            placeholder="Нэр өгөөгүй шалгалт"
-            value={examTitle}
-            onChange={(e) => setExamTitle(e.target.value)}
-            className="text-xl font-semibold border-0 border-b rounded-none focus-visible:ring-0 px-0"
-            disabled={isLoading}
-          />
-        </CardContent>
-      </Card>
       <ExamBuilderQuestionList
         onAddQuestion={addQuestion}
         onRemoveQuestion={removeQuestion}
@@ -118,8 +105,10 @@ export function EditExamPageContent({
       />
       <ExamBuilderSummaryCard
         duration={duration}
+        examTitle={examTitle}
         onAddScheduleEntry={addScheduleEntry}
         onDurationChange={setDuration}
+        onExamTitleChange={setExamTitle}
         onRemoveScheduleEntry={removeScheduleEntry}
         onReportReleaseModeChange={setReportReleaseMode}
         onScheduleEntryChange={updateScheduleEntry}
