@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
-import { Check, Plus } from "lucide-react"
+import { Check } from "lucide-react"
 import type { Exam } from "@/lib/mock-data"
 import { getScheduleEnd } from "@/lib/student-exam-time"
 
@@ -48,11 +48,11 @@ export function StudentDashboardScheduleCard(props: { completedExamIds: Set<stri
   const desktopCells = new Map(weekEvents.map(({ exam, schedule }, index) => [`${schedule.date}-${schedule.time.slice(0, 2)}`, { examId: exam.id, isCompleted: completedExamIds.has(exam.id), isMissed: getScheduleEnd(schedule.date, schedule.time, exam.duration, exam.availableIndefinitely) <= now, title: exam.title, tone: eventTone[index % eventTone.length] }]))
 
   return (
-    <section className="font-sans mx-auto h-auto w-[358px] max-w-full rounded-[20px] border border-[#DCE8F3] bg-white p-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:h-[659px] sm:w-full sm:overflow-y-auto sm:p-[18px] xl:max-w-[900px]">
+    <section className="font-sans mx-auto h-auto w-[358px] max-w-full rounded-[20px] border border-[#DCE8F3] bg-white p-5 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:h-[659px] sm:w-full sm:overflow-y-auto sm:p-[18px] xl:max-w-[900px]">
       <div className="sm:hidden">
         <h2 className="text-[16px] font-medium leading-none text-[#3E4957] dark:text-[#edf4ff]">{monthDate.getFullYear()} оны {monthDate.getMonth() + 1}-р сар</h2>
         <div className="mt-6 grid grid-cols-7 gap-1 text-center">
-          {weekDates.map((entry, index) => <div key={entry.key} className="flex flex-col items-center gap-2"><span className="text-[14px] font-normal leading-none text-[#97A3B2]">{entry.label}</span><span className={`flex h-11 w-11 items-center justify-center rounded-full text-[16px] font-semibold leading-none ${entry.key === todayKey ? "bg-[#409CFF] text-white" : index >= 5 ? "text-[#97A3B2] dark:text-[#97A3B2]" : "text-[#3E4957] dark:text-[#edf4ff]"}`}>{entry.number}</span></div>)}
+          {weekDates.map((entry, index) => <div key={entry.key} className="flex flex-col items-center gap-2"><span className={`text-[14px] font-normal leading-none ${index >= 5 ? "text-[#97A3B2]" : "text-[#2D3642] dark:text-[#edf4ff]"}`}>{entry.label}</span><span className={`flex h-11 w-11 items-center justify-center rounded-full text-[16px] font-semibold leading-none ${entry.key === todayKey ? "bg-[#409CFF] text-white" : index >= 5 ? "text-[#97A3B2] dark:text-[#97A3B2]" : "text-[#2D3642] dark:text-[#edf4ff]"}`}>{entry.number}</span></div>)}
         </div>
         <div className="mt-5 space-y-5">
           {weekEvents.map(({ exam, schedule }, index) => {
@@ -62,7 +62,6 @@ export function StudentDashboardScheduleCard(props: { completedExamIds: Set<stri
             return <div key={`${schedule.date}-${schedule.time}-${exam.id}`} className="space-y-3"><div className="flex items-center gap-3"><span className="shrink-0 text-[14px] font-normal leading-none text-[#2388FF]">{schedule.time} - {endHours}:{endMinutes}</span><div className="h-px flex-1 border-t border-dashed border-[#CFE5FF]" /></div><div className="rounded-[8px] border border-[#DCE8F3] bg-white px-[16px] py-[12px] shadow-[0_6px_20px_rgba(114,144,179,0.10)]"><div className="flex items-center gap-3"><span className={`h-[10px] w-[10px] shrink-0 rounded-full ${eventTone[index % eventTone.length]}`} /><span className="font-sans text-[14px] font-normal leading-none text-[#4A5565]">{exam.title}</span></div></div></div>
           })}
         </div>
-        <button type="button" className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#DCE8F3] bg-white text-[12px] font-normal text-[#0066FF] shadow-[0_6px_20px_rgba(114,144,179,0.08)]"><Plus className="h-3 w-3" /><span>Хуваарь</span></button>
       </div>
 
       <div className="relative hidden items-center justify-center sm:flex">
@@ -71,7 +70,6 @@ export function StudentDashboardScheduleCard(props: { completedExamIds: Set<stri
           <h2 className="text-[16px] font-medium text-[#4C5370] dark:text-[#edf4ff]">{monthLabel}</h2>
           <button type="button" onClick={() => setAnchorDate((current) => shiftDate(current, 7))} className={navButtonClassName}><Image src="/chev-right.svg" alt="" width={6} height={11} className="h-[11px] w-[6px] object-contain dark:brightness-[3]" /></button>
         </div>
-        <button type="button" className="absolute right-3 inline-flex h-[26px] w-[129px] items-center justify-center gap-2 rounded-full border-[0.3px] border-[#E6F2FF] bg-transparent px-5 text-[12px] font-medium text-[#0066CC] shadow-[0_4px_16px_rgba(0,102,204,0.08)] dark:border-[rgba(230,242,255,0.3)] dark:bg-transparent dark:text-[#7ec0ff]"><Plus className="h-[12px] w-[12px]" /><span>Хуваарь</span></button>
       </div>
       <div className="mt-4 hidden grid-cols-[92px_repeat(7,minmax(0,1fr))] gap-2 sm:grid">
         <div />

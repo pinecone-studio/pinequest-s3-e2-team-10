@@ -195,6 +195,15 @@
     background: linear-gradient(112deg, rgba(6, 11, 38, 0.74) 28%, rgba(26, 31, 55, 0.5) 91%);
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .ocean-glow {
     background: radial-gradient(
       circle at center,

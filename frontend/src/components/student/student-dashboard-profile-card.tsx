@@ -64,7 +64,7 @@ export function StudentDashboardProfileCard({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <div className="mx-auto h-auto w-[358px] max-w-full rounded-[20px] border border-[#DCE8F3] bg-white p-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:h-[102px] sm:w-full sm:p-[21px] xl:max-w-[900px]">
+      <div className="mx-auto h-auto w-[358px] max-w-full overflow-hidden rounded-[20px] border border-[#DCE8F3] bg-white p-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:h-[102px] sm:w-full sm:p-[21px] xl:max-w-[900px]">
         <input
           ref={imageInputRef}
           type="file"

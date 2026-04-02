@@ -40,12 +40,12 @@ export function StudentShellFrame(props: {
     <div className={cn("relative min-h-screen text-foreground", isDark ? "bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]" : "bg-[linear-gradient(180deg,#eef6ff_0%,#f7fbff_100%)]")}>
       {isDark ? <div className="pointer-events-none absolute inset-0 overflow-hidden"><div className="absolute inset-0 bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]" /><div className="absolute inset-[-8%] bg-[radial-gradient(circle_at_68%_68%,rgba(27,120,255,0.96)_0%,rgba(27,120,255,0.84)_16%,rgba(27,120,255,0.52)_30%,rgba(27,120,255,0.24)_43%,transparent_60%),radial-gradient(circle_at_36%_20%,rgba(28,105,255,0.52)_0%,rgba(28,105,255,0.3)_18%,transparent_38%),radial-gradient(circle_at_82%_38%,rgba(16,78,210,0.24)_0%,transparent_28%)] blur-[136px]" /></div> : null}
       <div className={cn("relative min-h-screen w-full", !isDark && "shadow-[0_10px_35px_rgba(110,150,190,0.10)]")}>
-        <header className="relative z-10">
+        <header className="relative z-[70]">
           <div className="flex items-center justify-between px-4 pb-0 pt-4 sm:px-6 lg:hidden">
             <Link href="/student/dashboard" className="inline-flex items-center font-semibold"><BrandLogo className="h-[34px] w-[132px]" /></Link>
-            <button type="button" onClick={() => setIsMenuOpen((current) => !current)} className={cn("flex h-10 w-10 items-center justify-center rounded-full", isDark ? "text-[#d5def0]" : "text-[#2D3642]")} aria-label="Цэс"><Image src="/menu.svg" alt="" width={24} height={24} className="h-6 w-6 object-contain" /></button>
+            <button type="button" onClick={() => setIsMenuOpen(true)} className={cn("flex h-10 w-10 items-center justify-center rounded-full", isDark ? "text-[#d5def0]" : "text-[#2D3642]")} aria-label="Цэс"><Image src="/menu.svg" alt="" width={24} height={24} className="h-6 w-6 object-contain" /></button>
           </div>
-          <StudentMobileMenu isDark={isDark} isOpen={isMenuOpen} items={navItems} onClose={() => setIsMenuOpen(false)} pathname={pathname} />
+          <StudentMobileMenu isDark={isDark} isOpen={isMenuOpen} items={navItems} onClose={() => setIsMenuOpen(false)} onLogout={onLogout} pathname={pathname} />
 
           <div className="mx-auto hidden max-w-[1440px] px-10 py-4 lg:block">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center">
