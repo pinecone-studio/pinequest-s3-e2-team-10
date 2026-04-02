@@ -7,6 +7,7 @@ import { TeacherExamsSection } from "@/components/teacher/teacher-exams-section"
 import { TeacherPageShell } from "@/components/teacher/teacher-page-primitives";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { isTeacherExamValidForHistory } from "@/lib/teacher-class-detail";
 import {
   getLegacyTeacherExams,
   getTeacherExams,
@@ -59,7 +60,9 @@ export default function ExamsPage() {
   const readyExams = exams.filter(
     (exam) => exam.status === "scheduled" && !isExamLiveNow(exam),
   );
-  const completedExams = exams.filter((exam) => exam.status === "completed");
+  const completedExams = exams.filter(
+    (exam) => exam.status === "completed" && isTeacherExamValidForHistory(exam),
+  );
 
   return (
     <TeacherPageShell>

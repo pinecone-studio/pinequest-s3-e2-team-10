@@ -18,6 +18,10 @@ type CreateExamPayload = {
     correctAnswer?: string
     points: number
     order: number
+    sourceQuestionId?: string
+    categoryName?: string
+    topicName?: string
+    difficulty?: 'easy' | 'medium' | 'hard'
   }>
   schedules: Array<{
     classId: string
@@ -42,6 +46,10 @@ export type CreatedExam = {
     correctAnswer?: string
     points: number
     order: number
+    sourceQuestionId?: string
+    categoryName?: string
+    topicName?: string
+    difficulty?: 'easy' | 'medium' | 'hard'
   }>
   schedules: Array<{
     id: string
@@ -111,6 +119,10 @@ export function buildCreateExamPayload({
       correctAnswer: question.correctAnswer?.trim(),
       points: question.points,
       order: index + 1,
+      sourceQuestionId: question.sourceQuestionId,
+      categoryName: question.categoryName?.trim(),
+      topicName: question.topicName?.trim(),
+      difficulty: question.difficulty,
     })),
     schedules: dedupedSchedules,
   }

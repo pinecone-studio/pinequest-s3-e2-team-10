@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import type { Class, ExamResult } from "@/lib/mock-data"
 import { loadStudentExamAttempts, type StudentExamAttempt } from "@/lib/student-exam-attempts"
 import { loadStudentExamResults } from "@/lib/student-exam-results"
+import { isMatchingDemoClassId } from "@/lib/teacher-class-detail"
 import { getAnswerReviewState, isManualReviewQuestionType } from "@/lib/student-report-view"
 import { getLegacyTeacherExams, getTeacherExams, type TeacherExam } from "@/lib/teacher-exams"
 
@@ -54,7 +55,11 @@ export function useTeacherExamPageData({
   const exam = useMemo(() => allExams.find((entry) => entry.id === examId), [allExams, examId])
   const filteredResults = useMemo(() => {
     const classStudentIds = new Set((classData?.students ?? []).map((student) => student.id))
-    return results.filter((result) => result.examId === examId && classStudentIds.has(result.studentId))
+    return results.filter(
+      (result) =>
+        result.examId === examId &&
+        (classStudentIds.has(result.studentId) || isMatchingDemoClassId(result.classId, classId)),
+    )
   }, [classData?.students, examId, results])
   const pendingResults = useMemo(() => {
     if (!exam) return []

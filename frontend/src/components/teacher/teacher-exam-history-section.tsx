@@ -7,6 +7,7 @@ import { classes } from "@/lib/mock-data";
 import type { TeacherExam } from "@/lib/teacher-exams";
 import type { DateRange } from "react-day-picker";
 import { TeacherExamHistoryControls } from "@/components/teacher/teacher-exam-history-controls";
+import { getDemoClassLabel } from "@/lib/teacher-class-detail";
 
 const ALL_CLASSES_VALUE = "all";
 
@@ -54,7 +55,10 @@ export function TeacherExamHistorySection({
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
 
       <TeacherExamHistoryControls
-        classOptions={classOptions.map((classEntry) => classEntry.id)}
+        classOptions={classOptions.map((classEntry) => ({
+          label: classEntry.name.replace(" анги", ""),
+          value: classEntry.id,
+        }))}
         dateRange={dateRange}
         filteredExamCount={filteredExams.length}
         nameQuery={nameQuery}
@@ -104,7 +108,7 @@ export function TeacherExamHistorySection({
 function buildHistoryReviewLink(exam: TeacherExam) {
   const firstSchedule = exam.scheduledClasses[0];
   return firstSchedule
-    ? `/teacher/classes/${firstSchedule.classId}/exam/${exam.id}`
+    ? `/teacher/classes?classId=${firstSchedule.classId}&examId=${exam.id}`
     : `/teacher/exams/${exam.id}/monitoring`;
 }
 
@@ -133,7 +137,9 @@ function formatExamClassSummary(exam: TeacherExam) {
     new Set(exam.scheduledClasses.map((schedule) => schedule.classId)),
   );
 
-  return classIds.join(", ");
+  return classIds
+    .map(getDemoClassLabel)
+    .join(", ");
 }
 
 function isDateWithinRange(dateString: string, dateRange?: DateRange) {

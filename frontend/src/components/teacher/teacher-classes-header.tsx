@@ -15,6 +15,7 @@ import { OverviewMetricCard } from "@/components/teacher/teacher-classes-overvie
 export function TeacherClassesHeader(props: {
   classData: Class;
   classOptions: Class[];
+  examOptions: Array<{ id: string; title: string }>;
   metrics: Array<{
     delta: string;
     deltaClassName: string;
@@ -26,16 +27,21 @@ export function TeacherClassesHeader(props: {
     value: string;
   }>;
   onClassChange: (value: string) => void;
+  onExamChange: (value: string) => void;
   onSemesterChange: (value: string) => void;
+  selectedExamId: string | null;
   selectedSemester: string;
   semesterOptions: string[];
 }) {
   const {
     classData,
     classOptions,
+    examOptions,
     metrics,
     onClassChange,
+    onExamChange,
     onSemesterChange,
+    selectedExamId,
     selectedSemester,
     semesterOptions,
   } = props;
@@ -43,6 +49,8 @@ export function TeacherClassesHeader(props: {
     name: "Э. Наранцацралт",
     subject: "Математикийн багш",
   };
+
+  const showExamSelect = examOptions.length > 1;
 
   return (
     <section className="px-2 py-1">
@@ -89,7 +97,9 @@ export function TeacherClassesHeader(props: {
             </div>
           </div>
 
-          <div className="grid w-[400px] grid-cols-[192px_192px] gap-4">
+          <div
+            className={`grid gap-4 ${showExamSelect ? "w-[608px] grid-cols-[192px_192px_192px]" : "w-[400px] grid-cols-[192px_192px]"}`}
+          >
             <div className="relative h-[36px] w-[192px]">
               <Image
                 src="/graduation-cap.svg"
@@ -146,6 +156,33 @@ export function TeacherClassesHeader(props: {
                 </SelectContent>
               </Select>
             </div>
+            {showExamSelect ? (
+              <div className="relative h-[36px] w-[192px]">
+                <Image
+                  src="/examsIcon.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 shrink-0"
+                />
+                <Select onValueChange={onExamChange} value={selectedExamId ?? undefined}>
+                  <SelectTrigger className="h-[36px] w-[192px] rounded-full border-0 bg-white/92 pl-9 pr-4 text-[#5f6f89] shadow-[0_14px_34px_rgba(170,190,225,0.16)] dark:border dark:border-[rgba(224,225,226,0.06)] dark:bg-[linear-gradient(156deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:text-[#f9fafb] dark:shadow-none dark:backdrop-blur dark:hover:bg-[linear-gradient(156deg,rgba(8,14,46,0.82)_28%,rgba(30,36,63,0.56)_91%)]">
+                    <SelectValue placeholder="Шалгалт сонгох" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px] overflow-y-auto dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(156deg,rgba(6,11,38,0.92)_28%,rgba(26,31,55,0.88)_91%)] dark:text-[#e6eeff] dark:shadow-[0_24px_60px_rgba(2,6,23,0.48)]">
+                    {examOptions.map((exam) => (
+                      <SelectItem
+                        key={exam.id}
+                        value={exam.id}
+                        className="dark:focus:bg-white/10 dark:focus:text-white"
+                      >
+                        {exam.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
           </div>
         </div>
 
