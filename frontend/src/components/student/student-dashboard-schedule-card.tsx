@@ -1,10 +1,11 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import type { Exam } from "@/lib/mock-data"
 
-const weekdayLabels = ["НЯ", "ДАВ", "МЯГ", "ЛХА", "ПҮ", "БА", "БЯ"]
+const weekdayLabels = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"]
 const timeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
 const eventTone = ["bg-[#F9D0F0]", "bg-[#B9E4FF]", "bg-[#FFE1A8]", "bg-[#FFD4D4]"]
 
@@ -19,9 +20,9 @@ function shiftDate(date: Date, days: number) {
 }
 
 function getWeekDates(anchorDate: Date) {
-  const sundayIndex = anchorDate.getDay()
+  const mondayIndex = (anchorDate.getDay() + 6) % 7
   const start = new Date(anchorDate)
-  start.setDate(anchorDate.getDate() - sundayIndex)
+  start.setDate(anchorDate.getDate() - mondayIndex)
 
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(start)
@@ -71,28 +72,28 @@ export function StudentDashboardScheduleCard({
   return (
     <section className="font-sans h-[659px] w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-[18px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] xl:max-w-[900px]">
       <div className="relative flex items-center justify-center">
-        <div className="flex items-center justify-center gap-8">
+        <div className="flex items-center justify-center gap-16">
           <button
             type="button"
             onClick={() => setAnchorDate((current) => shiftDate(current, -7))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F7F3FB] text-[#7B6CA8] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] dark:text-[#d7def0]"
+            className="flex h-6 w-6 items-center justify-center rounded-full border-[0.5px] border-[#E6F2FF] bg-transparent"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <Image src="/chev-left.svg" alt="" width={6} height={11} className="h-[11px] w-[6px] object-contain" />
           </button>
-          <h2 className="text-[18px] font-medium text-[#4C5370] dark:text-[#edf4ff]">{monthLabel}</h2>
+          <h2 className="text-[16px] font-medium text-[#4C5370] dark:text-[#edf4ff]">{monthLabel}</h2>
           <button
             type="button"
             onClick={() => setAnchorDate((current) => shiftDate(current, 7))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F7F3FB] text-[#7B6CA8] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] dark:text-[#d7def0]"
+            className="flex h-6 w-6 items-center justify-center rounded-full border-[0.5px] border-[#E6F2FF] bg-transparent"
           >
-            <ChevronRight className="h-5 w-5" />
+            <Image src="/chev-right.svg" alt="" width={6} height={11} className="h-[11px] w-[6px] object-contain" />
           </button>
         </div>
         <button
           type="button"
-          className="absolute right-0 inline-flex h-10 items-center gap-2 rounded-full border border-[#E3EDF7] bg-white px-5 text-[14px] font-medium text-[#0066CC] shadow-[0_4px_16px_rgba(0,102,204,0.08)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] dark:text-[#7ec0ff]"
+          className="absolute right-3 inline-flex h-[26px] w-[129px] items-center justify-center gap-2 rounded-full border-[0.3px] border-[#E6F2FF] bg-transparent px-5 text-[12px] font-medium text-[#0066CC] shadow-[0_4px_16px_rgba(0,102,204,0.08)] dark:border-[rgba(230,242,255,0.3)] dark:bg-transparent dark:text-[#7ec0ff]"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-[12px] w-[12px]" />
           <span>Хуваарь</span>
         </button>
       </div>
@@ -102,11 +103,11 @@ export function StudentDashboardScheduleCard({
           const isToday = entry.key === todayKey
           return (
             <div key={entry.key} className="flex h-[72px] flex-col items-center justify-center gap-1 text-center">
-              <span className="text-[15px] font-medium text-[#98A2B3] dark:text-[#92a0b8]">{weekdayLabels[index]}</span>
+              <span className="font-sans text-[12px] font-normal text-[#89939C] dark:text-[#89939C]">{weekdayLabels[index]}</span>
               <span className={`flex h-11 min-w-11 items-center justify-center rounded-full px-1 text-[20px] font-semibold leading-none ${
                 isToday ? "bg-[#409CFF] text-white shadow-[0_6px_16px_rgba(64,156,255,0.28)]" : "text-[#2D3642] dark:text-[#edf4ff]"
               }`}>
-                {String(entry.number).padStart(2, "0")}
+                {entry.number}
               </span>
             </div>
           )

@@ -1,11 +1,11 @@
 "use client"
 
+import Image from "next/image"
 import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   Bell,
-  ClipboardList,
   LayoutDashboard,
   LogOut,
 } from "lucide-react"
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/student/dashboard", label: "Хянах самбар", icon: LayoutDashboard },
-  { href: "/student/exams", label: "Шалгалтууд", icon: ClipboardList },
+  { href: "/student/exams", label: "Шалгалтууд", iconPath: "/examsIcon.svg" },
 ]
 
 function isStudentNavItemActive(pathname: string, href: string) {
@@ -72,8 +72,9 @@ export default function StudentLayout({
 
             <nav className="flex h-[46px] items-center gap-1 rounded-full bg-[#FFFFFF] p-1 shadow-[0_12px_40px_rgba(90,143,203,0.18)] dark:border dark:border-white/10 student-dark-surface dark:shadow-[0_20px_44px_rgba(2,6,23,0.4)]">
               {navItems.map((item) => {
-                const Icon = item.icon
                 const active = isStudentNavItemActive(pathname, item.href)
+                const Icon = "icon" in item ? item.icon : null
+                const iconPath = "iconPath" in item ? item.iconPath : null
 
                 return (
                   <Link
@@ -86,7 +87,17 @@ export default function StudentLayout({
                         : "text-[#697586] dark:text-[#b5c0d4]",
                     )}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
+                    {Icon ? (
+                      <Icon className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <Image
+                        src={iconPath ?? ""}
+                        alt=""
+                        width={16}
+                        height={16}
+                        className={cn("h-4 w-4 shrink-0 object-contain", active && "brightness-0 invert")}
+                      />
+                    )}
                     <span>{item.label}</span>
                   </Link>
                 )

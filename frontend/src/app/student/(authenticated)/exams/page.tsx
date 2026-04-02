@@ -37,27 +37,27 @@ export default function StudentExamsPage() {
   return (
     <div className="mx-auto w-full max-w-[1440px] px-6 pb-10 pt-5 xl:px-[155px]">
       <div className="mx-auto flex w-full max-w-[1130px] flex-col gap-[30px]">
-        <div className="space-y-[7px]">
+        <div className="mx-auto w-full max-w-[900px] space-y-[7px]">
           <h1 className="text-[24px] font-semibold leading-[29px] text-[#293138] dark:text-[#edf4ff]">Шалгалтууд</h1>
           <p className="text-[14px] leading-5 text-[#566069] dark:text-[#aab7cb]">
             Мэдлэгээ баталгаажуулах мөч ирлээ. Амжилт хүсье!
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-[10px]">
-          <div className="relative w-full max-w-[301px]">
+        <div className="mx-auto flex w-full max-w-[900px] items-center gap-[10px]">
+            <div className="relative flex h-[48px] w-[301px] items-center">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#566069] dark:text-[#aab7cb]" />
             <Input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Шалгалт хайх..."
-              className="h-11 rounded-full border border-[#E6F2FF] bg-[#F5FAFF] pl-10 text-[14px] font-medium text-[#566069] placeholder:text-[#566069] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(156deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:text-[#d0d8e6] dark:placeholder:text-[#8fa0bb]"
+                className="h-[48px] w-[301px] rounded-full border border-[#E6F2FF] bg-[#F5FAFF] px-4 py-3 pl-10 text-[14px] font-medium text-[#566069] placeholder:text-[#566069] dark:border-[#E6F2FF] dark:bg-[linear-gradient(156deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:text-[#d0d8e6] dark:placeholder:text-[#8fa0bb]"
             />
           </div>
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="h-12 min-w-[152px] rounded-full border border-[#E6F2FF] bg-[#66B2FF] px-4 text-[14px] font-medium text-[#F5FAFF] shadow-none dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] [&_svg]:text-white [&_svg]:opacity-100">
-              <SelectValue placeholder="Бүх хичээл" />
+            <SelectTrigger className="h-[48px] w-[152px] overflow-visible rounded-full border border-[#E6F2FF] bg-[#66B2FF] px-4 text-[14px] font-medium text-[#F5FAFF] shadow-none dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)] [&_svg]:text-white [&_svg]:opacity-100">
+                <SelectValue className="block overflow-visible whitespace-nowrap text-[12px] tracking-[-0.02em]" placeholder="Бүх хичээл" />
             </SelectTrigger>
             <SelectContent>
               {categoryOptions.map((category) => (
@@ -68,16 +68,16 @@ export default function StudentExamsPage() {
             </SelectContent>
           </Select>
 
-          <div className="flex w-[427px] items-center rounded-full border border-[#E6F2FF] bg-[#003366] p-2 shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_20px_44px_rgba(2,6,23,0.4)]">
+          <div className="flex h-[48px] w-[427px] items-center rounded-full border border-[#E6F2FF] bg-[#003366] p-2 shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_20px_44px_rgba(2,6,23,0.4)]">
             <SegmentedTab active={activeTab === "all"} count={allCount} label="Бүгд" onClick={() => setActiveTab("all")} />
             <SegmentedTab active={activeTab === "upcoming"} count={filteredUpcomingExams.length} label="Удахгүй" onClick={() => setActiveTab("upcoming")} />
             <SegmentedTab active={activeTab === "finished"} count={finishedItems.length} label="Дууссан" onClick={() => setActiveTab("finished")} />
           </div>
         </div>
 
-        {isLoading ? <p className="text-sm text-[#566069] dark:text-[#aab7cb]">Шалгалтуудыг ачаалж байна...</p> : null}
+        <div className="mx-auto w-full max-w-[900px] space-y-7">
+          {isLoading ? <p className="text-sm text-[#566069] dark:text-[#aab7cb]">Шалгалтуудыг ачаалж байна...</p> : null}
 
-        <div className="space-y-7">
           {showUpcoming && filteredUpcomingExams.length > 0 ? (
             <section className="space-y-5">
               <div className="flex items-center gap-5">

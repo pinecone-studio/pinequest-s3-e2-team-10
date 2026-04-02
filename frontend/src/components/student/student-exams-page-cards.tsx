@@ -22,7 +22,7 @@ export function UpcomingExamCard(props: {
   const schedule = getStudentSchedule(exam, studentClass)
 
   return (
-    <article className="flex items-center gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F5FAFF] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
+    <article className="mx-auto flex w-[900px] items-center gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F5FAFF] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <div className="flex h-[60px] w-[60px] items-center justify-center rounded-2xl p-[10px]">
           <Image src={getExamIcon(exam.title)} alt="" width={40} height={40} unoptimized className="h-10 w-10 object-contain" />
@@ -67,7 +67,7 @@ export function FinishedExamCard(props: {
 
   if (item.kind === "missed") {
     return (
-      <article className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F9FAFB] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
+      <article className="mx-auto flex w-[900px] items-center justify-between gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F9FAFB] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="flex h-[60px] w-[60px] items-center justify-center rounded-2xl p-[10px] text-[#EF4444]">
             <AlertCircle className="h-8 w-8 stroke-[1.7]" />
@@ -101,7 +101,7 @@ export function FinishedExamCard(props: {
   const isReportAvailable = isStudentExamReportAvailable(item.exam)
 
   return (
-      <article className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F9FAFB] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
+      <article className="mx-auto flex w-[900px] items-center justify-between gap-3 rounded-2xl border border-[#E6F2FF] bg-[#F9FAFB] p-[17px] shadow-[0px_9px_4px_rgba(201,201,201,0.01),0px_5px_3px_rgba(201,201,201,0.05),0px_2px_2px_rgba(201,201,201,0.09),0px_1px_1px_rgba(201,201,201,0.10)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(112deg,rgba(6,11,38,0.74)_28%,rgba(26,31,55,0.5)_91%)] dark:shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
       <div className="w-full max-w-[700px] space-y-[6px]">
         <div className="flex items-center gap-3">
           <div className="flex h-[60px] w-[60px] items-center justify-center rounded-2xl p-[10px]">
