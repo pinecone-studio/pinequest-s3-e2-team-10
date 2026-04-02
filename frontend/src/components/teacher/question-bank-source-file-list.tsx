@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import { FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { formatFileSize } from "@/components/teacher/question-bank-source-shared";
 import { getReadableUploadName } from "@/lib/source-files";
 import type { UploadRecord } from "@/lib/uploads-api";
@@ -46,20 +44,12 @@ function SourceFileCard({ file }: { file: UploadRecord }) {
 
 export function QuestionBankSourceFileList({ files }: Props) {
   return (
-    <>
-      <div className="space-y-3">
-        {files.length === 0 ? (
-          <EmptyState />
-        ) : (
-          files.slice(0, 6).map((file) => <SourceFileCard key={file.id} file={file} />)
-        )}
-      </div>
-
-      {files.length > 6 ? (
-        <Button variant="outline" asChild className="w-full">
-          <Link href="/teacher/sources">Бүх эх сурвалж харах</Link>
-        </Button>
-      ) : null}
-    </>
+    <div className="space-y-3">
+      {files.length === 0 ? (
+        <EmptyState />
+      ) : (
+        files.map((file) => <SourceFileCard key={file.id} file={file} />)
+      )}
+    </div>
   );
 }
