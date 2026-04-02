@@ -132,6 +132,7 @@ export function QuestionBankSourcePanel({ files, setSourceFiles }: Props) {
       </TeacherSurfaceCard>
 
       <QuestionBankSourceUploadDialog
+        key={isDialogOpen ? "source-dialog-open" : "source-dialog-closed"}
         isOpen={isDialogOpen}
         isUploading={isUploading}
         newSourceName={newSourceName}

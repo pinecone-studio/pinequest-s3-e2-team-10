@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { QuestionBankSourceUploadForm } from "@/components/teacher/question-bank-source-upload-form";
 import { QuestionBankSourceUploadSummary } from "@/components/teacher/question-bank-source-upload-summary";
 import { UNIT_OPTIONS } from "@/components/teacher/question-bank-source-shared";
@@ -34,27 +34,33 @@ export function QuestionBankSourceUploadDialog({
   const [grade, setGrade] = useState("");
   const [unit, setUnit] = useState("");
   const [topic, setTopic] = useState("");
-  const availableTopics: readonly string[] =
-    UNIT_OPTIONS.find((entry) => entry.value === unit)?.topics ?? [];
+  const availableTopics = useMemo(
+    () => UNIT_OPTIONS.find((entry) => entry.value === unit)?.topics ?? [],
+    [unit],
+  );
 
-  useEffect(() => {
-    if (isOpen) return;
+  const resetFormState = () => {
     setSubject("");
     setGrade("");
     setUnit("");
     setTopic("");
-  }, [isOpen]);
+  };
 
-  useEffect(() => {
-    if (!unit) {
-      setTopic("");
-      return;
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      resetFormState();
     }
+    onOpenChange(open);
+  };
 
-    if (topic && !availableTopics.includes(topic)) {
+  const handleUnitChange = (nextUnit: string) => {
+    const nextTopics: readonly string[] =
+      UNIT_OPTIONS.find((entry) => entry.value === nextUnit)?.topics ?? [];
+    setUnit(nextUnit);
+    if (!nextTopics.includes(topic)) {
       setTopic("");
     }
-  }, [availableTopics, topic, unit]);
+  };
 
   const handleDemo = async () => {
     onNameChange("Математик 7-р анги");
@@ -66,7 +72,7 @@ export function QuestionBankSourceUploadDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[28px] border border-[#dbe6ff] bg-[linear-gradient(180deg,#ffffff_0%,#f9fbff_100%)] p-0 shadow-[0_24px_60px_rgba(99,131,196,0.18)] sm:max-w-4xl">
         <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.85fr)] lg:p-6">
           <div className="space-y-5">
@@ -89,7 +95,7 @@ export function QuestionBankSourceUploadDialog({
               onNameChange={onNameChange}
               onSubjectChange={setSubject}
               onTopicChange={setTopic}
-              onUnitChange={setUnit}
+              onUnitChange={handleUnitChange}
               selectedSourceFile={selectedSourceFile}
               subject={subject}
               topic={topic}
@@ -102,7 +108,7 @@ export function QuestionBankSourceUploadDialog({
               grade={grade}
               isUploading={isUploading}
               newSourceName={newSourceName}
-              onCancel={() => onOpenChange(false)}
+              onCancel={() => handleOpenChange(false)}
               onDemo={() => void handleDemo()}
               onUpload={onUpload}
               selectedSourceFile={selectedSourceFile}
