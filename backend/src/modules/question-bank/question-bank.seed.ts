@@ -47,16 +47,28 @@ export function ensureDefaultMathQuestionBank(store: LocalQuestionBankStore) {
 export function replaceLegacyDefaultQuestionBank(
   store: LocalQuestionBankStore,
 ) {
-  const legacyCategoryIds = new Set(
-    store.categories
-      .filter((category) =>
-        LEGACY_DEFAULT_CATEGORY_NAMES.some(
-          (legacyName) =>
-            category.name.trim().toLowerCase() === legacyName.toLowerCase(),
-        ),
-      )
-      .map((category) => category.id),
-  );
+  const currentSeedSignature = ['алгебр', 'функц ба график', 'геометр', 'магадлал ба статистик'];
+
+  const legacyCategoryIds = new Set<string>();
+
+  store.categories.forEach((category) => {
+    const normalizedName = category.name.trim().toLowerCase();
+    const categoryTopicNames = store.topics
+      .filter((topic) => topic.categoryId === category.id)
+      .map((topic) => topic.name.trim().toLowerCase());
+    const matchesLegacyName = LEGACY_DEFAULT_CATEGORY_NAMES.some(
+      (legacyName) => normalizedName === legacyName.toLowerCase(),
+    );
+    const matchesCurrentSeedTopics =
+      normalizedName === 'математик' &&
+      currentSeedSignature.every((topicName) =>
+        categoryTopicNames.includes(topicName),
+      );
+
+    if (matchesLegacyName || matchesCurrentSeedTopics) {
+      legacyCategoryIds.add(category.id);
+    }
+  });
   if (legacyCategoryIds.size === 0) return false;
 
   const legacyTopicIds = new Set(
