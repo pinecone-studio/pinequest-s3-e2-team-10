@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { LayoutDashboard, LogOut, RefreshCw } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { StudentMobileMenu } from "@/components/student/student-mobile-menu";
 import { StudentNotificationMenu } from "@/components/student/student-notification-menu";
 import { useTheme } from "@/components/theme-provider";
 import { ThemeToggleButton } from "@/components/theme-toggle-button";
@@ -29,125 +31,44 @@ export function StudentShellFrame(props: {
   onSelectNotification?: (examId: string) => void;
   onRefresh?: () => void;
 }) {
-  const {
-    pathname,
-    children,
-    hasNotifications = false,
-    notificationItems = [],
-    notificationCount = 0,
-    onLogout,
-    onSelectNotification,
-    onRefresh,
-  } = props;
+  const { pathname, children, hasNotifications = false, notificationItems = [], notificationCount = 0, onLogout, onSelectNotification, onRefresh } = props;
   const { resolvedTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isDark = resolvedTheme === "dark";
 
   return (
-    <div
-      className={cn(
-        "relative min-h-screen text-foreground",
-        isDark
-          ? "bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]"
-          : "bg-[linear-gradient(180deg,#eef6ff_0%,#f7fbff_100%)]",
-      )}
-    >
-      {isDark ? (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]" />
-          <div className="absolute inset-[-8%] bg-[radial-gradient(circle_at_68%_68%,rgba(27,120,255,0.96)_0%,rgba(27,120,255,0.84)_16%,rgba(27,120,255,0.52)_30%,rgba(27,120,255,0.24)_43%,transparent_60%),radial-gradient(circle_at_36%_20%,rgba(28,105,255,0.52)_0%,rgba(28,105,255,0.3)_18%,transparent_38%),radial-gradient(circle_at_82%_38%,rgba(16,78,210,0.24)_0%,transparent_28%)] blur-[136px]" />
-        </div>
-      ) : null}
-      <div
-        className={cn(
-          "relative min-h-screen w-full",
-          !isDark && "shadow-[0_10px_35px_rgba(110,150,190,0.10)]",
-        )}
-      >
+    <div className={cn("relative min-h-screen text-foreground", isDark ? "bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]" : "bg-[linear-gradient(180deg,#eef6ff_0%,#f7fbff_100%)]")}>
+      {isDark ? <div className="pointer-events-none absolute inset-0 overflow-hidden"><div className="absolute inset-0 bg-[linear-gradient(159.02deg,#0F123B_14.25%,#090D2E_56.45%,#020515_86.14%)]" /><div className="absolute inset-[-8%] bg-[radial-gradient(circle_at_68%_68%,rgba(27,120,255,0.96)_0%,rgba(27,120,255,0.84)_16%,rgba(27,120,255,0.52)_30%,rgba(27,120,255,0.24)_43%,transparent_60%),radial-gradient(circle_at_36%_20%,rgba(28,105,255,0.52)_0%,rgba(28,105,255,0.3)_18%,transparent_38%),radial-gradient(circle_at_82%_38%,rgba(16,78,210,0.24)_0%,transparent_28%)] blur-[136px]" /></div> : null}
+      <div className={cn("relative min-h-screen w-full", !isDark && "shadow-[0_10px_35px_rgba(110,150,190,0.10)]")}>
         <header className="relative z-10">
-          <div className="mx-auto max-w-[1440px] px-10 py-4">
+          <div className="flex items-center justify-between px-4 pb-0 pt-4 sm:px-6 lg:hidden">
+            <Link href="/student/dashboard" className="inline-flex items-center font-semibold"><BrandLogo className="h-[34px] w-[132px]" /></Link>
+            <button type="button" onClick={() => setIsMenuOpen((current) => !current)} className={cn("flex h-10 w-10 items-center justify-center rounded-full", isDark ? "text-[#d5def0]" : "text-[#2D3642]")} aria-label="Цэс">
+              <Image src="/menu.svg" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
+            </button>
+          </div>
+          <StudentMobileMenu isDark={isDark} isOpen={isMenuOpen} items={navItems} onClose={() => setIsMenuOpen(false)} pathname={pathname} />
+
+          <div className="mx-auto hidden max-w-[1440px] px-10 py-4 lg:block">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-              <Link href="/student/dashboard" className="inline-flex items-center justify-self-start font-semibold">
-                <BrandLogo className="gap-2.5" textClassName="text-left" />
-              </Link>
-              <nav
-                className={cn(
-                  "flex h-[46px] items-center gap-1 rounded-full p-1",
-                  isDark
-                    ? "border border-white/10 bg-[linear-gradient(180deg,rgba(14,25,58,0.98)_0%,rgba(11,20,46,0.96)_100%)] shadow-[0_18px_44px_rgba(2,6,23,0.42)]"
-                    : "bg-[#FFFFFF] shadow-[0_12px_40px_rgba(90,143,203,0.18)]",
-                )}
-              >
+              <Link href="/student/dashboard" className="inline-flex items-center justify-self-start font-semibold"><BrandLogo className="gap-2.5" textClassName="text-left" /></Link>
+              <nav className={cn("flex h-[46px] items-center gap-1 rounded-full p-1", isDark ? "border border-white/10 bg-[linear-gradient(180deg,rgba(14,25,58,0.98)_0%,rgba(11,20,46,0.96)_100%)] shadow-[0_18px_44px_rgba(2,6,23,0.42)]" : "bg-[#FFFFFF] shadow-[0_12px_40px_rgba(90,143,203,0.18)]")}>
                 {navItems.map((item) => {
                   const active = isStudentNavItemActive(pathname, item.href);
                   const Icon = "icon" in item ? item.icon : null;
                   const iconPath = "iconPath" in item ? item.iconPath : null;
-
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "flex h-[38px] items-center justify-center gap-2 rounded-full px-5 text-[14px] font-medium",
-                        isDark
-                          ? active
-                            ? "border border-[rgba(224,225,226,0.18)] bg-[#001933] text-[#F5FAFF] shadow-[0_6px_16px_rgba(0,0,0,0.22)]"
-                            : "text-[#6F7982]"
-                          : active
-                            ? "bg-[linear-gradient(180deg,#5EB6FF_0%,#3CA6F5_100%)] text-white shadow-[0_8px_18px_rgba(76,170,242,0.35)]"
-                            : "text-[#697586]",
-                      )}
-                    >
-                      {Icon ? (
-                        <Icon className="h-4 w-4 shrink-0" />
-                      ) : (
-                        <Image
-                          src={iconPath ?? ""}
-                          alt=""
-                          width={16}
-                          height={16}
-                          className={cn("h-4 w-4 shrink-0 object-contain", active && "brightness-0 invert")}
-                        />
-                      )}
+                    <Link key={item.href} href={item.href} className={cn("flex h-[38px] items-center justify-center gap-2 rounded-full px-5 text-[14px] font-medium", isDark ? active ? "border border-[rgba(224,225,226,0.18)] bg-[#001933] text-[#F5FAFF] shadow-[0_6px_16px_rgba(0,0,0,0.22)]" : "text-[#6F7982]" : active ? "bg-[linear-gradient(180deg,#5EB6FF_0%,#3CA6F5_100%)] text-white shadow-[0_8px_18px_rgba(76,170,242,0.35)]" : "text-[#697586]")}>
+                      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : <Image src={iconPath ?? ""} alt="" width={16} height={16} className={cn("h-4 w-4 shrink-0 object-contain", active && "brightness-0 invert")} />}
                       <span>{item.label}</span>
                     </Link>
                   );
                 })}
               </nav>
               <div className="isolate flex items-center justify-self-end gap-3">
-                <button
-                  type="button"
-                  onClick={onRefresh}
-                  className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-full border",
-                    isDark
-                      ? "border-white/12 bg-[linear-gradient(180deg,#121d43_0%,#0d1737_100%)] text-[#d5def0]"
-                      : "border-[#D6E2F0] bg-white text-[#7B8898]",
-                  )}
-                  aria-label="Refresh current page"
-                  title="Refresh current page"
-                >
-                  <RefreshCw className="h-4 w-4 stroke-[1.75]" />
-                </button>
-                <StudentNotificationMenu
-                  hasNotifications={hasNotifications}
-                  isDark={isDark}
-                  items={notificationItems}
-                  notificationCount={notificationCount}
-                  onSelect={(examId) => onSelectNotification?.(examId)}
-                />
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-full border",
-                    isDark
-                      ? "border-white/12 bg-[linear-gradient(180deg,#121d43_0%,#0d1737_100%)] text-[#d5def0]"
-                      : "border-[#D6E2F0] bg-white text-[#7B8898]",
-                  )}
-                >
-                  <LogOut className="h-4 w-4 stroke-[1.75]" />
-                </button>
+                <button type="button" onClick={onRefresh} className={cn("flex h-7 w-7 items-center justify-center rounded-full border", isDark ? "border-white/12 bg-[linear-gradient(180deg,#121d43_0%,#0d1737_100%)] text-[#d5def0]" : "border-[#D6E2F0] bg-white text-[#7B8898]")} aria-label="Refresh current page" title="Refresh current page"><RefreshCw className="h-4 w-4 stroke-[1.75]" /></button>
+                <StudentNotificationMenu hasNotifications={hasNotifications} isDark={isDark} items={notificationItems} notificationCount={notificationCount} onSelect={(examId) => onSelectNotification?.(examId)} />
+                <button type="button" onClick={onLogout} className={cn("flex h-7 w-7 items-center justify-center rounded-full border", isDark ? "border-white/12 bg-[linear-gradient(180deg,#121d43_0%,#0d1737_100%)] text-[#d5def0]" : "border-[#D6E2F0] bg-white text-[#7B8898]")}><LogOut className="h-4 w-4 stroke-[1.75]" /></button>
                 <ThemeToggleButton />
               </div>
             </div>
