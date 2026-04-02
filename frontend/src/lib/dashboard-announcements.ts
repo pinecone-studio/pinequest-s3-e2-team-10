@@ -1,6 +1,8 @@
 "use client"
 
 export type DashboardAnnouncement = {
+  authorName?: string
+  authorSubject?: string
   id: string
   classId: string
   createdAt: string
@@ -42,6 +44,8 @@ export function subscribeDashboardAnnouncements(onChange: () => void) {
 export function saveDashboardAnnouncement(input: { classId: string; message: string }) {
   if (typeof window === "undefined") return
   const nextItem: DashboardAnnouncement = {
+    authorName: localStorage.getItem("teacherName") || "",
+    authorSubject: localStorage.getItem("teacherSubject") || "",
     id: crypto.randomUUID(),
     classId: input.classId,
     createdAt: new Date().toISOString(),
