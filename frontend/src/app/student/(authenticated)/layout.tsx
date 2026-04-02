@@ -73,6 +73,8 @@ export default function StudentLayout({
             <nav className="flex h-[46px] items-center gap-1 rounded-full bg-[#FFFFFF] p-1 shadow-[0_12px_40px_rgba(90,143,203,0.18)] dark:border dark:border-white/10 student-dark-surface dark:shadow-[0_20px_44px_rgba(2,6,23,0.4)]">
               {navItems.map((item) => {
                 const active = isStudentNavItemActive(pathname, item.href)
+                const Icon = "icon" in item ? item.icon : null
+                const iconPath = "iconPath" in item ? item.iconPath : null
 
                 return (
                   <Link
@@ -85,11 +87,11 @@ export default function StudentLayout({
                         : "text-[#697586] dark:text-[#b5c0d4]",
                     )}
                   >
-                    {"icon" in item ? (
-                      <item.icon className="h-4 w-4 shrink-0" />
+                    {Icon ? (
+                      <Icon className="h-4 w-4 shrink-0" />
                     ) : (
                       <Image
-                        src={item.iconPath}
+                        src={iconPath ?? ""}
                         alt=""
                         width={16}
                         height={16}
