@@ -1,20 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { useId, useMemo, useState } from "react";
+import { QuestionBankSourceUploadForm } from "@/components/teacher/question-bank-source-upload-form";
+import { QuestionBankSourceUploadSummary } from "@/components/teacher/question-bank-source-upload-summary";
+import { UNIT_OPTIONS } from "@/components/teacher/question-bank-source-shared";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 type Props = {
   isOpen: boolean;
   isUploading: boolean;
   newSourceName: string;
+  onDemo: () => void | Promise<void>;
   onFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onNameChange: (value: string) => void;
   onOpenChange: (open: boolean) => void;
@@ -22,76 +18,106 @@ type Props = {
   selectedSourceFile: File | null;
 };
 
-function formatFileSize(bytes: number) {
-  if (bytes === 0) return "0 Bytes";
-  const unit = Math.floor(Math.log(bytes) / Math.log(1024));
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  return `${parseFloat((bytes / 1024 ** unit).toFixed(2))} ${sizes[unit]}`;
-}
-
 export function QuestionBankSourceUploadDialog({
   isOpen,
   isUploading,
   newSourceName,
+  onDemo,
   onFileSelect,
   onNameChange,
   onOpenChange,
   onUpload,
   selectedSourceFile,
 }: Props) {
+  const fileInputId = useId();
+  const [subject, setSubject] = useState("");
+  const [grade, setGrade] = useState("");
+  const [unit, setUnit] = useState("");
+  const [topic, setTopic] = useState("");
+  const availableTopics = useMemo(
+    () => UNIT_OPTIONS.find((entry) => entry.value === unit)?.topics ?? [],
+    [unit],
+  );
+
+  const resetFormState = () => {
+    setSubject("");
+    setGrade("");
+    setUnit("");
+    setTopic("");
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      resetFormState();
+    }
+    onOpenChange(open);
+  };
+
+  const handleUnitChange = (nextUnit: string) => {
+    const nextTopics: readonly string[] =
+      UNIT_OPTIONS.find((entry) => entry.value === nextUnit)?.topics ?? [];
+    setUnit(nextUnit);
+    if (!nextTopics.includes(topic)) {
+      setTopic("");
+    }
+  };
+
+  const handleDemo = async () => {
+    onNameChange("Математик 7-р анги");
+    setSubject("Математик");
+    setGrade("7-р анги");
+    setUnit("1-р бүлэг - Бүхэл тоо");
+    setTopic("1.1 сэдэв - Нэмэх, хасах үйлдэл");
+    await onDemo();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Шинэ эх сурвалж файл</DialogTitle>
-          <DialogDescription>
-            Файлын нэр болон файлаа оруулаад шууд эх сурвалждаа нэмнэ.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground" htmlFor="source-name">
-              Нэр
-            </label>
-            <Input
-              id="source-name"
-              placeholder="Жишээ: 9-р ангийн нийгэм"
-              value={newSourceName}
-              onChange={(event) => onNameChange(event.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground" htmlFor="source-file">
-              Файл
-            </label>
-            <Input
-              id="source-file"
-              type="file"
-              accept=".pdf,.doc,.docx,.txt"
-              onChange={onFileSelect}
-            />
-          </div>
-
-          {selectedSourceFile ? (
-            <div className="rounded-xl bg-muted p-3 text-sm text-muted-foreground">
-              {selectedSourceFile.name} ({formatFileSize(selectedSourceFile.size)})
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[28px] border border-[#dbe6ff] bg-[linear-gradient(180deg,#ffffff_0%,#f9fbff_100%)] p-0 shadow-[0_24px_60px_rgba(99,131,196,0.18)] sm:max-w-4xl">
+        <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.85fr)] lg:p-6">
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <DialogTitle className="text-2xl font-semibold tracking-[-0.02em] text-[#4b4f72] sm:text-[2rem]">
+                Эх сурвалж бүртгэх
+              </DialogTitle>
+              <p className="max-w-2xl text-sm leading-5 text-[#7b81a2]">
+                Эх сурвалжийн мэдээллээ оруулаад PDF файлаар нь асуултын сандаа
+                бүртгэнэ.
+              </p>
             </div>
-          ) : null}
-        </div>
+            <QuestionBankSourceUploadForm
+              availableTopics={availableTopics}
+              fileInputId={fileInputId}
+              grade={grade}
+              newSourceName={newSourceName}
+              onFileSelect={onFileSelect}
+              onGradeChange={setGrade}
+              onNameChange={onNameChange}
+              onSubjectChange={setSubject}
+              onTopicChange={setTopic}
+              onUnitChange={handleUnitChange}
+              selectedSourceFile={selectedSourceFile}
+              subject={subject}
+              topic={topic}
+              unit={unit}
+            />
+          </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Болих
-          </Button>
-          <Button
-            onClick={onUpload}
-            disabled={!selectedSourceFile || !newSourceName.trim() || isUploading}
-          >
-            {isUploading ? "Нэмж байна..." : "Эх сурвалж нэмэх"}
-          </Button>
-        </DialogFooter>
+          <div className="flex">
+            <QuestionBankSourceUploadSummary
+              grade={grade}
+              isUploading={isUploading}
+              newSourceName={newSourceName}
+              onCancel={() => handleOpenChange(false)}
+              onDemo={() => void handleDemo()}
+              onUpload={onUpload}
+              selectedSourceFile={selectedSourceFile}
+              subject={subject}
+              topic={topic}
+              unit={unit}
+            />
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

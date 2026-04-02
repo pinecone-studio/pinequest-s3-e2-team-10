@@ -1,22 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { QuestionBankSourceFileList } from "@/components/teacher/question-bank-source-file-list";
 import { TeacherSurfaceCard } from "@/components/teacher/teacher-page-primitives";
 import { QuestionBankSourceUploadDialog } from "@/components/teacher/question-bank-source-upload-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { mergeSourceFiles } from "@/lib/source-files";
 import { uploadFile, type UploadRecord } from "@/lib/uploads-api";
-import { FileText, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 
 const SOURCES_FOLDER = "sources";
-
-function formatFileSize(bytes: number) {
-  if (bytes === 0) return "0 Bytes";
-  const unit = Math.floor(Math.log(bytes) / Math.log(1024));
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  return `${parseFloat((bytes / 1024 ** unit).toFixed(2))} ${sizes[unit]}`;
-}
 
 type Props = {
   files: UploadRecord[];
@@ -31,13 +25,54 @@ export function QuestionBankSourcePanel({ files, setSourceFiles }: Props) {
     null,
   );
 
+  const resetSourceDialog = () => {
+    setNewSourceName("");
+    setSelectedSourceFile(null);
+  };
+
   const handleSourceFileSelect = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setSelectedSourceFile(file);
-    setNewSourceName(file.name);
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      resetSourceDialog();
+    }
+  };
+
+  const handleDialogOpen = () => {
+    resetSourceDialog();
+    setIsDialogOpen(true);
+  };
+
+  const handleDemoFill = async () => {
+    try {
+      const response = await fetch("/question-bank-demo-source.pdf");
+      if (!response.ok) {
+        throw new Error("Demo PDF файлыг ачаалж чадсангүй.");
+      }
+
+      const blob = await response.blob();
+      const file = new File([blob], "matematik-7r-angi-demo.pdf", {
+        type: "application/pdf",
+      });
+      setNewSourceName("Математик 7-р анги");
+      setSelectedSourceFile(file);
+    } catch (error) {
+      toast({
+        title: "Алдаа",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Demo PDF файлыг бэлдэж чадсангүй.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSourceUpload = async () => {
@@ -57,9 +92,8 @@ export function QuestionBankSourcePanel({ files, setSourceFiles }: Props) {
         fileName: newSourceName.trim(),
         folder: SOURCES_FOLDER,
       });
-      setSourceFiles((current) => [createdFile, ...current]);
-      setSelectedSourceFile(null);
-      setNewSourceName("");
+      setSourceFiles((current) => mergeSourceFiles([createdFile, ...current]));
+      resetSourceDialog();
       setIsDialogOpen(false);
       toast({ title: "Амжилттай", description: "Эх сурвалж файл нэмэгдлээ." });
     } catch (error) {
@@ -86,64 +120,26 @@ export function QuestionBankSourcePanel({ files, setSourceFiles }: Props) {
             </h2>
           </div>
           <Button
-            className="rounded-2xl bg-[#f3e7f7] text-[#7a3f75] shadow-none hover:bg-[#eddcf3]"
-            onClick={() => setIsDialogOpen(true)}
+            className="rounded-2xl bg-[#eaf2ff] text-[#2458d3] shadow-none hover:bg-[#dce8ff]"
+            onClick={handleDialogOpen}
           >
             <Upload className="mr-2 h-4 w-4" />
-            New source file
+            Шинэ эх сурвалж нэмэх
           </Button>
         </div>
 
-        <div className="space-y-3">
-          {files.length === 0 ? (
-            <div className="rounded-[24px] border border-dashed border-[#d7e3ff] bg-[linear-gradient(180deg,#f9fbff_0%,#ffffff_100%)] px-4 py-8 text-center">
-              <FileText className="mx-auto mb-3 h-10 w-10 text-[#98a9ca]" />
-              <p className="font-medium text-[#344264]">
-                Эх сурвалж файл алга байна
-              </p>
-              <p className="mt-1 text-sm text-[#6f7898]">
-                Шинэ файл нэмээд AI-аар асуулт үүсгэхдээ ашиглаарай.
-              </p>
-            </div>
-          ) : (
-            files.slice(0, 6).map((file) => (
-              <div
-                key={file.id}
-                className="rounded-[24px] border border-[#dde7ff] bg-[linear-gradient(180deg,#f9fbff_0%,#ffffff_100%)] px-4 py-4"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="rounded-2xl bg-[#eef4ff] p-2 text-[#5b91fc]">
-                    <FileText className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-[#344264]">
-                      {file.originalName}
-                    </p>
-                    <p className="mt-1 text-sm text-[#6f7898]">
-                      {formatFileSize(file.size)} •{" "}
-                      {new Date(file.uploadedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {files.length > 6 ? (
-          <Button variant="outline" asChild className="w-full">
-            <Link href="/teacher/sources">Бүх эх сурвалж харах</Link>
-          </Button>
-        ) : null}
+        <QuestionBankSourceFileList files={files} />
       </TeacherSurfaceCard>
 
       <QuestionBankSourceUploadDialog
+        key={isDialogOpen ? "source-dialog-open" : "source-dialog-closed"}
         isOpen={isDialogOpen}
         isUploading={isUploading}
         newSourceName={newSourceName}
+        onDemo={handleDemoFill}
         onFileSelect={handleSourceFileSelect}
         onNameChange={setNewSourceName}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={handleDialogOpenChange}
         onUpload={() => void handleSourceUpload()}
         selectedSourceFile={selectedSourceFile}
       />
