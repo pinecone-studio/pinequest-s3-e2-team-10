@@ -44,19 +44,20 @@ export default function StudentDashboard() {
     ),
     [allExams, studentClass],
   )
+  const mobileStatCards = [statCards[0], statCards[2]]
 
   return (
-    <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-5 pb-[28px] pt-[18px]">
-      <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-        <div className="min-w-0">
-          <h1 className="font-sans text-[33px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#2D3642] dark:text-[#edf4ff]">
+    <div className="mx-auto flex w-full max-w-[390px] flex-col gap-[10px] px-4 pb-[28px] pt-[18px] sm:max-w-[1360px] sm:gap-5 sm:px-6">
+      <div className="flex flex-col gap-[10px] sm:gap-6 xl:flex-row xl:items-start xl:justify-between">
+        <div className="min-w-0 py-[10px] sm:py-0">
+          <h1 className="font-sans text-[18px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#2D3642] dark:text-[#edf4ff] sm:text-[33px]">
             Сайн уу, {studentName}!
           </h1>
-          <p className="mt-[6px] font-sans text-[16px] font-normal leading-5 text-[#606C80] dark:text-[#aab7cb]">
+          <p className="mt-[6px] font-sans text-[12px] font-normal leading-4 text-[#606C80] dark:text-[#aab7cb] sm:text-[16px] sm:leading-5">
             Өнөөдөр чиний гялалзах өдөр ✨
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
+        <div className="hidden gap-[10px] sm:grid sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 xl:gap-8">
           {statCards.map((item) => {
             return (
               <div key={item.label} className="flex items-center gap-3">
@@ -82,9 +83,9 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[900px_440px] xl:items-stretch xl:gap-[20px]">
-        <div className="flex h-full flex-col gap-[20px] xl:w-[900px]">
-          <StudentDashboardProfileCard studentId={studentId} studentName={studentName} />
+      <div className="grid gap-[10px] sm:gap-5 xl:grid-cols-[900px_440px] xl:items-stretch xl:gap-[20px]">
+        <div className="flex h-full flex-col gap-[10px] sm:gap-[20px] xl:w-[900px]">
+          <StudentDashboardProfileCard mobileStats={mobileStatCards} studentId={studentId} studentName={studentName} />
           <StudentDashboardScheduleCard exams={myExams} studentClass={studentClass} />
         </div>
 

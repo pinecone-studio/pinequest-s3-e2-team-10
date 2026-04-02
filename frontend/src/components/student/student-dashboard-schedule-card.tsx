@@ -4,10 +4,11 @@ import Image from "next/image"
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import type { Exam } from "@/lib/mock-data"
-
-const weekdayLabels = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"]
+import { getScheduleEnd } from "@/lib/student-exam-time"
+const desktopWeekdays = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"]
+const mobileWeekdays = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"]
 const timeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
-const eventTone = ["bg-[#F9D0F0]", "bg-[#B9E4FF]", "bg-[#FFE1A8]", "bg-[#FFD4D4]"]
+const eventTone = ["bg-[#F04FC2]", "bg-[#58B4EA]", "bg-[#F9A825]", "bg-[#FF7A7A]"]
 
 function getDateKey(date: Date) {
   return date.toISOString().split("T")[0]
@@ -19,59 +20,106 @@ function shiftDate(date: Date, days: number) {
   return next
 }
 
-function getWeekDates(anchorDate: Date) {
-  const mondayIndex = (anchorDate.getDay() + 6) % 7
+function getWeekDates(anchorDate: Date, startsOnSunday = false) {
+  const dayIndex = startsOnSunday ? anchorDate.getDay() : (anchorDate.getDay() + 6) % 7
   const start = new Date(anchorDate)
-  start.setDate(anchorDate.getDate() - mondayIndex)
+  start.setDate(anchorDate.getDate() - dayIndex)
+  const labels = startsOnSunday ? mobileWeekdays : desktopWeekdays
 
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(start)
     date.setDate(start.getDate() + index)
-    return {
-      key: getDateKey(date),
-      day: weekdayLabels[index],
-      date,
-      number: date.getDate(),
-    }
+    return { key: getDateKey(date), label: labels[index], date, number: date.getDate() }
   })
 }
 
-function getWeekEvents(exams: Exam[], studentClass: string, weekKeys: Set<string>) {
+function getWeekEvents(exams: Exam[], studentClass: string, keys: Set<string>) {
   return exams
     .flatMap((exam) =>
       exam.scheduledClasses
-        .filter((schedule) => schedule.classId === studentClass && weekKeys.has(schedule.date))
+        .filter((schedule) => schedule.classId === studentClass && keys.has(schedule.date))
         .map((schedule) => ({ exam, schedule })),
     )
-    .sort((left, right) =>
-      `${left.schedule.date}${left.schedule.time}`.localeCompare(`${right.schedule.date}${right.schedule.time}`),
-    )
+    .sort((a, b) => `${a.schedule.date}${a.schedule.time}`.localeCompare(`${b.schedule.date}${b.schedule.time}`))
 }
 
-export function StudentDashboardScheduleCard({
-  exams,
-  studentClass,
-}: {
-  exams: Exam[]
-  studentClass: string
-}) {
+export function StudentDashboardScheduleCard(props: { exams: Exam[]; studentClass: string }) {
+  const { exams, studentClass } = props
   const today = new Date()
   const [anchorDate, setAnchorDate] = useState(() => today)
   const todayKey = getDateKey(today)
-  const weekDates = getWeekDates(anchorDate)
-  const weekEvents = getWeekEvents(exams, studentClass, new Set(weekDates.map((entry) => entry.key)))
-  const monthDate = weekDates.find((entry) => entry.date.getMonth() === anchorDate.getMonth())?.date ?? anchorDate
+  const desktopWeek = getWeekDates(anchorDate)
+  const mobileWeek = getWeekDates(anchorDate)
+  const desktopEvents = getWeekEvents(exams, studentClass, new Set(desktopWeek.map((entry) => entry.key)))
+  const mobileEvents = getWeekEvents(exams, studentClass, new Set(mobileWeek.map((entry) => entry.key)))
+  const monthDate = desktopWeek.find((entry) => entry.date.getMonth() === anchorDate.getMonth())?.date ?? anchorDate
   const monthLabel = `${monthDate.getMonth() + 1}-р сар ${monthDate.getFullYear()} он`
-  const eventsByCell = new Map(
-    weekEvents.map(({ exam, schedule }, index) => [
+  const desktopCells = new Map(
+    desktopEvents.map(({ exam, schedule }, index) => [
       `${schedule.date}-${schedule.time.slice(0, 2)}`,
       { title: exam.title, tone: eventTone[index % eventTone.length] },
     ]),
   )
 
   return (
-    <section className="font-sans h-[659px] w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-[18px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] xl:max-w-[900px]">
-      <div className="relative flex items-center justify-center">
+    <section className="font-sans mx-auto h-auto w-[358px] max-w-full rounded-[20px] border border-[#DCE8F3] bg-white p-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:w-full sm:p-[18px] xl:max-w-[900px]">
+      <div className="sm:hidden">
+        <h2 className="text-[16px] font-medium leading-none text-[#3E4957] dark:text-[#edf4ff]">
+          {monthDate.getFullYear()} оны {monthDate.getMonth() + 1}-р сар
+        </h2>
+        <div className="mt-6 grid grid-cols-7 gap-1 text-center">
+          {mobileWeek.map((entry, index) => (
+            <div key={entry.key} className="flex flex-col items-center gap-2">
+              <span className="text-[14px] font-normal leading-none text-[#97A3B2]">{entry.label}</span>
+              <span
+                className={`flex h-11 w-11 items-center justify-center rounded-full text-[16px] font-semibold leading-none ${
+                  entry.key === todayKey
+                    ? "bg-[#409CFF] text-white"
+                    : index >= 5
+                      ? "text-[#97A3B2] dark:text-[#97A3B2]"
+                      : "text-[#3E4957] dark:text-[#edf4ff]"
+                }`}
+              >
+                {entry.number}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 space-y-5">
+          {mobileEvents.map(({ exam, schedule }, index) => {
+            const end = getScheduleEnd(schedule.date, schedule.time, exam.duration)
+            const endHours = `${end.getHours()}`.padStart(2, "0")
+            const endMinutes = `${end.getMinutes()}`.padStart(2, "0")
+            return (
+              <div key={`${schedule.date}-${schedule.time}-${exam.id}`} className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="shrink-0 text-[14px] font-normal leading-none text-[#2388FF]">
+                    {schedule.time} - {endHours}:{endMinutes}
+                  </span>
+                  <div className="h-px flex-1 border-t border-dashed border-[#CFE5FF]" />
+                </div>
+                <div className="rounded-[8px] border border-[#DCE8F3] bg-white px-[16px] py-[12px] shadow-[0_6px_20px_rgba(114,144,179,0.10)]">
+                  <div className="flex items-center gap-3">
+                    <span className={`h-[10px] w-[10px] shrink-0 rounded-full ${eventTone[index % eventTone.length]}`} />
+                    <span className="font-sans text-[14px] font-normal leading-none text-[#4A5565]">
+                      {exam.title}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <button
+          type="button"
+          className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#DCE8F3] bg-white text-[12px] font-normal text-[#0066FF] shadow-[0_6px_20px_rgba(114,144,179,0.08)]"
+        >
+          <Plus className="h-3 w-3" />
+          <span>Хуваарь</span>
+        </button>
+      </div>
+
+      <div className="relative hidden items-center justify-center sm:flex">
         <div className="flex items-center justify-center gap-16">
           <button
             type="button"
@@ -91,32 +139,31 @@ export function StudentDashboardScheduleCard({
         </div>
         <button
           type="button"
-          className="absolute right-3 inline-flex h-[26px] w-[129px] items-center justify-center gap-2 rounded-full border-[0.3px] border-[#E6F2FF] bg-transparent px-5 text-[12px] font-medium text-[#0066CC] shadow-[0_4px_16px_rgba(0,102,204,0.08)] dark:border-[rgba(230,242,255,0.3)] dark:bg-transparent dark:text-[#7ec0ff]"
+          className="absolute right-3 inline-flex h-[26px] w-[129px] items-center justify-center gap-2 rounded-full border-[0.3px] border-[#E6F2FF] bg-transparent px-5 text-[12px] font-medium text-[#0066CC] shadow-[0_4px_16px_rgba(0,102,204,0.08)] dark:border-[rgba(230,242,255,0.3)] dark:text-[#7ec0ff]"
         >
           <Plus className="h-[12px] w-[12px]" />
           <span>Хуваарь</span>
         </button>
       </div>
-      <div className="mt-4 grid grid-cols-[92px_repeat(7,minmax(0,1fr))] gap-2">
+      <div className="mt-4 hidden grid-cols-[92px_repeat(7,minmax(0,1fr))] gap-2 sm:grid">
         <div />
-        {weekDates.map((entry, index) => {
-          const isToday = entry.key === todayKey
-          return (
-            <div key={entry.key} className="flex h-[72px] flex-col items-center justify-center gap-1 text-center">
-              <span className="font-sans text-[12px] font-normal text-[#89939C] dark:text-[#89939C]">{weekdayLabels[index]}</span>
-              <span className={`flex h-11 min-w-11 items-center justify-center rounded-full px-1 text-[20px] font-semibold leading-none ${
-                isToday ? "bg-[#409CFF] text-white shadow-[0_6px_16px_rgba(64,156,255,0.28)]" : "text-[#2D3642] dark:text-[#edf4ff]"
-              }`}>
-                {entry.number}
-              </span>
-            </div>
-          )
-        })}
+        {desktopWeek.map((entry) => (
+          <div key={entry.key} className="flex h-[72px] flex-col items-center justify-center gap-1 text-center">
+            <span className="text-[12px] font-normal text-[#89939C] dark:text-[#89939C]">{entry.label}</span>
+            <span
+              className={`flex h-11 min-w-11 items-center justify-center rounded-full px-1 text-[20px] font-semibold leading-none ${
+                entry.key === todayKey ? "bg-[#409CFF] text-white shadow-[0_6px_16px_rgba(64,156,255,0.28)]" : "text-[#2D3642] dark:text-[#edf4ff]"
+              }`}
+            >
+              {entry.number}
+            </span>
+          </div>
+        ))}
         {timeSlots.map((time) => (
           <div key={time} className="contents">
-            <div className="font-sans flex min-h-[64px] items-start justify-center pt-5 text-center text-[14px] font-medium text-[#007FFF] dark:text-[#007FFF]">{time}</div>
-            {weekDates.map((entry) => {
-              const event = eventsByCell.get(`${entry.key}-${time.slice(0, 2)}`)
+            <div className="flex min-h-[64px] items-start justify-center pt-5 text-center text-[14px] font-medium text-[#007FFF] dark:text-[#007FFF]">{time}</div>
+            {desktopWeek.map((entry) => {
+              const event = desktopCells.get(`${entry.key}-${time.slice(0, 2)}`)
               return (
                 <div
                   key={`${entry.key}-${time}`}

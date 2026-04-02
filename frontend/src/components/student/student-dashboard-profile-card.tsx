@@ -2,6 +2,10 @@
 
 import { useRef, useState } from "react"
 import { Camera, Pencil } from "lucide-react"
+import {
+  StudentDashboardMobileStats,
+  type StudentMobileStatCard,
+} from "@/components/student/student-dashboard-mobile-stats"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useStudentDashboardProfile } from "@/hooks/use-student-dashboard-profile"
 
 type StudentDashboardProfileCardProps = {
+  mobileStats?: StudentMobileStatCard[]
   studentId: string
   studentName: string
 }
@@ -33,6 +38,7 @@ function getInitials(name: string) {
 }
 
 export function StudentDashboardProfileCard({
+  mobileStats = [],
   studentId,
   studentName,
 }: StudentDashboardProfileCardProps) {
@@ -58,7 +64,7 @@ export function StudentDashboardProfileCard({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <div className="h-[102px] w-full rounded-[20px] border border-[#DCE8F3] bg-white p-[21px] shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] xl:max-w-[900px]">
+      <div className="mx-auto h-auto w-[358px] max-w-full rounded-[20px] border border-[#DCE8F3] bg-white p-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:h-[102px] sm:w-full sm:p-[21px] xl:max-w-[900px]">
         <input
           ref={imageInputRef}
           type="file"
@@ -67,8 +73,8 @@ export function StudentDashboardProfileCard({
           onChange={(event) => void handleImageChange(event, true)}
         />
 
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-end gap-4">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-3 sm:items-end sm:gap-4">
             <button
               type="button"
               onClick={() => imageInputRef.current?.click()}
@@ -88,10 +94,10 @@ export function StudentDashboardProfileCard({
             </button>
 
             <div className="min-w-0">
-              <p className="truncate font-sans text-[24px] font-semibold leading-[29px] text-[#2F3845] dark:text-[#edf4ff]">
+              <p className="truncate font-sans text-[18px] font-semibold leading-[1.2] text-[#2F3845] dark:text-[#edf4ff] sm:text-[24px] sm:leading-[29px]">
                 {profile.name}
               </p>
-              <p className="mt-1 truncate font-sans text-[14px] font-normal italic leading-[17px] text-[#667284] dark:text-[#aab7cb]">
+              <p className="mt-1 truncate font-sans text-[12px] font-normal italic leading-[16px] text-[#667284] dark:text-[#aab7cb] sm:text-[14px] sm:leading-[17px]">
                 &quot;{profile.bio}&quot;
               </p>
               {isUploadingImage ? (
@@ -110,6 +116,8 @@ export function StudentDashboardProfileCard({
             </button>
           </DialogTrigger>
         </div>
+
+        <StudentDashboardMobileStats items={mobileStats} />
       </div>
 
       <DialogContent className="rounded-[24px] border-[#d8eaff] bg-white p-6 dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(127deg,rgba(6,11,38,0.92)_18%,rgba(12,18,44,0.86)_58%,rgba(26,31,55,0.72)_100%)] dark:shadow-[0_28px_90px_rgba(2,6,23,0.55)] sm:max-w-[520px]">

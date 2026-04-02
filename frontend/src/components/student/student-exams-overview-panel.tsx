@@ -43,12 +43,12 @@ export function StudentExamsOverviewPanel(props: { exams: Exam[]; studentClass: 
   }, [studentClass])
 
   return (
-    <section className="box-border h-[781px] w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-5 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] xl:w-[440px]">
-      <h1 className="font-sans text-[22px] font-semibold leading-6 text-[#2F3845] dark:text-[#edf4ff]">Шинэ содон 🎉</h1>
+    <section className="box-border h-auto w-full overflow-y-auto rounded-[20px] border border-[#DCE8F3] bg-white p-5 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)] sm:p-5 xl:h-[781px] xl:w-[440px]">
+      <h1 className="font-sans text-[20px] font-semibold leading-6 text-[#2F3845] dark:text-[#edf4ff]">Шинэ содон 🎉</h1>
 
       <div className="mt-5 grid h-[44px] w-full grid-cols-3 rounded-full bg-[#003366] p-1 shadow-[0_10px_22px_rgba(52,94,145,0.20)] dark:border-[rgba(224,225,226,0.08)] dark:bg-[linear-gradient(161deg,rgba(6,11,38,0.94)_59%,rgba(26,31,55,0)_100%)]">
         {tabs.map((tab) => (
-          <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`rounded-full px-4 py-1 font-sans text-[14px] font-medium leading-5 ${activeTab === tab.id ? "bg-[#1864FB] text-white" : "text-[#F8FBFF]"}`}>
+          <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`rounded-full px-4 py-1 font-sans text-[14px] font-medium leading-5 ${activeTab === tab.id ? "bg-white text-[#1864FB]" : "text-[#F8FBFF]"}`}>
             {tab.label}
           </button>
         ))}
@@ -57,7 +57,8 @@ export function StudentExamsOverviewPanel(props: { exams: Exam[]; studentClass: 
       {activeTab === "all" ? (
         <div className="mt-5">
           <p className="font-sans text-[14px] font-semibold leading-5 text-[#293138] dark:text-[#edf4ff]">
-            Өнөөдрийн онцлох мэдээ болон сонордуулга
+            <span className="sm:hidden">Өнөөдрийн онцлох мэдээ</span>
+            <span className="hidden sm:inline">Өнөөдрийн онцлох мэдээ болон сонордуулга</span>
           </p>
           <div className="mt-5 space-y-5">
           {announcement ? <article className="rounded-[18px] border border-[#DCE8F3] bg-white px-5 py-4 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-[rgba(224,225,226,0.08)] student-dark-surface dark:shadow-[0_24px_64px_rgba(2,6,23,0.38)]"><p className="text-[14px] font-semibold leading-7 text-[#2F3845] dark:text-[#edf4ff]">{announcement}</p></article> : null}
