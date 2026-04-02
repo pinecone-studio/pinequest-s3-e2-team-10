@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { CreateExamSelectedQuestionsPanel } from "@/components/teacher/create-exam-selected-questions-panel";
 import { CreateExamSubmitActions } from "@/components/teacher/create-exam-submit-actions";
 import { ExamBuilderSummaryCard } from "@/components/teacher/exam-builder-summary-card";
 import { filterQuestionBank } from "@/components/teacher/question-bank-filter";

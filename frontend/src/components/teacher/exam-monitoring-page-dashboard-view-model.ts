@@ -1,5 +1,5 @@
 import { getClassById } from "@/lib/mock-data-helpers";
-import { formatHeaderDate, getAcademicWeekLabel } from "@/lib/teacher-dashboard-utils";
+import { getAcademicWeekLabel } from "@/lib/teacher-dashboard-utils";
 import type { StudentAttempt } from "@/hooks/use-exam-monitoring";
 import type { CreatedExam } from "@/lib/exams-api";
 import { chartSeries, summaryStatIcons } from "./exam-monitoring-page-dashboard-constants";

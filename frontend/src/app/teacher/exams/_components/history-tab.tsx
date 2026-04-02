@@ -8,7 +8,12 @@ import { TeacherSurfaceCard } from "@/components/teacher/teacher-page-primitives
 import { Button } from "@/components/ui/button";
 import { classes } from "@/lib/mock-data";
 import type { TeacherExam } from "@/lib/teacher-exams";
-import { buildHistoryReviewLink, formatExamClassSummary, formatExamDateSummary, isDateWithinRange } from "../exams-page-utils";
+import {
+  buildHistoryReviewLink,
+  formatExamClassSummary,
+  formatExamDateSummary,
+  isDateWithinRange,
+} from "../exams-page-utils";
 
 export function HistoryTab({ exams }: { exams: TeacherExam[] }) {
   const [nameQuery, setNameQuery] = React.useState("");
@@ -16,7 +21,11 @@ export function HistoryTab({ exams }: { exams: TeacherExam[] }) {
   const [selectedClass, setSelectedClass] = React.useState("all");
 
   const classOptions = React.useMemo(() => {
-    const scheduledClassIds = new Set(exams.flatMap((exam) => exam.scheduledClasses.map((schedule) => schedule.classId)));
+    const scheduledClassIds = new Set(
+      exams.flatMap((exam) =>
+        exam.scheduledClasses.map((schedule) => schedule.classId),
+      ),
+    );
     return classes.filter((classEntry) => scheduledClassIds.has(classEntry.id));
   }, [exams]);
 
@@ -33,7 +42,19 @@ export function HistoryTab({ exams }: { exams: TeacherExam[] }) {
   return (
     <TeacherSurfaceCard className="rounded-[32px] p-6">
       <div className="space-y-5">
-        <TeacherExamHistoryControls classOptions={classOptions.map((classEntry) => classEntry.id)} dateRange={dateRange} filteredExamCount={filteredExams.length} nameQuery={nameQuery} onClassChange={setSelectedClass} onDateRangeChange={setDateRange} onNameQueryChange={setNameQuery} selectedClass={selectedClass} />
+        <TeacherExamHistoryControls
+          classOptions={classOptions.map((classEntry) => ({
+            label: classEntry.name,
+            value: classEntry.id,
+          }))}
+          dateRange={dateRange}
+          filteredExamCount={filteredExams.length}
+          nameQuery={nameQuery}
+          onClassChange={setSelectedClass}
+          onDateRangeChange={setDateRange}
+          onNameQueryChange={setNameQuery}
+          selectedClass={selectedClass}
+        />
 
         {filteredExams.length === 0 ? (
           <div className="rounded-[26px] border border-dashed border-[#dce7ff] bg-[#fbfdff] px-6 py-12 text-center text-sm text-[#7280a4]">
