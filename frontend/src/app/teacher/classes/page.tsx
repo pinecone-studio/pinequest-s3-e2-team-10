@@ -13,6 +13,7 @@ import {
   normalizeDemoClassId,
 } from "@/lib/teacher-class-detail"
 import { loadStudentExamResults } from "@/lib/student-exam-results"
+import { getPreferredClassId } from "@/lib/teacher-classes-page-utils"
 import {
   getTeacherManagedClasses,
   registerTeacherStudent,
@@ -175,16 +176,4 @@ export default function ClassesPage() {
       visibleCompletedExams={visibleCompletedExams}
     />
   )
-}
-
-function getPreferredClassId(classList: Class[], examList: TeacherExam[]) {
-  const classWithCompletedExams = classList.find((classItem) =>
-    examList.some(
-      (exam) =>
-        exam.status === "completed" &&
-        exam.scheduledClasses.some((schedule) => isMatchingDemoClassId(schedule.classId, classItem.id)),
-    ),
-  )
-
-  return classWithCompletedExams?.id ?? classList[0]?.id ?? ""
 }
