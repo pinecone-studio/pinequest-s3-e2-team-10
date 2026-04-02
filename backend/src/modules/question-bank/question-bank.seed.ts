@@ -47,18 +47,6 @@ export function ensureDefaultMathQuestionBank(store: LocalQuestionBankStore) {
 export function replaceLegacyDefaultQuestionBank(
   store: LocalQuestionBankStore,
 ) {
-<<<<<<< ours
-  const legacyCategoryIds = new Set(
-    store.categories
-      .filter((category) =>
-        LEGACY_DEFAULT_CATEGORY_NAMES.some(
-          (legacyName) =>
-            category.name.trim().toLowerCase() === legacyName.toLowerCase(),
-        ),
-      )
-      .map((category) => category.id),
-  );
-=======
   const currentSeedSignature = ['алгебр', 'функц ба график', 'геометр', 'магадлал ба статистик'];
 
   const legacyCategoryIds = new Set<string>();
@@ -81,8 +69,6 @@ export function replaceLegacyDefaultQuestionBank(
       legacyCategoryIds.add(category.id);
     }
   });
-
->>>>>>> theirs
   if (legacyCategoryIds.size === 0) return false;
 
   const legacyTopicIds = new Set(
