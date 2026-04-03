@@ -30,5 +30,5 @@ export const studentSeedData: Student[] = [
   { id: "s13", name: "Отгонбаяр", email: "otgonbayar@school.com", password: "otgonbayar123", classId: "10C" },
   { id: "s14", name: "Баярмаа", email: "bayarmaa@school.com", password: "bayarmaa123", classId: "10C" },
   { id: "s15", name: "Сүхбат", email: "sukhbat@school.com", password: "sukhbat123", classId: "10C" },
-  { id: "s16", name: "Нандин", email: "nandin@school.com", password: "nandin123", classId: "10B" },
+  { id: "s16", name: "Нандин", email: "nandin@school.com", password: "nandin123", classId: "10A" },
 ]

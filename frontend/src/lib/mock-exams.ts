@@ -57,7 +57,7 @@ const curatedExamSeeds: ExamSeed[] = [
   {
     id: "7b-math-equations",
     title: "7А Илэрхийлэл ба тэгшитгэл",
-    classId: "10B",
+    classId: "10A",
     date: "2026-03-31",
     time: "09:20",
     createdAt: "2026-03-25",
@@ -66,7 +66,7 @@ const curatedExamSeeds: ExamSeed[] = [
   {
     id: "7b-math-scale",
     title: "7А Пропорц ба масштаб",
-    classId: "10B",
+    classId: "10A",
     date: "2026-04-02",
     time: "08:30",
     createdAt: "2026-03-28",
@@ -75,7 +75,7 @@ const curatedExamSeeds: ExamSeed[] = [
   {
     id: "7b-math-data",
     title: "7А Өгөгдөл ба магадлал",
-    classId: "10B",
+    classId: "10A",
     date: "2026-04-04",
     time: "11:10",
     createdAt: "2026-03-30",
