@@ -17,6 +17,7 @@ import {
   type FinishedExamItem,
   formatScheduleLabel,
   getExamIcon,
+  getStudentExamTitle,
   getStudentSchedule,
 } from "@/components/student/student-exams-page-utils";
 
@@ -39,9 +40,9 @@ export function UpcomingExamCard(props: {
     getScheduleEnd(schedule.date, schedule.time, exam.duration, exam.availableIndefinitely) <= new Date();
 
   return (
-    <article className={cardClassName}>
+    <article className={`${cardClassName} border-[#FFE0B2] bg-[#FFF9F1] dark:border-[rgba(255,149,0,0.28)] dark:bg-[linear-gradient(126.97deg,rgba(56,34,8,0.74)_28.26%,rgba(94,52,8,0.5)_91.2%)]`}>
       <ExamCardTop
-        title={exam.title}
+        title={getStudentExamTitle(exam)}
         icon={
           <div className="flex h-[40px] w-[40px] items-center justify-center rounded-2xl p-0 sm:h-[60px] sm:w-[60px] sm:p-[10px]">
             <Image src={getExamIcon(exam.title)} alt="" width={40} height={40} unoptimized className="h-[40px] w-[40px] object-contain sm:h-10 sm:w-10" />
@@ -66,11 +67,11 @@ export function FinishedExamCard(props: {
     return (
       <article className={`${cardClassName} h-[226px] sm:h-auto`}>
         <ExamCardTop
-          title={item.exam.title}
+          title={getStudentExamTitle(item.exam)}
           icon={<AlertCircle className="h-11 w-11 stroke-[1.6] text-[#FF504A]" />}
-          badge={<span className="inline-flex h-[22px] w-[79px] items-center justify-center gap-[7px] rounded-full bg-[#FEE2E2] px-[9px] text-[12px] font-semibold leading-none text-[#DC2626] dark:bg-[#FF5A53] dark:text-[#FFF1EF] sm:h-[28px] sm:w-auto sm:px-[14px]"><span className="h-[8px] w-[8px] rounded-full bg-current dark:bg-[#FFF1EF]" />Хоцорсон</span>}
+          badge={<span className="inline-flex h-[22px] items-center justify-center gap-[7px] rounded-full bg-[#FEE2E2] px-[9px] text-[12px] font-semibold leading-none text-[#DC2626] dark:bg-[#FF5A53] dark:text-[#FFF1EF] sm:h-[28px] sm:w-auto sm:px-[14px]"><span className="h-[8px] w-[8px] rounded-full bg-current dark:bg-[#FFF1EF]" />Late test</span>}
           subtitle={<div className="flex flex-wrap items-center gap-3 text-[14px] font-medium leading-[17px] text-[#566069] dark:text-[#E1E6EB]"><span>{formatScheduleLabel(schedule?.date, schedule?.time)}</span><span>|</span><span>{item.exam.duration} мин</span><span>|</span><span>{item.exam.questions.length} асуулт</span></div>}
-          action={<Button variant="outline" disabled className={`${actionButtonClassName} border border-[#FECACA] bg-[#FEF2F2] text-[#DC2626] opacity-100 dark:border-[rgba(255,90,83,0.26)] dark:bg-[rgba(255,90,83,0.18)] dark:text-[#FFB5B0]`}>Хоцорсон</Button>}
+          action={<Button variant="outline" disabled className={`${actionButtonClassName} border border-[#FECACA] bg-[#FEF2F2] text-[#DC2626] opacity-100 dark:border-[rgba(255,90,83,0.26)] dark:bg-[rgba(255,90,83,0.18)] dark:text-[#FFB5B0]`}>Late test</Button>}
         />
       </article>
     );
@@ -94,7 +95,7 @@ export function FinishedExamCard(props: {
     <article className={`${cardClassName} h-[226px] gap-4 sm:h-auto`}>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <ExamCardTop
-          title={item.exam.title}
+          title={getStudentExamTitle(item.exam)}
           icon={<div className="flex h-[40px] w-[40px] items-center justify-center rounded-2xl p-0 sm:h-[60px] sm:w-[60px] sm:p-[10px]"><Image src={getExamIcon(item.exam.title)} alt="" width={40} height={40} unoptimized className="h-[40px] w-[40px] object-contain sm:h-10 sm:w-10" /></div>}
           badge={<span className="inline-flex h-[22px] w-[79px] items-center justify-center gap-[7px] rounded-full bg-[#E8F5E9] px-[9px] text-[12px] font-semibold leading-none text-[#00C853] dark:bg-[#00C853] dark:text-[#E8F5E9] sm:h-[28px] sm:w-auto sm:px-[14px]"><Check className="h-[14px] w-[14px]" />Дууссан</span>}
           subtitle={<div className="flex flex-wrap items-center gap-3 text-[14px] font-medium leading-[17px]"><span className="text-[#566069] dark:text-[#E1E6EB]">{formatFinishedSubmittedAt(item.result.submittedAt)}</span><span className="ml-auto text-right text-[#007FFF] dark:text-[#007FFF]">{item.result.score}/{item.result.totalPoints} оноо</span></div>}
