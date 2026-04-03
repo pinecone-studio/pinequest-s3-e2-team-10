@@ -7,6 +7,7 @@ export type StudentExamAnswer = {
   isCorrect: boolean | null;
   awardedPoints?: number | null;
   reviewStatus?: 'auto-correct' | 'auto-wrong' | 'pending' | 'graded';
+  explanation?: string;
 };
 
 export type StudentExamResult = {

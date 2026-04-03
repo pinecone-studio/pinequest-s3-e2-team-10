@@ -15,6 +15,8 @@ export type StudentExamAttempt = {
   studentName: string
   classId: string
   status: StudentExamAttemptStatus
+  answers?: Record<string, string>
+  currentQuestion?: number
   answeredCount?: number
   startedAt: string
   submittedAt?: string | null
@@ -27,17 +29,18 @@ type UpsertStudentExamAttemptPayload = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >
 
+type RemoteStudentExamAttemptPayload = Omit<
+  UpsertStudentExamAttemptPayload,
+  'answers' | 'currentQuestion'
+>
+
 const STUDENT_EXAM_ATTEMPTS_STORAGE_KEY = 'studentExamAttempts'
 
 function readStoredAttempts() {
-  if (typeof window === 'undefined') {
-    return []
-  }
+  if (typeof window === 'undefined') return []
 
   const rawValue = window.localStorage.getItem(STUDENT_EXAM_ATTEMPTS_STORAGE_KEY)
-  if (!rawValue) {
-    return []
-  }
+  if (!rawValue) return []
 
   try {
     const parsed = JSON.parse(rawValue)
@@ -48,10 +51,7 @@ function readStoredAttempts() {
 }
 
 function writeStoredAttempts(attempts: StudentExamAttempt[]) {
-  if (typeof window === 'undefined') {
-    return
-  }
-
+  if (typeof window === 'undefined') return
   window.localStorage.setItem(STUDENT_EXAM_ATTEMPTS_STORAGE_KEY, JSON.stringify(attempts))
 }
 
@@ -86,22 +86,10 @@ function filterAttempts(
   },
 ) {
   return attempts.filter((attempt) => {
-    if (filters?.examId && attempt.examId !== filters.examId) {
-      return false
-    }
-
-    if (filters?.studentId && attempt.studentId !== filters.studentId) {
-      return false
-    }
-
-    if (filters?.classId && attempt.classId !== filters.classId) {
-      return false
-    }
-
-    if (filters?.status && attempt.status !== filters.status) {
-      return false
-    }
-
+    if (filters?.examId && attempt.examId !== filters.examId) return false
+    if (filters?.studentId && attempt.studentId !== filters.studentId) return false
+    if (filters?.classId && attempt.classId !== filters.classId) return false
+    if (filters?.status && attempt.status !== filters.status) return false
     return true
   })
 }
@@ -129,7 +117,8 @@ export async function loadStudentExamAttempts(filters?: {
       `/student-exam-attempts${query ? `?${query}` : ''}`,
       {
         method: 'GET',
-        fallbackMessage: 'Шалгалт эхэлсэн төлөвийг backend-ээс уншиж чадсангүй. Cloudflare D1 одоогоор боломжгүй эсвэл миграци дутуу байж магадгүй.',
+        fallbackMessage:
+          'Шалгалтын эхэлсэн төлөвийг backend-ээс уншиж чадсангүй. Cloudflare D1 одоогоор боломжгүй эсвэл миграци дутуу байж магадгүй.',
       },
     )
 
@@ -148,6 +137,16 @@ export async function upsertStudentExamAttempt(payload: UpsertStudentExamAttempt
     createdAt: payload.startedAt,
     updatedAt: new Date().toISOString(),
   }
+  const remotePayload: RemoteStudentExamAttemptPayload = {
+    examId: payload.examId,
+    studentId: payload.studentId,
+    studentName: payload.studentName,
+    classId: payload.classId,
+    status: payload.status,
+    answeredCount: payload.answeredCount,
+    startedAt: payload.startedAt,
+    submittedAt: payload.submittedAt,
+  }
 
   writeStoredAttempts(mergeAttempts(readStoredAttempts(), [optimisticAttempt]))
 
@@ -156,8 +155,9 @@ export async function upsertStudentExamAttempt(payload: UpsertStudentExamAttempt
       '/student-exam-attempts',
       {
         method: 'POST',
-        body: payload,
-        fallbackMessage: 'Шалгалтын явцын төлөвийг backend дээр хадгалж чадсангүй. Cloudflare D1 одоогоор бичих боломжгүй эсвэл `student_exam_attempts` хүснэгт үүсээгүй байж магадгүй.',
+        body: remotePayload,
+        fallbackMessage:
+          'Шалгалтын явцын төлөвийг backend дээр хадгалж чадсангүй. Cloudflare D1 одоогоор бичих боломжгүй эсвэл student_exam_attempts хүснэгт үүсээгүй байж магадгүй.',
       },
     )
 

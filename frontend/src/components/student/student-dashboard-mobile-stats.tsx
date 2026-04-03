@@ -9,9 +9,7 @@ export type StudentMobileStatCard = {
   value: string
 }
 
-export function StudentDashboardMobileStats(props: {
-  items: StudentMobileStatCard[]
-}) {
+export function StudentDashboardMobileStats(props: { items: StudentMobileStatCard[] }) {
   const { items } = props
 
   if (items.length === 0) return null
@@ -21,9 +19,9 @@ export function StudentDashboardMobileStats(props: {
       {items.map((item) => (
         <div
           key={item.label}
-          className={`flex min-h-[64px] shrink-0 items-center gap-2 rounded-[16px] border border-[#DCE8F3] bg-[#F3F9FF] px-[10px] py-[10px] shadow-[0_6px_20px_rgba(114,144,179,0.08)] dark:border-[rgba(224,225,226,0.14)] dark:bg-[radial-gradient(62%_1.5px_at_50%_0%,rgba(167,182,214,0.22)_0%,rgba(167,182,214,0.09)_42%,rgba(167,182,214,0)_100%),radial-gradient(62%_1.5px_at_50%_100%,rgba(167,182,214,0.18)_0%,rgba(167,182,214,0.08)_42%,rgba(167,182,214,0)_100%),linear-gradient(180deg,#0d163f_0%,#0a1236_100%)] dark:shadow-[inset_0_0_8px_rgba(55,82,138,0.05)] ${item.label === "Энэ 7 хоногт" ? "w-[138px]" : "w-[167px]"}`}
+          className={`flex min-h-[64px] shrink-0 items-center gap-2 rounded-[16px] border border-[#DCE8F3] bg-[#F3F9FF] px-[10px] py-[10px] shadow-[0_6px_20px_rgba(114,144,179,0.08)] dark:border-transparent dark:bg-transparent dark:shadow-none ${item.label === "Энэ 7 хоногт" ? "w-[138px]" : "w-[167px]"}`}
         >
-          <Image src={item.iconPath} alt="" width={24} height={24} className="h-6 w-6 shrink-0 object-contain" />
+          <Image src={item.iconPath} alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
             <p className="line-clamp-2 text-[10px] leading-[1.15] text-[#7A8698] dark:text-[#9eacc3]">{item.label}</p>
             <div className="mt-1 flex flex-wrap items-end gap-x-1 gap-y-0.5">

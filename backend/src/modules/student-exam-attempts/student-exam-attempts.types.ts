@@ -40,7 +40,7 @@ export type StudentExamAttemptRecord = {
   studentName: string;
   classId: string;
   status: StudentExamAttemptStatus;
-  answeredCount?: number;
+  answeredCount?: number | null;
   startedAt: string;
   submittedAt?: string | null;
   createdAt: string;

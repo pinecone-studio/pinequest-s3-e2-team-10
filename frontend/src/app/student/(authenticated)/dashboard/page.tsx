@@ -8,12 +8,15 @@ import { StudentExamsOverviewPanel } from "@/components/student/student-exams-ov
 import { useStudentSession } from "@/hooks/use-student-session"
 import { exams as legacyExams, type Exam, type ExamResult } from "@/lib/mock-data"
 import { getCachedStudentExamResults, loadStudentExamResults } from "@/lib/student-exam-results"
-import { getExamLetterGrade } from "@/lib/student-report-view"
 import { getLocalDateString } from "@/lib/student-exam-time"
 import { getStudentExams } from "@/lib/student-exams"
+import { getExamLetterGrade } from "@/lib/student-report-view"
+import { useTheme } from "@/components/theme-provider"
 
 export default function StudentDashboard() {
   const { studentClass, studentId, studentName } = useStudentSession()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
   const [allExams, setAllExams] = useState<Exam[]>(legacyExams)
   const [allResults, setAllResults] = useState<ExamResult[]>(() => getCachedStudentExamResults())
 
@@ -52,11 +55,11 @@ export default function StudentDashboard() {
       return startsAt >= now && startsAt <= nextWeek
     })).length
     return [
-      { label: "Нийт амжилт", value: `${averagePercentage}%`, detail: `${studentResults.length} шалгалт`, iconPath: "/trophyIcon.svg" },
-      { label: latestExam?.title ?? "Сүүлийн шалгалт", value: latestResult ? `${latestPercentage}% ${getExamLetterGrade(latestPercentage)}` : "-", detail: "Сүүлийн дүн", iconPath: "/dunIcon.svg" },
-      { label: "Энэ 7 хоногт", value: String(upcomingThisWeek), detail: "Өгөх шалгалт", iconPath: "/calendarIcon.svg" },
+      { label: "Нийт амжилт", value: `${averagePercentage}%`, detail: `${studentResults.length} шалгалт`, iconPath: isDark ? "/student-dashboard-dark-achievement.svg" : "/trophyIcon.svg" },
+      { label: latestExam?.title ?? "Сүүлийн шалгалт", value: latestResult ? `${latestPercentage}% ${getExamLetterGrade(latestPercentage)}` : "-", detail: "Сүүлийн дүн", iconPath: isDark ? "/student-dashboard-dark-score.svg" : "/dunIcon.svg" },
+      { label: "Энэ 7 хоногт", value: String(upcomingThisWeek), detail: "Өгөх шалгалт", iconPath: isDark ? "/student-dashboard-dark-calendar.svg" : "/calendarIcon.svg" },
     ] as const
-  }, [allExams, myExams, studentClass, studentResults])
+  }, [allExams, isDark, myExams, studentClass, studentResults])
   const mobileStatCards = [statCards[0], statCards[2], statCards[1]]
 
   return (
@@ -68,13 +71,17 @@ export default function StudentDashboard() {
         </div>
         <div className="hidden gap-[10px] sm:grid sm:grid-cols-2 sm:gap-5 xl:grid-cols-3 xl:gap-8">
           {statCards.map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <div className="flex h-[56px] w-[56px] items-center justify-center rounded-xl border border-[#D9E8F4] bg-[#F3F9FF] text-[#39424E] dark:border-[rgba(224,225,226,0.14)] dark:bg-[radial-gradient(62%_1.5px_at_50%_0%,rgba(167,182,214,0.22)_0%,rgba(167,182,214,0.09)_42%,rgba(167,182,214,0)_100%),radial-gradient(62%_1.5px_at_50%_100%,rgba(167,182,214,0.18)_0%,rgba(167,182,214,0.08)_42%,rgba(167,182,214,0)_100%),linear-gradient(180deg,#0d163f_0%,#0a1236_100%)] dark:shadow-[inset_0_0_8px_rgba(55,82,138,0.05)] dark:text-[#edf4ff]">
-                <Image src={item.iconPath} alt="" width={26} height={26} className="h-[26px] w-[26px] object-contain" />
-              </div>
+            <div
+              key={item.label}
+              className="flex min-h-[88px] items-center gap-3 rounded-[20px] border border-[#DCE8F3] bg-white px-4 py-3 shadow-[0_6px_24px_rgba(114,144,179,0.10)] dark:border-transparent dark:bg-transparent dark:shadow-none"
+            >
+              <Image src={item.iconPath} alt="" width={56} height={56} className="h-[56px] w-[56px] shrink-0 object-contain" />
               <div>
                 <p className="text-[14px] leading-5 text-[#7A8698] dark:text-[#9eacc3]">{item.label}</p>
-                <div className="mt-1 flex items-end gap-1.5"><p className="text-[24px] font-semibold leading-none tracking-[-0.03em] text-[#39424E] dark:text-[#edf4ff]">{item.value}</p><p className="text-[12px] font-medium text-[#4A9DFF]">{item.detail}</p></div>
+                <div className="mt-1 flex items-end gap-1.5">
+                  <p className="text-[24px] font-semibold leading-none tracking-[-0.03em] text-[#39424E] dark:text-[#edf4ff]">{item.value}</p>
+                  <p className="text-[12px] font-medium text-[#4A9DFF]">{item.detail}</p>
+                </div>
               </div>
             </div>
           ))}

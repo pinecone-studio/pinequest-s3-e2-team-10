@@ -6,11 +6,12 @@ import { getAwardedPoints, getReviewStatus, gradeQuestion } from "@/lib/student-
 export async function submitStudentExam(props: {
   exam: Exam
   answers: Record<string, string>
+  currentQuestion: number
   studentId: string
   studentName: string
   studentClass: string
 }) {
-  const { exam, answers, studentId, studentName, studentClass } = props
+  const { exam, answers, currentQuestion, studentId, studentName, studentClass } = props
   const submittedAt = new Date().toISOString()
   const scoredAnswers = exam.questions.map((question) => {
     const answer = answers[question.id] ?? ""
@@ -23,7 +24,6 @@ export async function submitStudentExam(props: {
       reviewStatus: getReviewStatus(question, answer, isCorrect),
     }
   })
-
   const score = exam.questions.reduce((sum, question) => {
     const matchedAnswer = scoredAnswers.find((entry) => entry.questionId === question.id)
     return sum + (matchedAnswer?.awardedPoints ?? 0)
@@ -47,6 +47,7 @@ export async function submitStudentExam(props: {
     studentName,
     classId: studentClass,
     status: "submitted",
+    currentQuestion,
     answeredCount: scoredAnswers.filter((entry) => entry.answer.trim().length > 0).length,
     startedAt: submittedAt,
     submittedAt,

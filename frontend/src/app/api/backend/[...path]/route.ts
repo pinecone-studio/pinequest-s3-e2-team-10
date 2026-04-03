@@ -23,14 +23,13 @@ async function proxyRequest(
 ) {
   const { path } = await context.params
   const upstreamUrl = buildUpstreamUrl(path, request.url)
-  const headers = new Headers(request.headers)
-
-  headers.delete('host')
-
+  const headers = new Headers()
+  const contentType = request.headers.get('content-type')
+  const authorization = request.headers.get('authorization')
+  if (contentType) headers.set('content-type', contentType)
+  if (authorization) headers.set('authorization', authorization)
   const requestBody =
-    request.method === 'GET' || request.method === 'HEAD'
-      ? undefined
-      : await request.arrayBuffer()
+    request.method === 'GET' || request.method === 'HEAD' ? undefined : await request.text()
 
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     const controller = new AbortController()
