@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { StudentResultDialog } from "@/components/teacher/teacher-classes-student-result-dialog";
 import { StudentResultRow } from "@/components/teacher/teacher-classes-student-result-row";
 import { normalizeSubjectLabel } from "@/components/teacher/teacher-classes-student-results-utils";
@@ -18,23 +18,21 @@ export function TeacherClassesStudentResultsCard(props: {
 }) {
   const { className, date, results, selectedExam, time } = props;
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  const [teacherSubject, setTeacherSubject] = useState(() => teachers[0]?.subject ?? "");
-
-  useEffect(() => {
-    const storedSubject = window.localStorage.getItem("teacherSubject")?.trim();
-    if (storedSubject) {
-      setTeacherSubject(storedSubject);
+  const [teacherSubject] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedSubject = window.localStorage.getItem("teacherSubject")?.trim();
+      if (storedSubject) {
+        return storedSubject;
+      }
     }
-  }, []);
-
-  useEffect(() => {
-    if (selectedStudentId && !results.some((result) => result.studentId === selectedStudentId)) {
-      setSelectedStudentId(null);
-    }
-  }, [results, selectedStudentId]);
+    return teachers[0]?.subject ?? "";
+  });
 
   const selectedResult = useMemo(
-    () => results.find((result) => result.studentId === selectedStudentId) ?? null,
+    () =>
+      selectedStudentId
+        ? results.find((result) => result.studentId === selectedStudentId) ?? null
+        : null,
     [results, selectedStudentId],
   );
 
