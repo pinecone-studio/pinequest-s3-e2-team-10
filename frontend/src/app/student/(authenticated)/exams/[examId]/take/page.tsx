@@ -9,9 +9,9 @@ import {
   StudentTakeExamSubmitted,
 } from "@/components/student/student-take-exam-states";
 import { Spinner } from "@/components/ui/spinner";
+import { useStudentLiveAttemptSync } from "@/app/student/(authenticated)/exams/[examId]/take/use-student-live-attempt-sync";
 import { useExamIntegrityGuard } from "@/hooks/use-exam-integrity-guard";
 import { useStudentSession } from "@/hooks/use-student-session";
-import { upsertStudentExamAttempt } from "@/lib/student-exam-attempts";
 import { exams as legacyExams, type Exam } from "@/lib/mock-data";
 import { loadStudentExamResults } from "@/lib/student-exam-results";
 import { isScheduleOpenNow } from "@/lib/student-exam-time";
@@ -82,56 +82,16 @@ export default function StudentTakeExamPage({
         )
       : false;
 
-  useEffect(() => {
-    if (!exam || !schedule || !isOpenNow || alreadySubmitted || !studentId) return;
-
-    void upsertStudentExamAttempt({
-      examId: exam.id,
-      studentId,
-      studentName: resolvedStudentName,
-      classId: studentClass,
-      status: "in_progress",
-      answeredCount,
-      startedAt: new Date().toISOString(),
-      submittedAt: null,
-    });
-  }, [
-    alreadySubmitted,
-    exam,
-    isOpenNow,
-    resolvedStudentName,
-    schedule,
-    studentClass,
-    studentId,
-  ]);
-
-  useEffect(() => {
-    if (!exam || !schedule || !isOpenNow || alreadySubmitted || !studentId) return;
-
-    const timeout = window.setTimeout(() => {
-      void upsertStudentExamAttempt({
-        examId: exam.id,
-        studentId,
-        studentName: resolvedStudentName,
-        classId: studentClass,
-        status: "in_progress",
-        answeredCount,
-        startedAt: new Date().toISOString(),
-        submittedAt: null,
-      });
-    }, 350);
-
-    return () => window.clearTimeout(timeout);
-  }, [
-    alreadySubmitted,
+  useStudentLiveAttemptSync({
     answeredCount,
+    alreadySubmitted,
     exam,
+    hasSchedule: Boolean(schedule),
     isOpenNow,
-    resolvedStudentName,
-    schedule,
     studentClass,
     studentId,
-  ]);
+    studentName: resolvedStudentName,
+  });
 
   useExamIntegrityGuard({
     examId: exam?.id,
