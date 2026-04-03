@@ -7,13 +7,7 @@ import { FinishedExamCard, UpcomingExamCard } from "@/components/student/student
 import { SegmentedTab } from "@/components/student/student-exams-page-controls"
 import { useTheme } from "@/components/theme-provider"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useStudentExamsPage } from "@/hooks/use-student-exams-page"
 
 const sectionContainerClassName =
@@ -44,19 +38,9 @@ export default function StudentExamsPage() {
     <div className="mx-auto w-full max-w-[390px] px-4 pb-10 pt-5 sm:max-w-[1440px] sm:px-6 xl:px-[155px]">
       <div className="mx-auto flex w-full max-w-[1130px] flex-col gap-[10px] sm:gap-[30px]">
         <div className="mx-auto w-full max-w-[358px] space-y-[7px] sm:max-w-[900px]">
-          <Link
-            href="/student/dashboard"
-            className="mb-[10px] inline-flex items-center gap-2 text-[14px] font-medium text-[#007FFF] dark:text-[#89C8FF]"
-          >
-            <span className="text-[18px] leading-none">←</span>
-            <span>Буцах</span>
-          </Link>
-          <h1 className="text-[24px] font-semibold leading-[29px] text-[#293138] dark:text-[#EDF4FF]">
-            Шалгалтууд
-          </h1>
-          <p className="text-[14px] leading-5 text-[#566069] dark:text-[#AAB7CB]">
-            Мэдлэгээ баталгаажуулах мөч ирлээ. Амжилт хүсье!
-          </p>
+          <Link href="/student/dashboard" className="mb-[10px] inline-flex items-center gap-2 text-[14px] font-medium text-[#007FFF] dark:text-[#89C8FF]"><span className="text-[18px] leading-none">←</span><span>Буцах</span></Link>
+          <h1 className="text-[24px] font-semibold leading-[29px] text-[#293138] dark:text-[#EDF4FF]">Шалгалтууд</h1>
+          <p className="text-[14px] leading-5 text-[#566069] dark:text-[#AAB7CB]">Мэдлэгээ баталгаажуулах мөч ирлээ. Амжилт хүсье!</p>
         </div>
 
         <div className="mx-auto flex w-full max-w-[358px] flex-col items-start gap-[10px] sm:max-w-[900px] sm:flex-row sm:items-center">

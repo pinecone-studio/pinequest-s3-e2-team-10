@@ -4,11 +4,7 @@ import Image from 'next/image'
 import { Globe, Monitor, WifiOff, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ExamCountdownDisplay } from '@/components/student/exam-countdown-display'
-import {
-  DetailInfoItem,
-  getExamDescription,
-  InstructionItem,
-} from '@/components/student/student-exam-detail-support'
+import { DetailInfoItem, getExamDescription, InstructionItem } from '@/components/student/student-exam-detail-support'
 import { Button } from '@/components/ui/button'
 import type { Exam } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
@@ -117,8 +113,7 @@ export function StudentExamDetailContent({
           onClick={onClose}
           type="button"
         >
-          <span className="text-[18px] leading-none">←</span>
-          <span>Буцах</span>
+          <span className="text-[18px] leading-none">←</span><span>Буцах</span>
         </button>
 
         <div className="flex items-start justify-between gap-4">
@@ -147,10 +142,8 @@ export function StudentExamDetailContent({
             titleClassName="text-[16px] font-semibold tracking-[-0.02em] text-[#1F2937] dark:text-[#F0F3F5]"
           >
             <div className="mt-[20px] grid grid-cols-2 gap-x-10 gap-y-6">
-              <DetailInfoItem iconSrc="/student-exam-card-date.svg" label="Огноо" value={scheduleDate ?? '-'} />
-              <DetailInfoItem iconSrc="/student-exam-card-time.svg" label="Цаг" value={scheduleTime ?? '-'} />
-              <DetailInfoItem iconSrc="/student-exam-card-duration.svg" label="Хугацаа" value={`${exam.duration} минут`} />
-              <DetailInfoItem iconSrc="/student-exam-card-questions.svg" label="Асуулт" value={String(exam.questions.length)} />
+              <DetailInfoItem iconSrc="/student-exam-card-date.svg" label="Огноо" value={scheduleDate ?? '-'} /><DetailInfoItem iconSrc="/student-exam-card-time.svg" label="Цаг" value={scheduleTime ?? '-'} />
+              <DetailInfoItem iconSrc="/student-exam-card-duration.svg" label="Хугацаа" value={`${exam.duration} минут`} /><DetailInfoItem iconSrc="/student-exam-card-questions.svg" label="Асуулт" value={String(exam.questions.length)} />
             </div>
           </PopupSection>
 
@@ -173,10 +166,8 @@ export function StudentExamDetailContent({
 
           <PopupSection title="Заавар">
             <ul className="mt-4 space-y-3">
-              <InstructionItem icon={<Globe className="h-4 w-4 stroke-[1.8]" />} text="Интернет холболт тогтвортой байгаа эсэхээ шалгана уу!" />
-              <InstructionItem icon={<ThemedInstructionIcon darkSrc="/student-exam-instruction-pause.svg" height={16} lightSrc="/student-exam-instruction-pause-light.svg" width={16} />} text="Шалгалт эхэлсний дараа түр зогсоох боломжгүй!" />
-              <InstructionItem icon={<ThemedInstructionIcon darkSrc="/student-exam-instruction-timer.svg" height={18} lightSrc="/student-exam-instruction-timer-light.svg" width={15} />} text="Хугацаа дуусахад шалгалт автоматаар илгээгдэнэ!" />
-              <InstructionItem icon={<Monitor className="h-4 w-4 stroke-[1.8]" />} text="Шалгалтын үеэр браузераа шинэчлэх эсвэл хааж болохгүй!" />
+              <InstructionItem icon={<Globe className="h-4 w-4 stroke-[1.8]" />} text="Интернет холболт тогтвортой байгаа эсэхээ шалгана уу!" /><InstructionItem icon={<ThemedInstructionIcon darkSrc="/student-exam-instruction-pause.svg" height={16} lightSrc="/student-exam-instruction-pause-light.svg" width={16} />} text="Шалгалт эхэлсний дараа түр зогсоох боломжгүй!" />
+              <InstructionItem icon={<ThemedInstructionIcon darkSrc="/student-exam-instruction-timer.svg" height={18} lightSrc="/student-exam-instruction-timer-light.svg" width={15} />} text="Хугацаа дуусахад шалгалт автоматаар илгээгдэнэ!" /><InstructionItem icon={<Monitor className="h-4 w-4 stroke-[1.8]" />} text="Шалгалтын үеэр браузераа шинэчлэх эсвэл хааж болохгүй!" />
               <InstructionItem icon={<WifiOff className="h-4 w-4 stroke-[1.8]" />} text="Интернет холболт салсан үед шалгалт автоматаар илгээгдэнэ!" />
             </ul>
           </PopupSection>
