@@ -63,11 +63,11 @@ export function StudentExamsOverviewPanel(props: { exams: Exam[]; results: ExamR
   const [announcementLikes, setAnnouncementLikes] = useState<Record<string, number>>(() => readStoredMap<Record<string, number>>("studentDashboardAnnouncementLikes"))
   const [likedAnnouncements, setLikedAnnouncements] = useState<Record<string, boolean>>(() => readStoredMap<Record<string, boolean>>("studentDashboardAnnouncementLiked"))
 
-  const examCards = useMemo(() => exams.filter((exam) => exam.status === "scheduled").map((exam) => {
+  const examCards = useMemo(() => exams.filter((exam) => exam.status !== "draft").map((exam) => {
     const schedule = exam.scheduledClasses.find((item) => item.classId === studentClass) ?? exam.scheduledClasses[0]
     const isUnavailable = !schedule || getScheduleEnd(schedule.date, schedule.time, exam.duration, exam.availableIndefinitely) <= new Date()
     return { exam, isToday: schedule?.date === today, isUnavailable, schedule }
-  }).sort((left, right) => new Date(`${left.schedule?.date ?? "9999-12-31"}T${left.schedule?.time ?? "23:59"}:00`).getTime() - new Date(`${right.schedule?.date ?? "9999-12-31"}T${right.schedule?.time ?? "23:59"}:00`).getTime()), [exams, studentClass, today])
+  }).filter(({ isUnavailable }) => !isUnavailable).sort((left, right) => new Date(`${left.schedule?.date ?? "9999-12-31"}T${left.schedule?.time ?? "23:59"}:00`).getTime() - new Date(`${right.schedule?.date ?? "9999-12-31"}T${right.schedule?.time ?? "23:59"}:00`).getTime()), [exams, studentClass, today])
 
   const resultCards = useMemo(() => results.map((result) => {
     const exam = exams.find((item) => item.id === result.examId)
