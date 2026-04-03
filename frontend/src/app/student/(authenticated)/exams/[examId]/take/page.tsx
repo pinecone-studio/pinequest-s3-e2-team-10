@@ -11,6 +11,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useStudentLiveAttemptSync } from "@/app/student/(authenticated)/exams/[examId]/take/use-student-live-attempt-sync";
 import { useExamIntegrityGuard } from "@/hooks/use-exam-integrity-guard";
+import { useStudentExamDraft } from "@/hooks/use-student-exam-draft";
 import { useStudentSession } from "@/hooks/use-student-session";
 import { exams as legacyExams, type Exam } from "@/lib/mock-data";
 import { loadStudentExamResults } from "@/lib/student-exam-results";
@@ -28,14 +29,12 @@ export default function StudentTakeExamPage({
   const { studentClass, studentId, studentName } = useStudentSession();
   const resolvedStudentName = studentName || "Сурагч";
   const [allExams, setAllExams] = useState<Exam[]>(legacyExams);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-
     const loadPage = async () => {
       try {
         const [nextExams, nextResults] = await Promise.all([
@@ -66,9 +65,6 @@ export default function StudentTakeExamPage({
     () => allExams.find((entry) => entry.id === examId),
     [allExams, examId],
   );
-  const answeredCount = Object.values(answers).filter(
-    (value) => value.trim().length > 0,
-  ).length;
   const schedule = exam?.scheduledClasses.find(
     (entry) => entry.classId === studentClass,
   );
@@ -81,6 +77,17 @@ export default function StudentTakeExamPage({
           exam.availableIndefinitely,
         )
       : false;
+  const { answers, currentQuestion, isDraftReady, setAnswer } = useStudentExamDraft({
+    exam,
+    studentId,
+    studentName: resolvedStudentName,
+    studentClass,
+    isOpenNow,
+    alreadySubmitted,
+  });
+  const answeredCount = Object.values(answers).filter(
+    (value) => value.trim().length > 0,
+  ).length;
 
   useStudentLiveAttemptSync({
     answeredCount,
@@ -94,13 +101,15 @@ export default function StudentTakeExamPage({
   });
 
   useExamIntegrityGuard({
+    answers,
+    currentQuestion,
     examId: exam?.id,
     studentClass,
     studentId,
     studentName: resolvedStudentName,
   });
 
-  if (isLoading) {
+  if (isLoading || !isDraftReady) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center gap-3 text-sm text-muted-foreground">
         <Spinner className="size-4" />
@@ -128,7 +137,6 @@ export default function StudentTakeExamPage({
 
   const totalQuestions = exam.questions.length;
   const completionPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
-  const unansweredCount = Math.max(totalQuestions - answeredCount, 0);
 
   return (
     <StudentExamHtmlCanvas
@@ -140,11 +148,9 @@ export default function StudentTakeExamPage({
       answeredCount={answeredCount}
       totalQuestions={totalQuestions}
       completionPercent={completionPercent}
-      unansweredCount={unansweredCount}
+      unansweredCount={Math.max(totalQuestions - answeredCount, 0)}
       isSubmitting={isSubmitting}
-      onAnswerChange={(questionId, value) =>
-        setAnswers((current) => ({ ...current, [questionId]: value }))
-      }
+      onAnswerChange={setAnswer}
       onSubmit={() => {
         if (!studentId || isSubmitting) return;
 
@@ -152,6 +158,7 @@ export default function StudentTakeExamPage({
         void submitStudentExam({
           exam,
           answers,
+          currentQuestion,
           studentId,
           studentName: resolvedStudentName,
           studentClass,

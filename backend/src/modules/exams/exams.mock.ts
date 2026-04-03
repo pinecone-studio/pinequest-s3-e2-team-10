@@ -1,4 +1,5 @@
 import type { ExamQuestion, ExamQuestionType } from './exams.types';
+import { safePickQuestionIconKey } from './question-icons';
 
 export function createMockQuestions(dto: {
   category: string;
@@ -9,23 +10,33 @@ export function createMockQuestions(dto: {
 }) {
   const questions: ExamQuestion[] = [];
   let order = 1;
+
   const createQuestion = (
     type: ExamQuestionType,
     index: number,
-  ): ExamQuestion => ({
-    id: crypto.randomUUID(),
-    type,
-    question: `AI-generated ${type} question #${index} (category: ${dto.category || 'General'})`,
-    options: type === 'multiple-choice' ? ['А', 'Б', 'В', 'Г'] : undefined,
-    correctAnswer:
-      type === 'multiple-choice'
-        ? 'А'
-        : type === 'true-false'
-          ? 'true'
-          : undefined,
-    points: type === 'true-false' ? 5 : 10,
-    order: order++,
-  });
+  ): ExamQuestion => {
+    const prompt = `AI-generated ${type} question #${index} (category: ${dto.category || 'General'})`;
+
+    return {
+      id: crypto.randomUUID(),
+      type,
+      question: prompt,
+      options: type === 'multiple-choice' ? ['A', 'B', 'C', 'D'] : undefined,
+      correctAnswer:
+        type === 'multiple-choice'
+          ? 'A'
+          : type === 'true-false'
+            ? 'true'
+            : undefined,
+      iconKey: safePickQuestionIconKey({
+        categoryName: dto.category,
+        question: prompt,
+        type,
+      }),
+      points: type === 'true-false' ? 5 : 10,
+      order: order++,
+    };
+  };
 
   for (let variant = 1; variant <= dto.variants; variant += 1) {
     for (let i = 0; i < dto.mcCount; i += 1)

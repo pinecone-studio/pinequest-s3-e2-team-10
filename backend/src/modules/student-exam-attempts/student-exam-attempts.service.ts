@@ -9,6 +9,7 @@ import {
 import {
   createStudentExamAttemptStoreContext,
   type StudentExamAttempt,
+  type StudentExamAttemptRecord,
   type StudentExamAttemptStatus,
   type StudentExamAttemptStoreContext,
   type UpsertStudentExamAttemptDto,
@@ -68,6 +69,7 @@ export class StudentExamAttemptsService {
           studentId: payload.studentId.trim(),
         })
       )[0];
+      const answers = payload.answers ?? readAttemptAnswers(existing) ?? {};
       const nextRecord = {
         id: `${payload.examId.trim()}::${payload.studentId.trim()}`,
         examId: payload.examId.trim(),
@@ -75,7 +77,10 @@ export class StudentExamAttemptsService {
         studentName: payload.studentName.trim(),
         classId: payload.classId.trim(),
         status: payload.status,
-        answeredCount: payload.answeredCount ?? existing?.answeredCount ?? 0,
+        answersJson: JSON.stringify(answers),
+        currentQuestion:
+          payload.currentQuestion ?? existing?.currentQuestion ?? 0,
+        answeredCount: payload.answeredCount ?? countAnsweredQuestions(answers),
         startedAt: existing?.startedAt ?? payload.startedAt,
         submittedAt:
           payload.status === 'submitted'
@@ -88,4 +93,20 @@ export class StudentExamAttemptsService {
       return mapStudentExamAttemptRecord(nextRecord);
     }, `Failed to save student exam attempt for ${payload.studentId}`);
   }
+}
+
+function readAttemptAnswers(
+  attempt?: StudentExamAttemptRecord,
+): Record<string, string> | null {
+  if (!attempt?.answersJson) return null;
+  try {
+    return JSON.parse(attempt.answersJson) as Record<string, string>;
+  } catch {
+    return null;
+  }
+}
+
+function countAnsweredQuestions(answers: Record<string, string>) {
+  return Object.values(answers).filter((answer) => answer.trim().length > 0)
+    .length;
 }

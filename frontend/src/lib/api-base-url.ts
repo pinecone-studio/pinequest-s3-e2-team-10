@@ -5,6 +5,8 @@ function trimTrailingSlashes(value: string) {
 }
 
 export function getBrowserApiBaseUrl() {
+  // Keep browser requests on the Next.js origin so client-side and server-side
+  // fetches use the same backend target through the proxy route.
   return '/api/backend'
 }
 

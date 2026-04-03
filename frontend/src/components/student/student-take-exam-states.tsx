@@ -2,11 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-export function StudentTakeExamNotFound({
-  onBack,
-}: {
-  onBack: () => void;
-}) {
+export function StudentTakeExamNotFound({ onBack }: { onBack: () => void }) {
   return (
     <div className="py-12 text-center">
       <h1 className="text-2xl font-bold">Шалгалт олдсонгүй</h1>
@@ -17,13 +13,11 @@ export function StudentTakeExamNotFound({
   );
 }
 
-export function StudentTakeExamSubmitted({
-  onBack,
-  onViewReport,
-}: {
+export function StudentTakeExamSubmitted(props: {
   onBack: () => void;
   onViewReport: () => void;
 }) {
+  const { onBack, onViewReport } = props;
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <h1 className="text-2xl font-bold">
@@ -42,11 +36,7 @@ export function StudentTakeExamSubmitted({
   );
 }
 
-export function StudentTakeExamClosed({
-  onBack,
-}: {
-  onBack: () => void;
-}) {
+export function StudentTakeExamClosed({ onBack }: { onBack: () => void }) {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <h1 className="text-2xl font-bold">
