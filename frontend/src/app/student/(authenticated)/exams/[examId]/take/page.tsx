@@ -66,6 +66,9 @@ export default function StudentTakeExamPage({
     () => allExams.find((entry) => entry.id === examId),
     [allExams, examId],
   );
+  const answeredCount = Object.values(answers).filter(
+    (value) => value.trim().length > 0,
+  ).length;
   const schedule = exam?.scheduledClasses.find(
     (entry) => entry.classId === studentClass,
   );
@@ -88,11 +91,40 @@ export default function StudentTakeExamPage({
       studentName: resolvedStudentName,
       classId: studentClass,
       status: "in_progress",
+      answeredCount,
       startedAt: new Date().toISOString(),
       submittedAt: null,
     });
   }, [
     alreadySubmitted,
+    exam,
+    isOpenNow,
+    resolvedStudentName,
+    schedule,
+    studentClass,
+    studentId,
+  ]);
+
+  useEffect(() => {
+    if (!exam || !schedule || !isOpenNow || alreadySubmitted || !studentId) return;
+
+    const timeout = window.setTimeout(() => {
+      void upsertStudentExamAttempt({
+        examId: exam.id,
+        studentId,
+        studentName: resolvedStudentName,
+        classId: studentClass,
+        status: "in_progress",
+        answeredCount,
+        startedAt: new Date().toISOString(),
+        submittedAt: null,
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [
+    alreadySubmitted,
+    answeredCount,
     exam,
     isOpenNow,
     resolvedStudentName,
@@ -134,9 +166,6 @@ export default function StudentTakeExamPage({
     return <StudentTakeExamClosed onBack={() => router.push(`/student/exams/${examId}`)} />;
   }
 
-  const answeredCount = Object.values(answers).filter(
-    (value) => value.trim().length > 0,
-  ).length;
   const totalQuestions = exam.questions.length;
   const completionPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
   const unansweredCount = Math.max(totalQuestions - answeredCount, 0);
