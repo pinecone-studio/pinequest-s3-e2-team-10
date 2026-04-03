@@ -33,8 +33,14 @@ function writeIds(key: string, ids: string[]) {
 
 function getExamsForClass(exams: Awaited<ReturnType<typeof getStudentExams>>, studentClass: string) {
   return exams
-    .filter((exam) => exam.status === 'scheduled')
+    .filter((exam) => exam.status !== 'draft')
     .filter((exam) => exam.scheduledClasses.some((schedule) => schedule.classId === studentClass))
+    .filter((exam) => {
+      const schedule = exam.scheduledClasses.find((item) => item.classId === studentClass)
+      return schedule
+        ? getScheduleEnd(schedule.date, schedule.time, exam.duration, exam.availableIndefinitely) > new Date()
+        : false
+    })
 }
 
 function getNotificationItems(
@@ -143,3 +149,4 @@ export function useStudentExamNotifications(studentId: string, studentClass: str
     refreshNotifications: syncNotifications,
   }
 }
+import { getScheduleEnd } from '@/lib/student-exam-time'
