@@ -23,16 +23,6 @@ type AppRouteLoadingContextValue = {
 
 const AppRouteLoadingContext = createContext<AppRouteLoadingContextValue | null>(null);
 
-function useAppRouteLoadingContext() {
-  const context = useContext(AppRouteLoadingContext);
-
-  if (!context) {
-    throw new Error("useAppRouteLoading must be used within AppRouteLoadingProvider");
-  }
-
-  return context;
-}
-
 export function AppRouteLoadingProvider(props: { children: ReactNode }) {
   const { children } = props;
   const pathname = usePathname();
@@ -73,7 +63,13 @@ export function AppRouteLoadingProvider(props: { children: ReactNode }) {
 }
 
 export function useAppRouteLoading() {
-  return useAppRouteLoadingContext();
+  const context = useContext(AppRouteLoadingContext);
+
+  if (!context) {
+    throw new Error("useAppRouteLoading must be used within AppRouteLoadingProvider");
+  }
+
+  return context;
 }
 
 type AppLoadingLinkProps = LinkProps &
@@ -83,7 +79,7 @@ type AppLoadingLinkProps = LinkProps &
 
 export function AppLoadingLink(props: AppLoadingLinkProps) {
   const { children, onClick, target, href, ...rest } = props;
-  const { startLoading } = useAppRouteLoadingContext();
+  const context = useContext(AppRouteLoadingContext);
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -101,9 +97,9 @@ export function AppLoadingLink(props: AppLoadingLinkProps) {
         return;
       }
 
-      startLoading();
+      context?.startLoading();
     },
-    [onClick, startLoading, target],
+    [context, onClick, target],
   );
 
   return (
