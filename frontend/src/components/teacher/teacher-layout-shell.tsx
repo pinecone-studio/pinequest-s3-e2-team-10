@@ -46,7 +46,7 @@ export function TeacherHeader() {
     localStorage.removeItem("teacherEmail");
     localStorage.removeItem("teacherSubject");
     notifyTeacherSessionChange();
-    startLoading();
+    startLoading("/");
     router.push("/");
   };
 

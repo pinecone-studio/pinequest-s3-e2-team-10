@@ -15,9 +15,11 @@ import {
 } from "react";
 import { AppRouteLoader } from "@/components/app/app-route-loader";
 
+const ROUTE_LOADING_TIMEOUT_MS = 12_000;
+
 type AppRouteLoadingContextValue = {
   isLoading: boolean;
-  startLoading: () => void;
+  startLoading: (targetPathname?: string | null) => void;
   stopLoading: () => void;
 };
 
@@ -45,10 +47,24 @@ export function AppRouteLoadingProvider(props: { children: ReactNode }) {
     };
   }, [isLoading]);
 
+  useEffect(() => {
+    if (!loadingPathname) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setLoadingPathname(null);
+    }, ROUTE_LOADING_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [loadingPathname]);
+
   const value = useMemo<AppRouteLoadingContextValue>(
     () => ({
       isLoading,
-      startLoading: () => setLoadingPathname(pathname),
+      startLoading: (targetPathname) => setLoadingPathname(targetPathname ?? pathname),
       stopLoading: () => setLoadingPathname(null),
     }),
     [isLoading, pathname],
@@ -77,9 +93,18 @@ type AppLoadingLinkProps = LinkProps &
     children: ReactNode;
   };
 
+function getLinkPathname(href: LinkProps["href"]) {
+  if (typeof href === "string") {
+    return href.split("#", 1)[0]?.split("?", 1)[0] ?? href;
+  }
+
+  return href.pathname ?? null;
+}
+
 export function AppLoadingLink(props: AppLoadingLinkProps) {
   const { children, onClick, target, href, ...rest } = props;
   const context = useContext(AppRouteLoadingContext);
+  const pathname = usePathname();
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -97,9 +122,15 @@ export function AppLoadingLink(props: AppLoadingLinkProps) {
         return;
       }
 
-      context?.startLoading();
+      const nextPathname = getLinkPathname(href);
+      if (nextPathname && nextPathname === pathname) {
+        context?.stopLoading();
+        return;
+      }
+
+      context?.startLoading(nextPathname);
     },
-    [context, onClick, target],
+    [context, href, onClick, pathname, target],
   );
 
   return (
