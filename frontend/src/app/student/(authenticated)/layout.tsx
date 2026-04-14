@@ -66,7 +66,7 @@ function StudentLayoutContent({
     localStorage.removeItem("studentName");
     localStorage.removeItem("studentClass");
     notifyStudentSessionChange();
-    startLoading();
+    startLoading("/");
     router.push("/");
   };
 
@@ -83,8 +83,9 @@ function StudentLayoutContent({
       onLogout={handleLogout}
       onSelectNotification={(examId) => {
         markNotificationAsRead(examId);
-        startLoading();
-        router.push(`/student/exams/${examId}`);
+        const examPath = `/student/exams/${examId}`;
+        startLoading(examPath);
+        router.push(examPath);
       }}
       onRefresh={() => setRefreshKey((current) => current + 1)}
     >
